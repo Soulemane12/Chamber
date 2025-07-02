@@ -31,4 +31,41 @@ export function generateId(length = 8): string {
  */
 export function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Location data for the hyperbaric chamber centers
+ */
+export const locationData = {
+  midtown: {
+    name: "Midtown Biohack",
+    address: "575 Madison Ave, 20th floor, New York, NY",
+    phone: "+1 (646) 262-8794",
+    email: "billydduc@gmail.com",
+    owner: "Billy Duc",
+  },
+  conyers: {
+    name: "Platinum Wellness Spa",
+    address: "1900 Parker Rd SE, Conyers, GA 30094",
+    phone: "+1 (646) 262-8794",
+    email: "billydduc@gmail.com",
+    owner: "Billy Duc",
+  }
+};
+
+/**
+ * Get location data by location ID
+ */
+export function getLocationData(locationId: 'midtown' | 'conyers' | null) {
+  if (!locationId) return null;
+  return locationData[locationId];
+}
+
+/**
+ * Generate Google Maps URL from address
+ */
+export function getGoogleMapsUrl(address: string): string {
+  // Encode the address for use in a URL
+  const encodedAddress = encodeURIComponent(address);
+  return `https://www.google.com/maps?q=${encodedAddress}`;
 } 

@@ -55,6 +55,7 @@ body {
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   background-color: var(--card);
   animation: fade-in 0.5s ease-out;
+  max-width: 100%;
 }
 
 .booking-calendar .react-datepicker__header {
@@ -246,4 +247,49 @@ body {
 
 .hover-scale:hover {
   transform: scale(1.05);
+}
+
+/* Responsive design improvements */
+@media (max-width: 640px) {
+  .booking-calendar .react-datepicker__month-container {
+    width: 100%;
+  }
+  
+  .booking-calendar .react-datepicker__day,
+  .booking-calendar .react-datepicker__day-name {
+    width: 2rem;
+    height: 2rem;
+    line-height: 2rem;
+    margin: 0.1rem;
+  }
+  
+  .booking-calendar .react-datepicker__header {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  
+  .booking-calendar .react-datepicker__current-month {
+    font-size: 0.9rem;
+  }
+  
+  /* Improve touch targets for mobile */
+  .hover-scale:active {
+    transform: scale(1.02);
+  }
+  
+  /* Better spacing for mobile forms */
+  input, select, textarea {
+    font-size: 16px !important; /* Prevents iOS zoom on focus */
+  }
+}
+
+/* Make footer content responsive */
+@media (max-width: 640px) {
+  footer .flex-col {
+    text-align: center;
+  }
+  
+  footer .flex-col .flex {
+    justify-content: center;
+  }
 }

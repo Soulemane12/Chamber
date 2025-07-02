@@ -11,6 +11,7 @@ export type BookingState = {
   notes: string;
   bookingId: string | null;
   bookingStatus: 'pending' | 'confirmed' | 'canceled' | null;
+  location: 'midtown' | 'conyers' | null;
 };
 
 export type BookingActions = {
@@ -32,6 +33,7 @@ const initialState: BookingState = {
   notes: '',
   bookingId: null,
   bookingStatus: null,
+  location: null,
 };
 
 // Create the store

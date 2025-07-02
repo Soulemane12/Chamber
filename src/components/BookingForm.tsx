@@ -25,6 +25,9 @@ const bookingSchema = z.object({
   duration: z.enum(["60", "90", "120"], {
     required_error: "Please select a duration",
   }),
+  location: z.enum(["midtown", "conyers"], {
+    required_error: "Please select a location",
+  }),
   notes: z.string().optional(),
 });
 
@@ -73,6 +76,7 @@ export function BookingForm({ onBookingComplete }: BookingFormProps) {
       phone: "",
       notes: "",
       duration: "60",
+      location: "midtown",
     },
   });
 
@@ -94,7 +98,22 @@ export function BookingForm({ onBookingComplete }: BookingFormProps) {
     setIsSubmitting(true);
     try {
       // Simulate API call to book session
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      
+      // Send confirmation email
+      const emailResponse = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      
+      const emailResult = await emailResponse.json();
+      if (!emailResult.success) {
+        console.error('Failed to send confirmation email:', emailResult.message);
+      }
+      
       onBookingComplete(data);
     } catch (error) {
       console.error("Booking failed", error);
@@ -118,11 +137,11 @@ export function BookingForm({ onBookingComplete }: BookingFormProps) {
       }
     }
     
-    // For step 2, validate date and time before proceeding
+    // For step 2, validate date, time, and location before proceeding
     if (currentStep === 2) {
-      const { date, time } = watch();
+      const { date, time, location } = watch();
       
-      if (!date || !time) {
+      if (!date || !time || !location) {
         // Trigger validation to show error messages
         handleSubmit(() => {})();
         return;
@@ -138,40 +157,52 @@ export function BookingForm({ onBookingComplete }: BookingFormProps) {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden animate-scale-in">
-      <div className="flex border-b border-gray-200 dark:border-gray-700">
+      <div className="flex flex-wrap border-b border-gray-200 dark:border-gray-700">
         <button
-          className={`flex-1 py-4 text-center transition-all-300 ${
+          className={`flex-1 py-4 text-center transition-all-300 text-xs sm:text-sm md:text-base ${
             currentStep === 1
               ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
               : "text-gray-500 dark:text-gray-400"
           }`}
           disabled={currentStep === 1}
         >
-          1. Personal Details
+          <span className="block sm:hidden">1. Details</span>
+          <span className="hidden sm:block">1. Personal Details</span>
         </button>
         <button
-          className={`flex-1 py-4 text-center transition-all-300 ${
+          className={`flex-1 py-4 text-center transition-all-300 text-xs sm:text-sm md:text-base ${
             currentStep === 2
               ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
               : "text-gray-500 dark:text-gray-400"
           }`}
           disabled={currentStep === 2}
         >
-          2. Select Date & Time
+          <span className="block sm:hidden">2. Date/Time</span>
+          <span className="hidden sm:block">2. Select Date & Time</span>
         </button>
         <button
-          className={`flex-1 py-4 text-center transition-all-300 ${
+          className={`flex-1 py-4 text-center transition-all-300 text-xs sm:text-sm md:text-base ${
             currentStep === 3
               ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
               : "text-gray-500 dark:text-gray-400"
           }`}
           disabled={currentStep === 3}
         >
-          3. Payment
+          <span className="block sm:hidden">3. Payment</span>
+          <span className="hidden sm:block">3. Payment</span>
         </button>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="p-6 sm:p-8">
+        <div className="mb-10">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            Book Your Hyperbaric Chamber Session
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            Fill out the form below to schedule your hyperbaric oxygen therapy session at one of Billy Duc's premium wellness centers.
+          </p>
+        </div>
+
         {currentStep === 1 && (
           <div className="space-y-6 animate-fade-in">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -315,6 +346,70 @@ export function BookingForm({ onBookingComplete }: BookingFormProps) {
 
             <div className="animate-slide-in-up animate-delay-300">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Location *
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <label
+                  className={`
+                    relative flex items-center p-4 border rounded-lg cursor-pointer transition-all-300
+                    ${
+                      watch("location") === "midtown"
+                        ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
+                        : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
+                    }
+                  `}
+                >
+                  <input
+                    type="radio"
+                    value="midtown"
+                    {...register("location")}
+                    className="sr-only"
+                  />
+                  <div className="flex-1">
+                    <h3 className={`font-medium ${
+                      watch("location") === "midtown"
+                        ? "text-blue-600 dark:text-blue-400"
+                        : "text-gray-900 dark:text-white"
+                    }`}>
+                      Midtown Biohack
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">575 Madison Ave, 20th floor, NY, NY</p>
+                  </div>
+                </label>
+
+                <label
+                  className={`
+                    relative flex items-center p-4 border rounded-lg cursor-pointer transition-all-300
+                    ${
+                      watch("location") === "conyers"
+                        ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
+                        : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
+                    }
+                  `}
+                >
+                  <input
+                    type="radio"
+                    value="conyers"
+                    {...register("location")}
+                    className="sr-only"
+                  />
+                  <div className="flex-1">
+                    <h3 className={`font-medium ${
+                      watch("location") === "conyers"
+                        ? "text-blue-600 dark:text-blue-400"
+                        : "text-gray-900 dark:text-white"
+                    }`}>
+                      Platinum Wellness Spa
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">1900 Parker Rd SE, Conyers, GA 30094</p>
+                  </div>
+                </label>
+              </div>
+              {errors.location && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.location.message}</p>
+              )}
+              
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Session Duration *
               </label>
               <div className="space-y-3">
@@ -440,17 +535,19 @@ export function BookingForm({ onBookingComplete }: BookingFormProps) {
               ></textarea>
             </div>
 
-            <div className="pt-4 flex justify-between">
+            <div className="pt-4 flex flex-col sm:flex-row justify-between gap-4">
               <Button 
                 type="button" 
                 onClick={prevStep}
                 variant="outline"
+                className="w-full sm:w-auto order-2 sm:order-1"
               >
                 Back
               </Button>
               <Button 
                 type="button" 
                 onClick={nextStep}
+                className="w-full sm:w-auto order-1 sm:order-2"
               >
                 Next Step
               </Button>
@@ -477,6 +574,20 @@ export function BookingForm({ onBookingComplete }: BookingFormProps) {
                   <div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Duration</p>
                     <p className="font-medium text-gray-900 dark:text-white">{watch("duration")} minutes</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Location</p>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {watch("location") === "midtown" ? "Midtown Biohack" : "Platinum Wellness Spa"}
+                    </p>
+                  </div>
+                  <div className="md:col-span-2">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Address</p>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {watch("location") === "midtown" 
+                        ? "575 Madison Ave, 20th floor, New York, NY" 
+                        : "1900 Parker Rd SE, Conyers, GA 30094"}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Total</p>
@@ -540,11 +651,12 @@ export function BookingForm({ onBookingComplete }: BookingFormProps) {
               </div>
             </div>
 
-            <div className="pt-4 flex justify-between">
+            <div className="pt-4 flex flex-col sm:flex-row justify-between gap-4">
               <Button 
                 type="button" 
                 onClick={prevStep}
                 variant="outline"
+                className="w-full sm:w-auto order-2 sm:order-1"
               >
                 Back
               </Button>
@@ -552,8 +664,10 @@ export function BookingForm({ onBookingComplete }: BookingFormProps) {
                 type="submit" 
                 isLoading={isSubmitting}
                 size="lg"
+                className="w-full sm:w-auto order-1 sm:order-2"
               >
-                {`Complete Booking • ${formatCurrency(calculateTotal())}`}
+                <span className="hidden sm:inline">{`Complete Booking • ${formatCurrency(calculateTotal())}`}</span>
+                <span className="sm:hidden">{`Book • ${formatCurrency(calculateTotal())}`}</span>
               </Button>
             </div>
           </div>
