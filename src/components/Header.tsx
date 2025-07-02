@@ -3,7 +3,7 @@ import { LanguageSelector, MobileLanguageSelector } from "./LanguageSelector";
 import { useLanguage } from "@/lib/LanguageContext";
 
 interface HeaderProps {
-  currentPage?: 'home' | 'booking' | 'about' | 'contact';
+  currentPage?: 'home' | 'booking' | 'about' | 'contact' | 'admin';
 }
 
 export function Header({ currentPage = 'home' }: HeaderProps) {

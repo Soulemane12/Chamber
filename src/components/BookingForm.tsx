@@ -7,7 +7,7 @@ import { z } from "zod";
 import { format, addDays, isAfter, isBefore, startOfDay } from "date-fns";
 import { DatePickerField } from "@/components/ui/DatePickerField";
 import { Button } from "@/components/ui/Button";
-import { formatCurrency, generateId } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 
 // Define the form schema with zod validation
 const bookingSchema = z.object({
@@ -199,7 +199,7 @@ export function BookingForm({ onBookingComplete }: BookingFormProps) {
             Book Your Hyperbaric Chamber Session
           </h1>
           <p className="text-gray-600 dark:text-gray-300">
-            Fill out the form below to schedule your hyperbaric oxygen therapy session at one of Billy Duc's premium wellness centers.
+            Fill out the form below to schedule your hyperbaric oxygen therapy session at one of Billy Duc&apos;s premium wellness centers.
           </p>
         </div>
 

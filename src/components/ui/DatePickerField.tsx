@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 interface DatePickerFieldProps {
   name: string;
   label: string;
-  control: Control<any>;
+  control: Control<Record<string, unknown>>;
   error?: string;
   minDate?: Date;
   maxDate?: Date;

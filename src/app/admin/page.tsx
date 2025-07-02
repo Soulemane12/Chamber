@@ -2,12 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
-import { useLanguage } from "@/lib/LanguageContext";
 import AdminDashboard from "@/components/AdminDashboard";
 import AdminLogin from "@/components/AdminLogin";
 
 export default function AdminPage() {
-  const { t } = useLanguage();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 

@@ -68,7 +68,6 @@ export const mockBookings = generateMockBookings(200);
 
 // Get bookings by time period
 export function getBookingsByTimePeriod(period: 'day' | 'month' | 'quarter' | 'year') {
-  const now = new Date();
   const bookings = [...mockBookings];
   
   // Sort bookings by date
@@ -198,7 +197,6 @@ export function getBookingRevenueByLocation(
   location: 'midtown' | 'conyers' | 'all',
   period: 'day' | 'week' | 'month' | 'year'
 ) {
-  const now = new Date();
   const filteredBookings = location === 'all' 
     ? mockBookings 
     : mockBookings.filter(booking => booking.location === location);
