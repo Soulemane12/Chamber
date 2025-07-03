@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { format, addDays, isAfter, isBefore, startOfDay } from "date-fns";
+import { format, isBefore, startOfDay } from "date-fns";
 import { DatePickerField } from "@/components/ui/DatePickerField";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency } from "@/lib/utils";
@@ -89,10 +89,9 @@ export function BookingForm({ onBookingComplete }: BookingFormProps) {
   };
 
   const isDateDisabled = (date: Date) => {
-    // Example: Disable past dates and dates more than 30 days in the future
+    // Disable past dates only; allow any future date
     const today = startOfDay(new Date());
-    const thirtyDaysFromNow = addDays(today, 30);
-    return isBefore(date, today) || isAfter(date, thirtyDaysFromNow);
+    return isBefore(date, today);
   };
 
   const onSubmit = async (data: BookingFormData) => {
@@ -288,7 +287,6 @@ export function BookingForm({ onBookingComplete }: BookingFormProps) {
                   control={control}
                   error={errors.date?.message}
                   minDate={new Date()}
-                  maxDate={addDays(new Date(), 30)}
                   filterDate={(date) => !isDateDisabled(date)}
                   inline
                   wrapperClassName="max-w-full animate-fade-in"
