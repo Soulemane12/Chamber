@@ -3,14 +3,15 @@ import { VariantProps, cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 // Define button variants using class-variance-authority
+// Modified to be more touch-friendly with less transform effects that can cause issues
 const buttonVariants = cva(
-  "inline-flex items-center justify-center rounded-md font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:pointer-events-none disabled:opacity-50 hover:transform hover:scale-105 active:scale-95",
+  "inline-flex items-center justify-center rounded-md font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700",
-        outline: "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700",
-        ghost: "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800",
+        default: "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 active:bg-blue-800",
+        outline: "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 active:bg-gray-100 dark:active:bg-gray-600",
+        ghost: "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 active:bg-gray-200 dark:active:bg-gray-700",
         link: "text-blue-600 underline-offset-4 hover:underline dark:text-blue-400",
       },
       size: {
@@ -34,13 +35,25 @@ export interface ButtonProps
   isLoading?: boolean;
 }
 
-// Forward ref button component
+// Forward ref button component with improved touch device handling
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, isLoading = false, children, ...props }, ref) => {
+  ({ className, variant, size, isLoading = false, children, onClick, ...props }, ref) => {
+    // Improved click handler for better touch device support
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+      // If button is disabled or loading, prevent the click
+      if (props.disabled || isLoading) return;
+      
+      // Add a small delay to improve touch response
+      setTimeout(() => {
+        if (onClick) onClick(event);
+      }, 0);
+    };
+    
     return (
       <button
         className={cn(buttonVariants({ variant, size }), className)}
         ref={ref}
+        onClick={handleClick}
         disabled={isLoading || props.disabled}
         {...props}
       >

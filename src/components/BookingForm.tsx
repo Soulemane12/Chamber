@@ -100,23 +100,31 @@ export function BookingForm({ onBookingComplete }: BookingFormProps) {
       // Simulate API call to book session
       await new Promise((resolve) => setTimeout(resolve, 1000));
       
-      // Send confirmation email
-      const emailResponse = await fetch('/api/send-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      
-      const emailResult = await emailResponse.json();
-      if (!emailResult.success) {
-        console.error('Failed to send confirmation email:', emailResult.message);
+      // Send confirmation email - wrap this in a try/catch to prevent it from blocking the booking completion
+      try {
+        const emailResponse = await fetch('/api/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+        
+        const emailResult = await emailResponse.json();
+        if (!emailResult.success) {
+          console.error('Failed to send confirmation email:', emailResult.message);
+          // Still continue with booking even if email fails
+        }
+      } catch (emailError) {
+        console.error('Error sending email:', emailError);
+        // Continue with booking even if email fails
       }
       
+      // Complete booking regardless of email success
       onBookingComplete(data);
     } catch (error) {
       console.error("Booking failed", error);
+      alert("There was an error processing your booking. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -661,10 +669,12 @@ export function BookingForm({ onBookingComplete }: BookingFormProps) {
                 Back
               </Button>
               <Button 
-                type="submit" 
+                type="button"
+                onClick={() => handleSubmit(onSubmit)()}
                 isLoading={isSubmitting}
                 size="lg"
                 className="w-full sm:w-auto order-1 sm:order-2"
+                disabled={isSubmitting}
               >
                 <span className="hidden sm:inline">{`Complete Booking • ${formatCurrency(calculateTotal())}`}</span>
                 <span className="sm:hidden">{`Book • ${formatCurrency(calculateTotal())}`}</span>

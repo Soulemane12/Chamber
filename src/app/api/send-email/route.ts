@@ -8,6 +8,14 @@ export async function POST(request: Request) {
   try {
     const bookingData: BookingFormData = await request.json();
     
+    // Safety check for required fields
+    if (!bookingData.email || !bookingData.firstName || !bookingData.date) {
+      return NextResponse.json(
+        { success: false, message: 'Missing required booking data' },
+        { status: 400 }
+      );
+    }
+
     // Create a transporter
     const transporter = nodemailer.createTransport({
       service: 'gmail',
@@ -17,8 +25,11 @@ export async function POST(request: Request) {
       }
     });
 
-    // Format the date
-    const formattedDate = format(new Date(bookingData.date), 'MMMM d, yyyy');
+    // Format the date - add safety check
+    const dateToFormat = bookingData.date instanceof Date 
+      ? bookingData.date 
+      : new Date(bookingData.date);
+    const formattedDate = format(dateToFormat, 'MMMM d, yyyy');
     
     // Calculate price based on duration
     const prices: Record<string, number> = {
@@ -70,13 +81,21 @@ export async function POST(request: Request) {
       `
     };
 
-    // Send the email
-    await transporter.sendMail(mailOptions);
-
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Confirmation email sent successfully' 
-    });
+    try {
+      // Send the email
+      await transporter.sendMail(mailOptions);
+      
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Confirmation email sent successfully' 
+      });
+    } catch (emailError) {
+      console.error('Error sending email through transporter:', emailError);
+      return NextResponse.json(
+        { success: false, message: 'Error sending through email service' },
+        { status: 500 }
+      );
+    }
   } catch (error) {
     console.error('Error sending confirmation email:', error);
     return NextResponse.json(
