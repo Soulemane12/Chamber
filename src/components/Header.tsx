@@ -3,7 +3,7 @@ import { LanguageSelector, MobileLanguageSelector } from "./LanguageSelector";
 import { useLanguage } from "@/lib/LanguageContext";
 
 interface HeaderProps {
-  currentPage?: 'home' | 'booking' | 'about' | 'contact' | 'admin';
+  currentPage?: 'home' | 'booking' | 'about' | 'contact' | 'admin' | 'account';
 }
 
 export function Header({ currentPage = 'home' }: HeaderProps) {
@@ -57,6 +57,16 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
                   : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"}
               >
                 {t('contact')}
+              </Link>
+            </li>
+            <li className="px-3 py-2 sm:p-0">
+              <Link 
+                href="/account" 
+                className={currentPage === 'account' 
+                  ? "text-blue-600 dark:text-blue-400 font-medium" 
+                  : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"}
+              >
+                Account
               </Link>
             </li>
           </ul>
