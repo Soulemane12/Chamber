@@ -66,6 +66,7 @@ export function BookingForm({ onBookingComplete }: BookingFormProps) {
     handleSubmit,
     control,
     watch,
+    trigger,
     formState: { errors },
   } = useForm<BookingFormData>({
     resolver: zodResolver(bookingSchema),
@@ -130,33 +131,18 @@ export function BookingForm({ onBookingComplete }: BookingFormProps) {
     }
   };
 
-  const nextStep = () => {
-    // For step 1, validate personal details before proceeding
+  const nextStep = async () => {
     if (currentStep === 1) {
-      const { firstName, lastName, email, phone } = watch();
-      
-      // Trigger validation for these fields
-      const isValid = [firstName, lastName, email, phone].every(field => field && field.length > 0);
-      
-      if (!isValid) {
-        // Trigger validation to show error messages
-        handleSubmit(() => {})();
-        return;
-      }
+      const isValid = await trigger(["firstName", "lastName", "email", "phone"]);
+      if (!isValid) return;
     }
-    
-    // For step 2, validate date, time, and location before proceeding
+
     if (currentStep === 2) {
-      const { date, time, location } = watch();
-      
-      if (!date || !time || !location) {
-        // Trigger validation to show error messages
-        handleSubmit(() => {})();
-        return;
-      }
+      const isValid = await trigger(["date", "time", "location", "duration"]);
+      if (!isValid) return;
     }
-    
-    setCurrentStep(currentStep + 1);
+
+    setCurrentStep((prev) => prev + 1);
   };
 
   const prevStep = () => {

@@ -38,15 +38,17 @@ export interface ButtonProps
 // Forward ref button component with improved touch device handling
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, isLoading = false, children, onClick, ...props }, ref) => {
-    // Improved click handler for better touch device support
+    // Simplified click handler: invoke onClick immediately for better reliability on mobile browsers.
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-      // If button is disabled or loading, prevent the click
-      if (props.disabled || isLoading) return;
-      
-      // Add a small delay to improve touch response
-      setTimeout(() => {
-        if (onClick) onClick(event);
-      }, 0);
+      if (props.disabled || isLoading) {
+        // Prevent interactions when disabled or loading
+        event.preventDefault();
+        return;
+      }
+
+      if (onClick) {
+        onClick(event);
+      }
     };
     
     return (
