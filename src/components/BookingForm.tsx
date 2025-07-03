@@ -669,8 +669,7 @@ export function BookingForm({ onBookingComplete }: BookingFormProps) {
                 Back
               </Button>
               <Button 
-                type="button"
-                onClick={() => handleSubmit(onSubmit)()}
+                type="submit"
                 isLoading={isSubmitting}
                 size="lg"
                 className="w-full sm:w-auto order-1 sm:order-2"
