@@ -23,6 +23,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // By default we will not add the dark class
+  // With darkMode: 'class' in the Tailwind config, this means the site will stay in light mode
+  // regardless of system preferences
   return (
     <html lang="en">
       <head>
