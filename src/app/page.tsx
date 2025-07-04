@@ -67,6 +67,63 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Benefits of HBOT Section */}
+        <div className="mb-16 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg animate-fade-in">
+          <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white text-center">🌿 5 Wellness-Level Benefits of HBOT</h2>
+          <div className="space-y-6">
+            <div className="animate-fade-in animate-delay-100">
+              <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400">Enhanced Immune Function</h3>
+              <p className="text-gray-600 dark:text-gray-300">HBOT boosts white blood cell activity and helps the body fight infections more effectively.</p>
+            </div>
+            <div className="animate-fade-in animate-delay-200">
+              <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400">Increased Stem Cell Production</h3>
+              <p className="text-gray-600 dark:text-gray-300">It stimulates the release and activity of stem cells, which are essential for tissue repair and regeneration.</p>
+            </div>
+            <div className="animate-fade-in animate-delay-300">
+              <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400">Improved Cognitive Function</h3>
+              <p className="text-gray-600 dark:text-gray-300">Some studies suggest HBOT may enhance memory, focus, and mental clarity, especially in aging individuals or those recovering from brain injuries.</p>
+            </div>
+            <div className="animate-fade-in animate-delay-400">
+              <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400">Reduced Inflammation</h3>
+              <p className="text-gray-600 dark:text-gray-300">The therapy has anti-inflammatory effects, which can help with chronic pain and inflammatory conditions.</p>
+            </div>
+            <div className="animate-fade-in animate-delay-500">
+              <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400">Better Physical Recovery and Performance</h3>
+              <p className="text-gray-600 dark:text-gray-300">Athletes and active individuals use HBOT to speed up recovery from workouts, injuries, and surgeries by improving oxygen delivery to tissues.</p>
+            </div>
+          </div>
+          <div className="border-t border-gray-200 dark:border-gray-700 mt-8 pt-4 text-center">
+            <p className="text-gray-500 dark:text-gray-400">⸻</p>
+          </div>
+        </div>
+
+        {/* Conditions Treated Section */}
+        <div className="mb-16 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg animate-fade-in">
+          <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white text-center">🩺 5 Conditions Commonly Treated with HBOT</h2>
+          <div className="space-y-6">
+            <div className="animate-fade-in animate-delay-100">
+              <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400">Chronic Wounds (e.g., Diabetic Foot Ulcers)</h3>
+              <p className="text-gray-600 dark:text-gray-300">HBOT promotes healing in wounds that are slow to close due to poor circulation or infection.</p>
+            </div>
+            <div className="animate-fade-in animate-delay-200">
+              <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400">Carbon Monoxide Poisoning</h3>
+              <p className="text-gray-600 dark:text-gray-300">It helps displace carbon monoxide from hemoglobin, restoring oxygen delivery to tissues.</p>
+            </div>
+            <div className="animate-fade-in animate-delay-300">
+              <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400">Radiation Injuries</h3>
+              <p className="text-gray-600 dark:text-gray-300">Used to treat tissue damage caused by radiation therapy, such as in cancer patients.</p>
+            </div>
+            <div className="animate-fade-in animate-delay-400">
+              <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400">Decompression Sickness ("The Bends")</h3>
+              <p className="text-gray-600 dark:text-gray-300">Common in divers, HBOT helps eliminate nitrogen bubbles from the bloodstream.</p>
+            </div>
+            <div className="animate-fade-in animate-delay-500">
+              <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400">Severe Infections</h3>
+              <p className="text-gray-600 dark:text-gray-300">The high-oxygen environment inhibits the growth of anaerobic bacteria and supports immune systems.</p>
+            </div>
+          </div>
+        </div>
+
         <div className="text-center animate-fade-in animate-delay-400">
           <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-white animate-slide-in-up">{t('readyToExperience')}</h2>
           <Link 
