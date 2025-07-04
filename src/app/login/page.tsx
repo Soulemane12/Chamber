@@ -3,7 +3,8 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase, setupEmailRedirect } from "@/lib/supabaseClient";
+import { getSiteUrl } from "@/lib/utils";
 
 function LoginForm() {
   const router = useRouter();
@@ -16,6 +17,9 @@ function LoginForm() {
   const redirectPath = searchParams.get('redirect') || '/';
 
   useEffect(() => {
+    // Initialize email redirect setup
+    setupEmailRedirect();
+    
     // Check for access token in URL (from email confirmation)
     const handleEmailConfirmation = async () => {
       // Check for hash parameters in URL (Supabase auth redirects)
@@ -23,6 +27,12 @@ function LoginForm() {
       const accessToken = hashParams.get('access_token') || searchParams.get('access_token');
       const refreshToken = hashParams.get('refresh_token') || searchParams.get('refresh_token');
       const type = hashParams.get('type') || searchParams.get('type');
+      
+      // Log the URL parameters for debugging
+      console.log("URL hash:", window.location.hash);
+      console.log("Access token present:", !!accessToken);
+      console.log("Type:", type);
+      console.log("Site URL:", getSiteUrl());
       
       if (accessToken && type === 'signup') {
         setLoading(true);

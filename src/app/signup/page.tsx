@@ -42,6 +42,7 @@ export default function SignupPage() {
     try {
       // Get the site URL for redirects
       const siteUrl = getSiteUrl();
+      console.log("Using site URL for redirect:", siteUrl);
       
       // Sign up with email
       const { error: signUpError } = await supabase.auth.signUp({

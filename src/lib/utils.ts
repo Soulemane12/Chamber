@@ -72,16 +72,20 @@ export function getGoogleMapsUrl(address: string): string {
 
 // Get the current site URL for proper redirects in different environments
 export const getSiteUrl = () => {
-  let url =
-    process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
-    process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
-    '';
+  // For Vercel deployments, use the VERCEL_URL environment variable
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}/`;
+  }
   
-  // Make sure to include `https://` when not localhost.
-  url = url.includes('http') ? url : `https://${url}`;
+  // For custom domains set in environment variables
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    const url = process.env.NEXT_PUBLIC_SITE_URL;
+    // Make sure to include `https://` when not localhost
+    const withProtocol = url.includes('http') ? url : `https://${url}`;
+    // Make sure to include trailing `/`
+    return withProtocol.charAt(withProtocol.length - 1) === '/' ? withProtocol : `${withProtocol}/`;
+  }
   
-  // Make sure to include trailing `/`.
-  url = url.charAt(url.length - 1) === '/' ? url : `${url}/`;
-  
-  return url;
+  // Hardcoded production URL as fallback
+  return 'https://chamber-alpha.vercel.app/';
 }; 
