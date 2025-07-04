@@ -68,24 +68,4 @@ export function getGoogleMapsUrl(address: string): string {
   // Encode the address for use in a URL
   const encodedAddress = encodeURIComponent(address);
   return `https://www.google.com/maps?q=${encodedAddress}`;
-}
-
-// Get the current site URL for proper redirects in different environments
-export const getSiteUrl = () => {
-  // For Vercel deployments, use the VERCEL_URL environment variable
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}/`;
-  }
-  
-  // For custom domains set in environment variables
-  if (process.env.NEXT_PUBLIC_SITE_URL) {
-    const url = process.env.NEXT_PUBLIC_SITE_URL;
-    // Make sure to include `https://` when not localhost
-    const withProtocol = url.includes('http') ? url : `https://${url}`;
-    // Make sure to include trailing `/`
-    return withProtocol.charAt(withProtocol.length - 1) === '/' ? withProtocol : `${withProtocol}/`;
-  }
-  
-  // Hardcoded production URL as fallback
-  return 'https://chamber-alpha.vercel.app/';
-}; 
+} 
