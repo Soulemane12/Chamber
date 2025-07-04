@@ -44,6 +44,16 @@ export default function SignupPage() {
       const siteUrl = getSiteUrl();
       console.log("Using site URL for redirect:", siteUrl);
       
+      // First, try to update the email template to ensure it uses the correct URL
+      try {
+        const response = await fetch('/api/auth/email-template');
+        const data = await response.json();
+        console.log("Email template update:", data);
+      } catch (templateError) {
+        console.error("Error updating email template:", templateError);
+        // Continue with signup even if template update fails
+      }
+      
       // Sign up with email
       const { error: signUpError } = await supabase.auth.signUp({
         email: form.email,
@@ -60,7 +70,7 @@ export default function SignupPage() {
             profession: form.profession,
             email: form.email,
           },
-          emailRedirectTo: `${siteUrl}login`,
+          emailRedirectTo: `${siteUrl}auth/confirm`,
         }
       });
       

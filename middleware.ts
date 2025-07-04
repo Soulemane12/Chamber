@@ -20,6 +20,11 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith(path)
   );
 
+  // Allow access to auth confirmation page regardless of authentication status
+  if (request.nextUrl.pathname.startsWith('/auth/confirm')) {
+    return response;
+  }
+
   if (!session && isProtectedPath) {
     // Redirect to login if unauthenticated
     const redirectUrl = new URL('/login', request.url);
@@ -31,5 +36,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/booking', '/booking/:path*', '/account', '/account/:path*'],
+  matcher: ['/booking', '/booking/:path*', '/account', '/account/:path*', '/auth/confirm'],
 }; 
