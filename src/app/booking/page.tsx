@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { format } from "date-fns";
 import { BookingForm, BookingFormData } from "@/components/BookingForm";
@@ -8,6 +9,7 @@ import { formatCurrency, getLocationData, getGoogleMapsUrl } from "@/lib/utils";
 import { Header } from "@/components/Header";
 import { useLanguage } from "@/lib/LanguageContext";
 import Image from "next/image";
+import { supabase } from "@/lib/supabaseClient";
 
 // Pricing for different durations
 const pricingOptions = {
@@ -17,14 +19,42 @@ const pricingOptions = {
 };
 
 export default function BookingPage() {
+  const router = useRouter();
   const [bookingComplete, setBookingComplete] = useState(false);
   const [bookingDetails, setBookingDetails] = useState<BookingFormData | null>(null);
+  const [loading, setLoading] = useState(true);
   const { t } = useLanguage();
+
+  // Check if user is authenticated
+  useEffect(() => {
+    const checkAuth = async () => {
+      setLoading(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        // If not authenticated, redirect to login
+        router.replace("/login?redirect=/booking");
+        return;
+      }
+      
+      setLoading(false);
+    };
+    
+    checkAuth();
+  }, [router]);
 
   const handleBookingComplete = (data: BookingFormData) => {
     setBookingDetails(data);
     setBookingComplete(true);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
