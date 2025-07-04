@@ -35,7 +35,7 @@ export async function GET() {
       .select('*')
       .limit(1);
       
-    let availableColumns = [];
+    let availableColumns: string[] = [];
     if (!tableError && tableInfo && tableInfo.length > 0) {
       availableColumns = Object.keys(tableInfo[0]);
     }

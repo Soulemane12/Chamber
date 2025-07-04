@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import Image from "next/image";
 
 interface Profile {
   id: string;
@@ -22,7 +21,7 @@ interface Profile {
 export default function AccountPage() {
   const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [user, setUser] = useState<any>(null); // Store the user object
+  const [user, setUser] = useState<{ email?: string } | null>(null); // Store the user object with defined type
   const [documents, setDocuments] = useState<{ name: string; url: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -343,9 +342,9 @@ export default function AccountPage() {
                     <option value="">Select education level</option>
                     <option value="high_school">High School or GED</option>
                     <option value="some_college">Some College</option>
-                    <option value="associates">Associate's Degree</option>
-                    <option value="bachelors">Bachelor's Degree</option>
-                    <option value="masters">Master's Degree</option>
+                    <option value="associates">Associate&apos;s Degree</option>
+                    <option value="bachelors">Bachelor&apos;s Degree</option>
+                    <option value="masters">Master&apos;s Degree</option>
                     <option value="doctorate">Doctorate</option>
                     <option value="professional">Professional Degree</option>
                     <option value="other">Other</option>

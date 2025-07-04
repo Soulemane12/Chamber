@@ -50,15 +50,15 @@ export async function GET() {
           return NextResponse.json(fullData);
         }
       }
-    } catch (err) {
+    } catch {
       // Ignore errors here, we'll just return the basic data
       console.log('API Route - Demographic columns might not exist yet');
     }
     
     console.log('API Route - Basic profiles fetched successfully:', data?.length);
     return NextResponse.json(data);
-  } catch (err) {
-    console.error('API Route - Unexpected error:', err);
+  } catch (error) {
+    console.error('API Route - Unexpected error:', error);
     return NextResponse.json({ 
       error: 'Internal server error',
       message: 'An unexpected error occurred while fetching profiles'

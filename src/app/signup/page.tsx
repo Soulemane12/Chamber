@@ -2,9 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
 import Link from "next/link";
-import Image from "next/image";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -194,7 +193,7 @@ export default function SignupPage() {
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Confirm your email</h1>
-          <p className="text-gray-700 dark:text-gray-300">We've sent a confirmation link to <span className="font-medium">{form.email}</span>. Please check your inbox and click the link to activate your account.</p>
+          <p className="text-gray-700 dark:text-gray-300">We&apos;ve sent a confirmation link to <span className="font-medium">{form.email}</span>. Please check your inbox and click the link to activate your account.</p>
           <p className="text-gray-600 dark:text-gray-400 text-sm">After confirming, you can log in.</p>
           <Link href="/login" className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium transition-colors">Go to Login</Link>
         </div>
@@ -413,9 +412,9 @@ export default function SignupPage() {
                     <option value="">Select education level</option>
                     <option value="high_school">High School or GED</option>
                     <option value="some_college">Some College</option>
-                    <option value="associates">Associate's Degree</option>
-                    <option value="bachelors">Bachelor's Degree</option>
-                    <option value="masters">Master's Degree</option>
+                    <option value="associates">Associate&apos;s Degree</option>
+                    <option value="bachelors">Bachelor&apos;s Degree</option>
+                    <option value="masters">Master&apos;s Degree</option>
                     <option value="doctorate">Doctorate</option>
                     <option value="professional">Professional Degree</option>
                     <option value="other">Other</option>
@@ -508,9 +507,12 @@ export default function SignupPage() {
           )}
         </form>
         
-        <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-          <p className="text-center text-sm text-gray-600 dark:text-gray-400">
-            Already have an account? <Link href="/login" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">Login</Link>
+        <div className="mt-6 text-center">
+          <p className="text-gray-600 dark:text-gray-400">
+            Already have an account?{" "}
+            <Link href="/login" className="text-blue-600 dark:text-blue-400 hover:underline">
+              Log in
+            </Link>
           </p>
         </div>
       </div>
