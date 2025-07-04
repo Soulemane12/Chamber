@@ -114,7 +114,7 @@ export default function Home() {
               <p className="text-gray-600 dark:text-gray-300">Used to treat tissue damage caused by radiation therapy, such as in cancer patients.</p>
             </div>
             <div className="animate-fade-in animate-delay-400">
-              <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400">Decompression Sickness ("The Bends")</h3>
+              <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400">Decompression Sickness (&ldquo;The Bends&rdquo;)</h3>
               <p className="text-gray-600 dark:text-gray-300">Common in divers, HBOT helps eliminate nitrogen bubbles from the bloodstream.</p>
             </div>
             <div className="animate-fade-in animate-delay-500">
