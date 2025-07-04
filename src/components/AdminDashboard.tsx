@@ -225,7 +225,7 @@ export default function AdminDashboard() {
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   };
-
+  
   return (
     <div className="space-y-8">
       {/* Summary Statistics */}

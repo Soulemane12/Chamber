@@ -29,15 +29,21 @@ export default function BookingPage() {
   useEffect(() => {
     const checkAuth = async () => {
       setLoading(true);
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        // If not authenticated, redirect to login
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          // If not authenticated, redirect to login
+          router.replace("/login?redirect=/booking");
+          return;
+        }
+        
+        setLoading(false);
+      } catch (error) {
+        console.error("Authentication error:", error);
+        // Redirect to login on error
         router.replace("/login?redirect=/booking");
-        return;
       }
-      
-      setLoading(false);
     };
     
     checkAuth();
