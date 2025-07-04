@@ -68,4 +68,20 @@ export function getGoogleMapsUrl(address: string): string {
   // Encode the address for use in a URL
   const encodedAddress = encodeURIComponent(address);
   return `https://www.google.com/maps?q=${encodedAddress}`;
-} 
+}
+
+// Get the current site URL for proper redirects in different environments
+export const getSiteUrl = () => {
+  let url =
+    process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
+    process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
+    'http://localhost:3000';
+  
+  // Make sure to include `https://` when not localhost.
+  url = url.includes('http') ? url : `https://${url}`;
+  
+  // Make sure to include trailing `/`.
+  url = url.charAt(url.length - 1) === '/' ? url : `${url}/`;
+  
+  return url;
+}; 

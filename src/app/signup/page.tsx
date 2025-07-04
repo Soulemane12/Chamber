@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
+import { getSiteUrl } from "@/lib/utils";
 
 export default function SignupPage() {
   const [form, setForm] = useState({
@@ -40,10 +41,8 @@ export default function SignupPage() {
     
     try {
       // Get the site URL for redirects
-      const siteUrl = process.env.NEXT_PUBLIC_VERCEL_URL 
-        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` 
-        : 'http://localhost:3000';
-        
+      const siteUrl = getSiteUrl();
+      
       // Sign up with email
       const { error: signUpError } = await supabase.auth.signUp({
         email: form.email,
@@ -60,7 +59,7 @@ export default function SignupPage() {
             profession: form.profession,
             email: form.email,
           },
-          emailRedirectTo: `${siteUrl}/login`,
+          emailRedirectTo: `${siteUrl}login`,
         }
       });
       
