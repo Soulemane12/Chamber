@@ -1,70 +1,54 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function SignupPage() {
-  const router = useRouter();
   const [form, setForm] = useState({
     name: "",
     email: "",
+    password: "",
+    confirmPassword: "",
     address: "",
     phone: "",
     dob: "",
-    password: "",
-    confirmPassword: "",
     gender: "",
     race: "",
     education: "",
     profession: "",
   });
-  const [avatar, setAvatar] = useState<File | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [documentFile, setDocumentFile] = useState<File | null>(null);
+  
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [confirmSent, setConfirmSent] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] ?? null;
-    setAvatar(file);
-    
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setAvatarPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setAvatarPreview(null);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Starting signup process...");
-
+    
     if (form.password !== form.confirmPassword) {
       setError("Passwords do not match");
       return;
     }
-
+    
     setLoading(true);
-    console.log("Form data:", { ...form, password: "[REDACTED]" });
-
+    
     try {
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      // Get the site URL for redirects
+      const siteUrl = process.env.NEXT_PUBLIC_VERCEL_URL 
+        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` 
+        : 'http://localhost:3000';
+        
+      // Sign up with email
+      const { error: signUpError } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
         options: {
-          emailRedirectTo: `${location.origin}/login`,
           data: {
             name: form.name,
             address: form.address,
@@ -74,106 +58,53 @@ export default function SignupPage() {
             race: form.race,
             education: form.education,
             profession: form.profession,
+            email: form.email,
           },
-        },
-      });
-
-      console.log("Auth signup response:", { 
-        user: signUpData?.user ? "User created" : "No user created", 
-        session: signUpData?.session ? "Session created" : "No session created",
-        error: signUpError ? signUpError.message : "No error" 
-      });
-
-      if (signUpError || !signUpData.user) {
-        setError(signUpError?.message ?? "Signup failed");
-        setLoading(false);
-        return;
-      }
-
-      // If session is null, email confirmation is required
-      if (!signUpData.session) {
-        setConfirmSent(true);
-        setLoading(false);
-        return;
-      }
-
-      const userId = signUpData.user.id;
-      console.log("User ID:", userId);
-      let avatarUrl: string | null = null;
-
-      if (avatar) {
-        const fileExt = avatar.name.split('.').pop();
-        const filePath = `${userId}/avatar.${fileExt}`;
-        const { error: uploadError } = await supabase.storage.from("uploads").upload(filePath, avatar);
-        if (!uploadError) {
-          avatarUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/uploads/${filePath}`;
-          console.log("Avatar uploaded:", avatarUrl);
-        } else {
-          console.error("Avatar upload error:", uploadError);
+          emailRedirectTo: `${siteUrl}/login`,
         }
-      }
-
-      if(documentFile) {
-        const { error: docUploadError } = await supabase.storage.from("uploads").upload(`${userId}/documents/${documentFile.name}`, documentFile);
-        if (docUploadError) {
-          console.error("Document upload error:", docUploadError);
-        } else {
-          console.log("Document uploaded successfully");
-        }
-      }
-
-      // Create profile record
-      const profileData = {
-        id: userId,
-        name: form.name,
-        // Remove email field since it doesn't exist in the profiles table
-        // The email is already stored in the auth.users table
-        address: form.address,
-        phone: form.phone,
-        dob: form.dob,
-        avatar_url: avatarUrl,
-        gender: form.gender,
-        race: form.race,
-        education: form.education,
-        profession: form.profession,
-      };
+      });
       
-      console.log("Creating profile with data:", profileData);
-      
-      const { error: profileError } = await supabase.from("profiles").insert(profileData);
-      
-      if (profileError) {
-        console.error("Error creating profile:", profileError);
-        setError(`Error creating profile: ${profileError.message}`);
+      if (signUpError) {
+        setError(signUpError.message);
         setLoading(false);
         return;
       }
       
-      console.log("Profile created successfully");
-      router.push("/booking");
-    } catch (err) {
-      console.error("Unexpected error during signup:", err);
-      setError("An unexpected error occurred during signup");
+      // Show email confirmation screen
+      setEmailSent(true);
+      
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "An error occurred during signup";
+      setError(errorMessage);
       setLoading(false);
     }
   };
 
   const nextStep = () => {
     if (currentStep === 1) {
-      // Validate first step
       if (!form.name || !form.email || !form.password || !form.confirmPassword) {
         setError("Please fill out all required fields");
         return;
       }
+      
       if (form.password !== form.confirmPassword) {
         setError("Passwords do not match");
         return;
       }
+      
       if (form.password.length < 6) {
         setError("Password must be at least 6 characters");
         return;
       }
     }
+    
+    if (currentStep === 2) {
+      if (!form.address || !form.phone || !form.dob) {
+        setError("Please fill out all required fields");
+        return;
+      }
+    }
+    
     setError(null);
     setCurrentStep(currentStep + 1);
   };
@@ -183,10 +114,10 @@ export default function SignupPage() {
     setCurrentStep(currentStep - 1);
   };
 
-  if (confirmSent) {
+  if (emailSent) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-6">
-        <div className="bg-white dark:bg-gray-800 p-10 rounded-xl shadow-2xl max-w-md text-center space-y-6 animate-scale-in">
+        <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl max-w-md w-full text-center space-y-6 animate-fade-in">
           <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -229,6 +160,7 @@ export default function SignupPage() {
         )}
         
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Step 1: Basic Information */}
           {currentStep === 1 && (
             <div className="space-y-6 animate-slide-in-right">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -296,6 +228,7 @@ export default function SignupPage() {
             </div>
           )}
           
+          {/* Step 2: Contact Information */}
           {currentStep === 2 && (
             <div className="space-y-6 animate-slide-in-right">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -376,6 +309,7 @@ export default function SignupPage() {
             </div>
           )}
           
+          {/* Step 3: Demographics */}
           {currentStep === 3 && (
             <div className="space-y-6 animate-slide-in-right">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -431,41 +365,6 @@ export default function SignupPage() {
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                     placeholder="Your profession or occupation"
                   />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Avatar (optional)</label>
-                  <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden flex items-center justify-center">
-                      {avatarPreview ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={avatarPreview} alt="Avatar preview" className="w-full h-full object-cover" />
-                      ) : (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={handleAvatarChange}
-                        className="w-full text-sm text-gray-600 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-blue-300" 
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Document (optional)</label>
-                  <input 
-                    type="file" 
-                    onChange={(e) => setDocumentFile(e.target.files?.[0] ?? null)} 
-                    className="w-full text-sm text-gray-600 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-gray-700 dark:file:text-blue-300" 
-                  />
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Upload any supporting documents (ID, medical records, etc.)</p>
                 </div>
               </div>
               
