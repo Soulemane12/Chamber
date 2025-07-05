@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/lib/LanguageContext";
-import { Toaster } from "react-hot-toast";
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -15,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Chamber Booking | Book Your Hyperbaric Session",
+  title: "WellNex02 | Book Your Hyperbaric Session",
   description: "Book and pay for your hyperbaric chamber session with our easy-to-use booking system.",
 };
 
@@ -37,7 +35,6 @@ export default function RootLayout({
       >
         <LanguageProvider>
           {children}
-          <Toaster position="top-right" />
         </LanguageProvider>
       </body>
     </html>

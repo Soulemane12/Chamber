@@ -1,4 +1,10 @@
+# WellNex02
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## About WellNex02
+
+WellNex02 is a platform for booking hyperbaric oxygen therapy (HBOT) sessions. The application allows users to create accounts, book sessions at different locations, and manage their appointments.
 
 ## Getting Started
 

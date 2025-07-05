@@ -25,10 +25,34 @@ export async function GET() {
     
     const sqlInstructions = `
 -- Run this SQL in your Supabase dashboard SQL editor
--- This will add the missing columns to your profiles table
+-- This will ensure we have all required columns in your profiles table
 
-ALTER TABLE profiles 
-ADD COLUMN IF NOT EXISTS age TEXT,
+-- Ensure we have the full_name column (in case we need to migrate from name to full_name)
+DO $$
+BEGIN
+    -- Check if 'name' column exists but 'full_name' doesn't
+    IF EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+        AND table_name = 'profiles'
+        AND column_name = 'name'
+    ) AND NOT EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+        AND table_name = 'profiles'
+        AND column_name = 'full_name'
+    ) THEN
+        -- Add full_name column and copy data from name
+        ALTER TABLE public.profiles ADD COLUMN full_name TEXT;
+        UPDATE public.profiles SET full_name = name;
+        ALTER TABLE public.profiles ALTER COLUMN full_name SET NOT NULL;
+    END IF;
+END $$;
+
+-- Add demographic columns if they don't exist
+ALTER TABLE public.profiles 
 ADD COLUMN IF NOT EXISTS gender TEXT,
 ADD COLUMN IF NOT EXISTS race TEXT,
 ADD COLUMN IF NOT EXISTS education TEXT,
@@ -90,7 +114,7 @@ ADD COLUMN IF NOT EXISTS profession TEXT;
         <body>
           <h1>Database Migration Instructions</h1>
           <p>
-            Your application needs to add new columns to the <code>profiles</code> table in your Supabase database.
+            Your application needs to update the <code>profiles</code> table in your Supabase database.
             Please follow these steps to complete the migration:
           </p>
           
@@ -127,7 +151,7 @@ ADD COLUMN IF NOT EXISTS profession TEXT;
     console.error('Error:', err);
     return NextResponse.json({ 
       error: 'Error occurred',
-      message: 'Please add the following columns to your profiles table manually: age, gender, race, education, profession'
+      message: 'Please check your profiles table structure and ensure it has the columns: full_name, gender, race, education, profession'
     }, { status: 500 });
   }
 } 

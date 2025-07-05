@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
+import Head from "next/head";
 
 export default function SignupPage() {
   const [form, setForm] = useState({
@@ -13,11 +14,11 @@ export default function SignupPage() {
     address: "",
     phone: "",
     dob: "",
-    age: "",
     gender: "",
     race: "",
     education: "",
     profession: "",
+    age: "",
   });
   
   const [error, setError] = useState<string | null>(null);
@@ -51,16 +52,16 @@ export default function SignupPage() {
         password: form.password,
         options: {
           data: {
-            name: form.name,
+            full_name: form.name,
             address: form.address,
             phone: form.phone,
             dob: form.dob,
-            age: form.age,
             gender: form.gender,
             race: form.race,
             education: form.education,
             profession: form.profession,
             email: form.email,
+            age: form.age,
           },
           emailRedirectTo: `${siteUrl}/login`,
         }
@@ -119,6 +120,9 @@ export default function SignupPage() {
   if (emailSent) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-6">
+        <Head>
+          <title>WellNex02 - Sign Up</title>
+        </Head>
         <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-xl max-w-md w-full text-center space-y-6 animate-fade-in">
           <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -128,7 +132,12 @@ export default function SignupPage() {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Confirm your email</h1>
           <p className="text-gray-700 dark:text-gray-300">We&apos;ve sent a confirmation link to <span className="font-medium">{form.email}</span>. Please check your inbox and click the link to activate your account.</p>
           <p className="text-gray-600 dark:text-gray-400 text-sm">After confirming, you can log in.</p>
+          <div className="flex justify-center space-x-4">
           <Link href="/login" className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium transition-colors">Go to Login</Link>
+            <Link href="/" className="inline-block bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-6 py-3 rounded-md font-medium transition-colors">
+              Return Home
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -136,13 +145,27 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-6">
+      <Head>
+        <title>WellNex02 - Sign Up</title>
+      </Head>
       <div className="bg-white dark:bg-gray-800 p-10 rounded-xl shadow-2xl w-full max-w-2xl animate-fade-in">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">Create your account</h1>
+          <div className="flex items-center">
+            <Link 
+              href="/" 
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center mr-4"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              Home
+            </Link>
           <div className="flex items-center space-x-1">
             <div className={`w-3 h-3 rounded-full ${currentStep >= 1 ? 'bg-blue-600' : 'bg-gray-300'}`}></div>
             <div className={`w-3 h-3 rounded-full ${currentStep >= 2 ? 'bg-blue-600' : 'bg-gray-300'}`}></div>
             <div className={`w-3 h-3 rounded-full ${currentStep >= 3 ? 'bg-blue-600' : 'bg-gray-300'}`}></div>
+            </div>
           </div>
         </div>
         
@@ -268,7 +291,7 @@ export default function SignupPage() {
                   />
                 </div>
                 <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Age Range *</label>
+                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Age Group *</label>
                   <select
                     name="age"
                     value={form.age}
@@ -276,13 +299,29 @@ export default function SignupPage() {
                     required
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                   >
-                    <option value="">Select age range</option>
+                    <option value="">Select age group</option>
                     <option value="18-24">18-24</option>
                     <option value="25-34">25-34</option>
                     <option value="35-44">35-44</option>
                     <option value="45-54">45-54</option>
                     <option value="55-64">55-64</option>
                     <option value="65+">65+</option>
+                  </select>
+                </div>
+                <div className="flex flex-col">
+                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Gender *</label>
+                  <select
+                    name="gender"
+                    value={form.gender}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  >
+                    <option value="">Select gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                    <option value="prefer_not_to_say">Prefer not to say</option>
                   </select>
                 </div>
               </div>
@@ -316,22 +355,6 @@ export default function SignupPage() {
           {currentStep === 3 && (
             <div className="space-y-6 animate-slide-in-right">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Gender *</label>
-                  <select
-                    name="gender"
-                    value={form.gender}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                  >
-                    <option value="">Select gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                    <option value="prefer_not_to_say">Prefer not to say</option>
-                  </select>
-                </div>
                 <div className="flex flex-col">
                   <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Race/Ethnicity *</label>
                   <select

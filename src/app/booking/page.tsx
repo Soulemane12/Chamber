@@ -1,15 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { format } from "date-fns";
-import { BookingForm, BookingFormData } from "@/components/BookingForm";
-import { formatCurrency, getLocationData, getGoogleMapsUrl } from "@/lib/utils";
 import { Header } from "@/components/Header";
-import { useLanguage } from "@/lib/LanguageContext";
-import Image from "next/image";
+import { BookingForm, BookingFormData } from "@/components/BookingForm";
 import { supabase } from "@/lib/supabaseClient";
+import { useLanguage } from "@/lib/LanguageContext";
+import { formatCurrency } from "@/lib/utils";
+import { format } from "date-fns";
+import Link from "next/link";
+import Image from "next/image";
+import Head from "next/head";
+import { Footer } from "@/components/Footer";
 
 // Pricing for different durations
 const pricingOptions = {
@@ -18,52 +19,70 @@ const pricingOptions = {
   "120": 250,
 };
 
+// Helper functions
+const getGoogleMapsUrl = (address: string) => {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+};
+
+// Function to get location contact data
+const getLocationData = (location: string) => {
+  if (location === "midtown") {
+    return {
+      owner: "Billy Duc",
+      phone: "+1 (646) 262-8794",
+      email: "billydduc@gmail.com"
+    };
+  } else {
+    return {
+      owner: "Billy Duc",
+      phone: "+1 (646) 262-8794",
+      email: "billydduc@gmail.com"
+    };
+  }
+};
+
 export default function BookingPage() {
-  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
   const [bookingDetails, setBookingDetails] = useState<BookingFormData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const { t } = useLanguage();
 
   // Check if user is authenticated
   useEffect(() => {
     const checkAuth = async () => {
-      setLoading(true);
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        
-        if (!session) {
-          // If not authenticated, redirect to login
-          router.replace("/login?redirect=/booking");
-          return;
-        }
-        
-        setLoading(false);
+        setIsAuthenticated(!!session);
       } catch (error) {
-        console.error("Authentication error:", error);
-        // Redirect to login on error
-        router.replace("/login?redirect=/booking");
+        console.error("Error checking authentication:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
     
     checkAuth();
-  }, [router]);
+  }, []);
 
   const handleBookingComplete = (data: BookingFormData) => {
     setBookingDetails(data);
     setBookingComplete(true);
+    window.scrollTo(0, 0);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+        <div className="animate-pulse text-blue-600 dark:text-blue-400">Loading...</div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <Head>
+        <title>WellNex02 - Book a Session</title>
+      </Head>
       <Header currentPage="booking" />
 
       <main className="py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
@@ -74,6 +93,24 @@ export default function BookingPage() {
           <p className="text-gray-600 dark:text-gray-300">
             {t('bookingSubtitle')}
           </p>
+          
+          {!isAuthenticated && !bookingComplete && (
+            <div className="mt-4 p-4 bg-amber-50 border border-amber-200 dark:bg-amber-900/20 dark:border-amber-800 rounded-lg">
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-amber-800 dark:text-amber-300">Guest Booking</h3>
+                  <div className="mt-1 text-sm text-amber-700 dark:text-amber-200">
+                    <p>You&apos;re booking as a guest. <Link href="/login?redirect=/booking" className="font-medium text-amber-800 dark:text-amber-300 underline hover:text-amber-900">Sign in</Link> or <Link href="/signup?redirect=/booking" className="font-medium text-amber-800 dark:text-amber-300 underline hover:text-amber-900">create an account</Link> to save your booking history and personal information for future visits.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {bookingComplete ? (
@@ -254,25 +291,12 @@ export default function BookingPage() {
           </div>
         ) : (
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
-            <BookingForm onBookingComplete={handleBookingComplete} />
+            <BookingForm onBookingComplete={handleBookingComplete} isAuthenticated={isAuthenticated} />
           </div>
         )}
       </main>
 
-      <footer className="mt-20 py-8 bg-gray-100 dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center justify-center space-y-3">
-            <div className="flex items-center">
-              <span className="font-medium text-gray-800 dark:text-gray-300">Billy Duc</span>
-              <span className="mx-2 text-gray-400">|</span>
-              <a href="mailto:billydduc@gmail.com" className="text-blue-600 dark:text-blue-400 hover:underline">billydduc@gmail.com</a>
-            </div>
-            <div className="text-center text-gray-600 dark:text-gray-400">
-              <p>&copy; {new Date().getFullYear()} Chamber. {t('allRightsReserved')}</p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer className="mt-20" showSocials={false} />
     </div>
   );
 } 

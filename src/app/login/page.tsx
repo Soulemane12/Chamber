@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import Head from "next/head";
 
 function LoginForm() {
   const router = useRouter();
@@ -80,8 +81,22 @@ function LoginForm() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-6">
+      <Head>
+        <title>WellNex02 - Login</title>
+      </Head>
       <div className="bg-white dark:bg-gray-800 p-10 rounded-xl shadow-2xl w-full max-w-md">
-        <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-8">Welcome back</h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">Welcome back</h1>
+          <Link 
+            href="/" 
+            className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            Home
+          </Link>
+        </div>
         
         {error && (
           <div className="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 mb-6 rounded">

@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
+import Head from "next/head";
 
 interface Profile {
   id: string;
-  name: string;
+  name: string;      // Keep this for UI compatibility
+  full_name?: string; // Add this for database compatibility
   // email is not stored in the profiles table
   address: string;
   phone: string;
@@ -23,20 +25,23 @@ export default function AccountPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [user, setUser] = useState<{ email?: string } | null>(null); // Store the user object with defined type
   const [documents, setDocuments] = useState<{ name: string; url: string }[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({
-    name: "",
-    address: "",
-    phone: "",
-    dob: "",
-    gender: "",
-    race: "",
-    education: "",
-    profession: "",
+  const [editMode, setEditMode] = useState(false);
+  const [editedProfile, setEditedProfile] = useState<Profile>({
+    id: '',
+    name: '',
+    address: '',
+    phone: '',
+    dob: '',
+    gender: '',
+    race: '',
+    education: '',
+    profession: '',
+    avatar_url: null
   });
-  const [newAvatar, setNewAvatar] = useState<File | null>(null);
-  const [newDocument, setNewDocument] = useState<File | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   // Helper function to format demographic values for display
   const formatDemographic = (value: string): string => {
@@ -69,7 +74,7 @@ export default function AccountPage() {
         // create empty profile row
         await supabase.from("profiles").insert({ 
           id: user.id, 
-          name: user.user_metadata.name ?? "", 
+          full_name: user.user_metadata.name ?? "",
           address: user.user_metadata.address ?? "", 
           phone: user.user_metadata.phone ?? "", 
           dob: user.user_metadata.dob ?? "",
@@ -78,8 +83,20 @@ export default function AccountPage() {
           education: user.user_metadata.education ?? "",
           profession: user.user_metadata.profession ?? ""
         });
-        setIsEditing(false);
+        setEditMode(false);
         setProfile({
+          id: user.id,
+          name: user.user_metadata.name ?? "",
+          address: user.user_metadata.address ?? "",
+          phone: user.user_metadata.phone ?? "",
+          dob: user.user_metadata.dob ?? "",
+          avatar_url: null,
+          gender: user.user_metadata.gender ?? "",
+          race: user.user_metadata.race ?? "",
+          education: user.user_metadata.education ?? "",
+          profession: user.user_metadata.profession ?? ""
+        });
+        setEditedProfile({
           id: user.id,
           name: user.user_metadata.name ?? "",
           address: user.user_metadata.address ?? "",
@@ -94,17 +111,12 @@ export default function AccountPage() {
       } else {
         setProfile({
           ...profileData as Profile,
+          name: profileData.full_name || profileData.name || "", // Map full_name to name for UI
           // Add email from the user object since it's not in the profiles table
         });
-        setEditForm({
-          name: profileData.name ?? "",
-          address: profileData.address ?? "",
-          phone: profileData.phone ?? "",
-          dob: profileData.dob ?? "",
-          gender: profileData.gender ?? "",
-          race: profileData.race ?? "",
-          education: profileData.education ?? "",
-          profession: profileData.profession ?? "",
+        setEditedProfile({
+          ...profileData as Profile,
+          name: profileData.full_name || profileData.name || "", // Map full_name to name for UI
         });
       }
 
@@ -128,61 +140,79 @@ export default function AccountPage() {
   }, [router]);
 
   const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setEditForm({ ...editForm, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setEditedProfile(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const saveChanges = async () => {
     if (!profile) return;
+    
+    // Reset states
+    setSaveLoading(true);
+    setMessage(null);
+    
+    try {
     const updates: Record<string, unknown> = {
-      name: editForm.name,
-      address: editForm.address,
-      phone: editForm.phone,
-      dob: editForm.dob,
-      gender: editForm.gender,
-      race: editForm.race,
-      education: editForm.education,
-      profession: editForm.profession,
+        full_name: editedProfile.name,
+        address: editedProfile.address,
+        phone: editedProfile.phone,
+        dob: editedProfile.dob,
+        gender: editedProfile.gender,
+        race: editedProfile.race,
+        education: editedProfile.education,
+        profession: editedProfile.profession,
     };
 
     // Avatar upload
     let avatar_url = profile.avatar_url;
-    if (newAvatar) {
-      const ext = newAvatar.name.split('.').pop();
+      if (avatarFile) {
+        const ext = avatarFile.name.split('.').pop();
       const path = `${profile.id}/avatar.${ext}`;
-      const { error: upErr } = await supabase.storage.from("uploads").upload(path, newAvatar, { upsert: true });
-      if (!upErr) {
+        const { error: upErr } = await supabase.storage.from("uploads").upload(path, avatarFile, { upsert: true });
+        if (upErr) {
+          throw new Error(`Error uploading avatar: ${upErr.message}`);
+        }
         avatar_url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/uploads/${path}`;
         updates["avatar_url"] = avatar_url;
       }
+
+      // Update profile in database
+      const { error: updateError } = await supabase.from("profiles").update(updates).eq("id", profile.id);
+      if (updateError) {
+        throw new Error(`Error updating profile: ${updateError.message}`);
+      }
+
+      // Update local state with new profile data
+      setProfile({
+        ...profile,
+        ...updates,
+        name: editedProfile.name,
+        avatar_url
+      });
+      
+      setMessage({ text: "Profile updated successfully!", type: 'success' });
+      setEditMode(false);
+      setAvatarFile(null);
+      
+    } catch (error) {
+      console.error('Error saving changes:', error);
+      setMessage({ text: error instanceof Error ? error.message : 'An unknown error occurred', type: 'error' });
+    } finally {
+      setSaveLoading(false);
     }
-
-    await supabase.from("profiles").update(updates).eq("id", profile.id);
-
-    // Document upload
-    if (newDocument) {
-      await supabase.storage.from("uploads").upload(`${profile.id}/documents/${newDocument.name}`, newDocument);
-    }
-
-    setIsEditing(false);
-    // refresh data
-    location.reload();
   };
 
   const cancelEdit = () => {
     if (!profile) return;
-    setEditForm({
-      name: profile.name ?? "",
-      address: profile.address ?? "",
-      phone: profile.phone ?? "",
-      dob: profile.dob ?? "",
-      gender: profile.gender ?? "",
-      race: profile.race ?? "",
-      education: profile.education ?? "",
-      profession: profile.profession ?? "",
+    setEditedProfile({
+      ...profile
     });
-    setNewAvatar(null);
-    setNewDocument(null);
-    setIsEditing(false);
+    setAvatarFile(null);
+    setEditMode(false);
+    setMessage(null);
   };
 
   const handleLogout = async () => {
@@ -196,6 +226,9 @@ export default function AccountPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 p-6 flex flex-col items-center">
+      <Head>
+        <title>WellNex02 - My Account</title>
+      </Head>
       <div className="bg-white dark:bg-gray-800 shadow-xl rounded-xl p-8 w-full max-w-3xl">
         <div className="flex items-center justify-between mb-8">
           <button 
@@ -210,20 +243,32 @@ export default function AccountPage() {
           <h1 className="text-3xl font-bold text-center text-gray-900 dark:text-white">Account Settings</h1>
           <div className="w-14"></div> {/* Spacer for centering the title */}
         </div>
+        
+        {/* Success and Error Messages */}
+        {message && (
+          <div className={`mb-6 p-4 ${message.type === 'success' ? 'bg-green-50 border-l-4 border-green-500 text-green-700 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-50 border-l-4 border-red-500 text-red-700 dark:bg-red-900/30 dark:text-red-300'} rounded`}>
+            <div className="flex">
+              <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <span>{message.text}</span>
+            </div>
+          </div>
+        )}
 
         {/* VIEW OR EDIT MODE */}
-        {isEditing ? (
+        {editMode ? (
           <div className="space-y-6">
             <div className="flex flex-col items-center mb-8">
               <div className="relative mb-4">
-                {profile?.avatar_url && !newAvatar ? (
+                {profile?.avatar_url && !avatarFile ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={profile.avatar_url} alt="Avatar" className="w-32 h-32 rounded-full object-cover ring-4 ring-blue-500/30" />
-                ) : newAvatar ? (
+                ) : avatarFile ? (
                   <div className="w-32 h-32 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img 
-                      src={URL.createObjectURL(newAvatar)} 
+                      src={URL.createObjectURL(avatarFile)} 
                       alt="New avatar preview" 
                       className="w-full h-full object-cover" 
                     />
@@ -245,7 +290,7 @@ export default function AccountPage() {
                   id="avatar-upload" 
                   type="file" 
                   accept="image/*" 
-                  onChange={(e) => setNewAvatar(e.target.files?.[0] ?? null)} 
+                  onChange={(e) => setAvatarFile(e.target.files?.[0] ?? null)} 
                   className="hidden" 
                 />
               </div>
@@ -257,7 +302,26 @@ export default function AccountPage() {
                 <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Name</label>
                 <input 
                   name="name" 
-                  value={editForm.name} 
+                  value={editedProfile.name} 
+                  onChange={handleEditChange} 
+                  className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" 
+                />
+              </div>
+              <div className="flex flex-col">
+                <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Email</label>
+                <input 
+                  name="email" 
+                  value={user?.email || ""} 
+                  disabled
+                  className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300" 
+                />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Email cannot be changed directly</p>
+              </div>
+              <div className="flex flex-col">
+                <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Phone</label>
+                <input 
+                  name="phone" 
+                  value={editedProfile.phone} 
                   onChange={handleEditChange} 
                   className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" 
                 />
@@ -266,16 +330,7 @@ export default function AccountPage() {
                 <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Address</label>
                 <input 
                   name="address" 
-                  value={editForm.address} 
-                  onChange={handleEditChange} 
-                  className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" 
-                />
-              </div>
-              <div className="flex flex-col">
-                <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Phone</label>
-                <input 
-                  name="phone" 
-                  value={editForm.phone} 
+                  value={editedProfile.address} 
                   onChange={handleEditChange} 
                   className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" 
                 />
@@ -285,7 +340,7 @@ export default function AccountPage() {
                 <input 
                   type="date" 
                   name="dob" 
-                  value={editForm.dob} 
+                  value={editedProfile.dob} 
                   onChange={handleEditChange} 
                   className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" 
                 />
@@ -299,7 +354,7 @@ export default function AccountPage() {
                   <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Gender</label>
                   <select 
                     name="gender" 
-                    value={editForm.gender} 
+                    value={editedProfile.gender} 
                     onChange={handleEditChange} 
                     className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                   >
@@ -315,7 +370,7 @@ export default function AccountPage() {
                   <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Race/Ethnicity</label>
                   <select 
                     name="race" 
-                    value={editForm.race} 
+                    value={editedProfile.race} 
                     onChange={handleEditChange} 
                     className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                   >
@@ -335,7 +390,7 @@ export default function AccountPage() {
                   <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Education</label>
                   <select 
                     name="education" 
-                    value={editForm.education} 
+                    value={editedProfile.education} 
                     onChange={handleEditChange} 
                     className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                   >
@@ -355,7 +410,7 @@ export default function AccountPage() {
                   <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Profession</label>
                   <input 
                     name="profession" 
-                    value={editForm.profession} 
+                    value={editedProfile.profession} 
                     onChange={handleEditChange} 
                     className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" 
                   />
@@ -373,9 +428,9 @@ export default function AccountPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                     </svg>
                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {newDocument ? newDocument.name : "Choose file"}
+                      {avatarFile ? avatarFile.name : "Choose file"}
                     </span>
-                    <input type="file" onChange={(e) => setNewDocument(e.target.files?.[0] ?? null)} className="hidden" />
+                    <input type="file" onChange={(e) => setAvatarFile(e.target.files?.[0] ?? null)} className="hidden" />
                   </label>
                 </div>
                 {documents.length > 0 && (
@@ -407,12 +462,25 @@ export default function AccountPage() {
               </button>
               <button 
                 onClick={saveChanges} 
-                className="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors flex items-center"
+                disabled={saveLoading}
+                className="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors flex items-center disabled:opacity-70 disabled:cursor-not-allowed"
               >
+                {saveLoading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Saving...
+                  </>
+                ) : (
+                  <>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
                 Save Changes
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -440,12 +508,20 @@ export default function AccountPage() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Address</p>
-                      <p className="text-gray-900 dark:text-white">{profile?.address || "-"}</p>
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Name</p>
+                      <p className="text-gray-900 dark:text-white">{profile?.name || "-"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</p>
+                      <p className="text-gray-900 dark:text-white">{user?.email || "-"}</p>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</p>
                       <p className="text-gray-900 dark:text-white">{profile?.phone || "-"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Address</p>
+                      <p className="text-gray-900 dark:text-white">{profile?.address || "-"}</p>
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Date of Birth</p>
@@ -512,7 +588,7 @@ export default function AccountPage() {
 
             <div className="mt-8 flex justify-between items-center">
               <button 
-                onClick={() => setIsEditing(true)} 
+                onClick={() => setEditMode(true)} 
                 className="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors flex items-center"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
