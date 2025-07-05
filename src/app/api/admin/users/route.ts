@@ -1,67 +1,70 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-// Debug logs for environment variables
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// Initialize Supabase client for server-side operations
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY as string;
 
-console.log('API Route - Supabase URL exists:', !!supabaseUrl);
-console.log('API Route - Service Role Key exists:', !!serviceRoleKey);
+console.log("API Route - Supabase URL exists:", !!supabaseUrl);
+console.log("API Route - Service Role Key exists:", !!supabaseServiceRoleKey);
 
+// Create a Supabase client with the service role key
 const supabase = createClient(
-  supabaseUrl as string,
-  serviceRoleKey as string,
+  supabaseUrl,
+  supabaseServiceRoleKey,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
 );
 
 export async function GET() {
   try {
-    console.log('API Route - Fetching profiles');
-    
-    // First, try to select only the columns that definitely exist
+    // Fetch all profiles
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, name, address, phone, dob, avatar_url');
-
+      .select('*');
+    
     if (error) {
-      console.error('API Route - Supabase error:', error);
-      return NextResponse.json({ 
-        error: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint
-      }, { status: 500 });
+      console.error("Error fetching profiles:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
     
-    // Now try to get demographic columns if they exist
-    try {
-      const { data: demographicData, error: demographicError } = await supabase
-        .from('profiles')
-        .select('id, gender, race, education, profession')
-        .limit(1);
-        
-      if (!demographicError && demographicData) {
-        // Demographic columns exist, fetch all data with these columns
-        const { data: fullData, error: fullError } = await supabase
-          .from('profiles')
-          .select('id, name, address, phone, dob, avatar_url, gender, race, education, profession');
-          
-        if (!fullError) {
-          console.log('API Route - Profiles with demographics fetched successfully:', fullData?.length);
-          return NextResponse.json(fullData);
-        }
-      }
-    } catch {
-      // Ignore errors here, we'll just return the basic data
-      console.log('API Route - Demographic columns might not exist yet');
-    }
-    
-    console.log('API Route - Basic profiles fetched successfully:', data?.length);
     return NextResponse.json(data);
-  } catch (error) {
-    console.error('API Route - Unexpected error:', error);
-    return NextResponse.json({ 
-      error: 'Internal server error',
-      message: 'An unexpected error occurred while fetching profiles'
-    }, { status: 500 });
+  } catch (err) {
+    console.error("Error in admin/users GET route:", err);
+    return NextResponse.json({ error: "Failed to fetch profiles" }, { status: 500 });
+  }
+}
+
+// Add PATCH method for updating user data
+export async function PATCH(request: Request) {
+  try {
+    const body = await request.json();
+    const { id, ...profileData } = body;
+    
+    // Validate required data
+    if (!id) {
+      return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+    }
+    
+    // Update the profile
+    const { data, error } = await supabase
+      .from('profiles')
+      .update(profileData)
+      .eq('id', id)
+      .select();
+    
+    if (error) {
+      console.error("Error updating profile:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    
+    return NextResponse.json({ message: "Profile updated successfully", profile: data[0] });
+  } catch (err) {
+    console.error("Error in admin/users PATCH route:", err);
+    return NextResponse.json({ error: "Failed to update profile" }, { status: 500 });
   }
 } 

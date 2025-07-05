@@ -13,6 +13,7 @@ export default function SignupPage() {
     address: "",
     phone: "",
     dob: "",
+    age: "",
     gender: "",
     race: "",
     education: "",
@@ -54,6 +55,7 @@ export default function SignupPage() {
             address: form.address,
             phone: form.phone,
             dob: form.dob,
+            age: form.age,
             gender: form.gender,
             race: form.race,
             education: form.education,
@@ -266,20 +268,21 @@ export default function SignupPage() {
                   />
                 </div>
                 <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Gender *</label>
+                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Age Range *</label>
                   <select
-                    name="gender"
-                    value={form.gender}
+                    name="age"
+                    value={form.age}
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                   >
-                    <option value="">Select gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="non-binary">Non-binary</option>
-                    <option value="other">Other</option>
-                    <option value="prefer_not_to_say">Prefer not to say</option>
+                    <option value="">Select age range</option>
+                    <option value="18-24">18-24</option>
+                    <option value="25-34">25-34</option>
+                    <option value="35-44">35-44</option>
+                    <option value="45-54">45-54</option>
+                    <option value="55-64">55-64</option>
+                    <option value="65+">65+</option>
                   </select>
                 </div>
               </div>
@@ -314,6 +317,22 @@ export default function SignupPage() {
             <div className="space-y-6 animate-slide-in-right">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="flex flex-col">
+                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Gender *</label>
+                  <select
+                    name="gender"
+                    value={form.gender}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  >
+                    <option value="">Select gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                    <option value="prefer_not_to_say">Prefer not to say</option>
+                  </select>
+                </div>
+                <div className="flex flex-col">
                   <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Race/Ethnicity *</label>
                   <select
                     name="race"
@@ -323,15 +342,11 @@ export default function SignupPage() {
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                   >
                     <option value="">Select race/ethnicity</option>
-                    <option value="asian">Asian</option>
-                    <option value="black">Black or African American</option>
-                    <option value="hispanic">Hispanic or Latino</option>
-                    <option value="native_american">Native American or Alaska Native</option>
-                    <option value="pacific_islander">Native Hawaiian or Pacific Islander</option>
-                    <option value="white">White</option>
-                    <option value="multiracial">Multiracial</option>
-                    <option value="other">Other</option>
-                    <option value="prefer_not_to_say">Prefer not to say</option>
+                    <option value="Asian">Asian</option>
+                    <option value="Black">Black</option>
+                    <option value="Hispanic">Hispanic</option>
+                    <option value="White">White</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
                 <div className="flex flex-col">
@@ -344,27 +359,29 @@ export default function SignupPage() {
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                   >
                     <option value="">Select education level</option>
-                    <option value="high_school">High School or GED</option>
-                    <option value="some_college">Some College</option>
-                    <option value="associates">Associate&apos;s Degree</option>
-                    <option value="bachelors">Bachelor&apos;s Degree</option>
-                    <option value="masters">Master&apos;s Degree</option>
-                    <option value="doctorate">Doctorate</option>
-                    <option value="professional">Professional Degree</option>
-                    <option value="other">Other</option>
-                    <option value="prefer_not_to_say">Prefer not to say</option>
+                    <option value="High School">High School</option>
+                    <option value="Bachelor">Bachelor</option>
+                    <option value="Master">Master</option>
+                    <option value="PhD">PhD</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
                 <div className="flex flex-col">
                   <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Profession *</label>
-                  <input
+                  <select
                     name="profession"
                     value={form.profession}
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                    placeholder="Your profession or occupation"
-                  />
+                  >
+                    <option value="">Select profession</option>
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Education">Education</option>
+                    <option value="Other">Other</option>
+                  </select>
                 </div>
               </div>
               

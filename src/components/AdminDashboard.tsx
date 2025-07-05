@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { 
   mockBookings, 
   getBookingsByTimePeriod, 
@@ -159,51 +159,6 @@ export default function AdminDashboard() {
   const [demographic, setDemographic] = useState<'age' | 'gender' | 'race' | 'education' | 'profession'>('age');
   const [revenuePeriod, setRevenuePeriod] = useState<'day' | 'week' | 'month' | 'year'>('month');
   const [revenueLocation, setRevenueLocation] = useState<'all' | 'midtown' | 'conyers'>('all');
-  const [profiles, setProfiles] = useState<{ 
-    id: string; 
-    name: string; 
-    address: string; 
-    phone: string; 
-    dob: string;
-    avatar_url?: string | null;
-    gender?: string;
-    race?: string;
-    education?: string;
-    profession?: string;
-  }[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadProfiles = async () => {
-      try {
-        const response = await fetch("/api/admin/users");
-        if (response.ok) {
-          const data = await response.json();
-          setProfiles(data);
-          setError(null);
-        } else {
-          console.error("Failed to fetch profiles:", response.status);
-          if (response.status === 500) {
-            const errorData = await response.json().catch(() => null);
-            if (errorData && errorData.error && errorData.error.includes('column')) {
-              setError("Database schema needs to be updated. Please run the migration.");
-            } else {
-              setError("Failed to fetch profiles. Please try again later.");
-            }
-          } else {
-            setError("Failed to fetch profiles. Please try again later.");
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching profiles:", error);
-        setError("An error occurred while fetching profiles.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadProfiles();
-  }, []);
   
   // Get data for charts
   const bookingsByTime = getBookingsByTimePeriod(timePeriod);
@@ -215,16 +170,6 @@ export default function AdminDashboard() {
   const totalBookings = mockBookings.length;
   const totalRevenue = mockBookings.reduce((sum, booking) => sum + booking.amount, 0);
   const averageBookingValue = totalRevenue / totalBookings;
-  
-  // Helper function to format demographic values for display
-  const formatDemographic = (value: string | undefined): string => {
-    if (!value) return "-";
-    // Replace underscores with spaces and capitalize each word
-    return value
-      .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  };
   
   return (
     <div className="space-y-8">
@@ -487,102 +432,6 @@ export default function AdminDashboard() {
           <span className="text-sm text-gray-500 dark:text-gray-400">
             * Values shown in {formatCurrency(0).replace('0', '')}
           </span>
-        </div>
-      </div>
-      {/* Users table */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Users</h2>
-        
-        {error ? (
-          <div className="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 mb-6 rounded">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
-                {error.includes("migration") && (
-                  <a 
-                    href="/api/admin/migrate" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="mt-2 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-                  >
-                    Run Database Migration
-                  </a>
-                )}
-              </div>
-            </div>
-          </div>
-        ) : loading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-          </div>
-        ) : profiles.length === 0 ? (
-          <div className="text-center py-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </div>
-            <p className="text-gray-600 dark:text-gray-400 text-lg">No users found.</p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
-            <div className="min-w-max">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead className="bg-gray-50 dark:bg-gray-700">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Address</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Phone</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">DOB</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Gender</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Race</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Education</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Profession</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
-                  {profiles.map((p) => (
-                    <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
-                            {p.avatar_url ? (
-                              // eslint-disable-next-line @next/next/no-img-element
-                              <img src={p.avatar_url} alt="" className="h-10 w-10 rounded-full object-cover" />
-                            ) : (
-                              <span className="text-gray-500 dark:text-gray-400 text-sm font-medium">
-                                {p.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                              </span>
-                            )}
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900 dark:text-white">{p.name}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{p.address}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                        <a href={`tel:${p.phone}`} className="hover:text-blue-600 dark:hover:text-blue-400">{p.phone}</a>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{p.dob}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{formatDemographic(p.gender)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{formatDemographic(p.race)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{formatDemographic(p.education)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{p.profession || "-"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-        <div className="mt-4 text-sm text-gray-500 dark:text-gray-400 text-center">
-          <p>Scroll horizontally to view all data</p>
         </div>
       </div>
     </div>

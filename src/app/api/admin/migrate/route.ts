@@ -28,6 +28,7 @@ export async function GET() {
 -- This will add the missing columns to your profiles table
 
 ALTER TABLE profiles 
+ADD COLUMN IF NOT EXISTS age TEXT,
 ADD COLUMN IF NOT EXISTS gender TEXT,
 ADD COLUMN IF NOT EXISTS race TEXT,
 ADD COLUMN IF NOT EXISTS education TEXT,
@@ -126,7 +127,7 @@ ADD COLUMN IF NOT EXISTS profession TEXT;
     console.error('Error:', err);
     return NextResponse.json({ 
       error: 'Error occurred',
-      message: 'Please add the following columns to your profiles table manually: gender, race, education, profession'
+      message: 'Please add the following columns to your profiles table manually: age, gender, race, education, profession'
     }, { status: 500 });
   }
 } 
