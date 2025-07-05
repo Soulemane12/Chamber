@@ -7,18 +7,13 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY as string,
 );
 
-// Define an interface for the route params
-interface RouteParams {
-  id: string;
-}
-
-// Define the route handlers with proper context typing
+// Define the route handlers with proper Next.js 15 typing
 export async function GET(
   request: Request,
-  { params }: { params: RouteParams }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     if (!id) {
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
@@ -53,10 +48,10 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: RouteParams }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     
     if (!id) {
