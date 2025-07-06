@@ -14,7 +14,6 @@ export interface UserProfile {
   race?: string;
   education?: string;
   profession?: string;
-  age?: string;
 }
 
 interface UserEditModalProps {
@@ -127,8 +126,8 @@ export default function UserEditModal({ user, isOpen, onClose, onSave }: UserEdi
                 <option value="">Select gender</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
-                <option value="non_binary">Non-binary</option>
                 <option value="other">Other</option>
+                <option value="prefer_not_to_say">Prefer not to say</option>
               </select>
             </div>
 
@@ -156,33 +155,11 @@ export default function UserEditModal({ user, isOpen, onClose, onSave }: UserEdi
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
               >
                 <option value="">Select race/ethnicity</option>
-                <option value="asian">Asian</option>
-                <option value="black">Black or African American</option>
-                <option value="hispanic">Hispanic or Latino</option>
-                <option value="white">White</option>
-                <option value="native">Native American or Alaskan Native</option>
-                <option value="pacific">Native Hawaiian or Pacific Islander</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-
-            <div className="flex flex-col">
-              <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
-                Age Range
-              </label>
-              <select
-                name="age"
-                value={formData.age || ""}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-              >
-                <option value="">Select age range</option>
-                <option value="18-24">18-24</option>
-                <option value="25-34">25-34</option>
-                <option value="35-44">35-44</option>
-                <option value="45-54">45-54</option>
-                <option value="55-64">55-64</option>
-                <option value="65+">65+</option>
+                <option value="Asian">Asian</option>
+                <option value="Black">Black</option>
+                <option value="Hispanic">Hispanic</option>
+                <option value="White">White</option>
+                <option value="Other">Other</option>
               </select>
             </div>
 
@@ -197,12 +174,11 @@ export default function UserEditModal({ user, isOpen, onClose, onSave }: UserEdi
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
               >
                 <option value="">Select education level</option>
-                <option value="high_school">High School or equivalent</option>
-                <option value="some_college">Some College</option>
-                <option value="associate">Associate's Degree</option>
-                <option value="bachelor">Bachelor's Degree</option>
-                <option value="master">Master's Degree</option>
-                <option value="doctorate">Doctorate or higher</option>
+                <option value="High School">High School</option>
+                <option value="Bachelor">Bachelor</option>
+                <option value="Master">Master</option>
+                <option value="PhD">PhD</option>
+                <option value="Other">Other</option>
               </select>
             </div>
 
@@ -210,14 +186,19 @@ export default function UserEditModal({ user, isOpen, onClose, onSave }: UserEdi
               <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                 Profession
               </label>
-              <input
-                type="text"
+              <select
                 name="profession"
                 value={formData.profession || ""}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                placeholder="Your profession"
-              />
+              >
+                <option value="">Select profession</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Finance">Finance</option>
+                <option value="Technology">Technology</option>
+                <option value="Education">Education</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
           </div>
 

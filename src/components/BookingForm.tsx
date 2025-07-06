@@ -307,7 +307,8 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         
         if (error) throw error;
         
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
         console.error('Error in booking submission:', {
           error: err,
           errorString: String(err),
@@ -316,13 +317,15 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         });
 
         // Check if it's a specific column not found error
-        if (err?.message?.includes('column') && err?.message?.includes('not found')) {
+        if (err instanceof Error && 
+            err.message.includes('column') && 
+            err.message.includes('not found')) {
           // Redirect to the fix page
           window.location.href = '/api/admin/fix-age-column';
           return;
         }
         
-        throw new Error(err?.message || 'Failed to save your booking');
+        throw new Error(errorMessage || 'Failed to save your booking');
       }
       
       console.log('Booking saved successfully:', result);
@@ -920,9 +923,9 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       <option value="">Prefer not to say</option>
                       <option value="high_school">High School or equivalent</option>
                       <option value="some_college">Some College</option>
-                      <option value="associate">Associate's Degree</option>
-                      <option value="bachelor">Bachelor's Degree</option>
-                      <option value="master">Master's Degree</option>
+                      <option value="associate">Associate&apos;s Degree</option>
+                      <option value="bachelor">Bachelor&apos;s Degree</option>
+                      <option value="master">Master&apos;s Degree</option>
                       <option value="doctorate">Doctorate or higher</option>
                     </select>
                   </div>

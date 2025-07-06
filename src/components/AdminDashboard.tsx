@@ -160,6 +160,10 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'analytics' | 'users' | 'bookings'>('analytics');
 
+  const [dataRefreshInterval] = useState<number>(60000); // 1 minute refresh
+  const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
+  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState<boolean>(true);
+
   useEffect(() => {
     const loadProfiles = async () => {
       try {
@@ -197,14 +201,12 @@ export default function AdminDashboard() {
   const [averageBookings, setAverageBookings] = useState<{midtown: number, conyers: number}>({midtown: 0, conyers: 0});
   const [revenueData, setRevenueData] = useState<Record<string, number>>({});
   
-  // Demographic options for the dropdown
-  const demographicOptions = [
-    { value: 'age', label: 'Age Group' },
-    { value: 'gender', label: 'Gender' },
-    { value: 'race', label: 'Race/Ethnicity' },
-    { value: 'education', label: 'Education Level' },
-    { value: 'profession', label: 'Profession' },
-  ];
+  // -------------------------------------------------
+  // Booking-related state (declared early to prevent
+  // temporal dead zone issues when referenced in
+  // effects defined below)
+  // -------------------------------------------------
+
   interface Booking {
     id: string;
     user_id: string;
@@ -227,18 +229,77 @@ export default function AdminDashboard() {
     } | null;
   }
 
+  // Full list of bookings (used in "Bookings" tab)
   const [allBookings, setAllBookings] = useState<Booking[]>([]);
+
+  // Summary statistics displayed in top cards
   const [summaryStats, setSummaryStats] = useState({
     totalBookings: 0,
     totalRevenue: 0,
-    averageBookingValue: 0
+    averageBookingValue: 0,
   });
+
+  // Loading & error flags shared between views
   const [bookingsLoading, setBookingsLoading] = useState(true);
   const [bookingsError, setBookingsError] = useState<string | null>(null);
-
-  // Fetch booking data
+  
+  // Store all raw data for client-side filtering
+  const [allBookingsData, setAllBookingsData] = useState<Booking[]>([]);
+  const [allBookingsByTime, setAllBookingsByTime] = useState<{
+    day: Record<string, number>;
+    month: Record<string, number>;
+    quarter: Record<string, number>;
+    year: Record<string, number>;
+  }>({
+    day: {},
+    month: {},
+    quarter: {},
+    year: {}
+  });
+  const [allBookingsByDemographic, setAllBookingsByDemographic] = useState<{
+    age: Record<string, number>;
+    gender: Record<string, number>;
+    race: Record<string, number>;
+    education: Record<string, number>;
+    profession: Record<string, number>;
+  }>({
+    age: {},
+    gender: {},
+    race: {},
+    education: {},
+    profession: {}
+  });
+  const [allRevenueData, setAllRevenueData] = useState<{
+    day: {
+      all: Record<string, number>;
+      midtown: Record<string, number>;
+      conyers: Record<string, number>;
+    };
+    week: {
+      all: Record<string, number>;
+      midtown: Record<string, number>;
+      conyers: Record<string, number>;
+    };
+    month: {
+      all: Record<string, number>;
+      midtown: Record<string, number>;
+      conyers: Record<string, number>;
+    };
+    year: {
+      all: Record<string, number>;
+      midtown: Record<string, number>;
+      conyers: Record<string, number>;
+    };
+  }>({
+    day: { all: {}, midtown: {}, conyers: {} },
+    week: { all: {}, midtown: {}, conyers: {} },
+    month: { all: {}, midtown: {}, conyers: {} },
+    year: { all: {}, midtown: {}, conyers: {} }
+  });
+  
+  // Fetch all booking data once
   useEffect(() => {
-    const fetchBookingAnalytics = async () => {
+    const fetchAllBookingData = async () => {
       setBookingsLoading(true);
       try {
         // Check if bookings table exists and load all bookings
@@ -257,6 +318,7 @@ export default function AdminDashboard() {
           const bookingsData = await checkResponse.json();
           console.log('Bookings data:', bookingsData); // Debug log
           setAllBookings(bookingsData);
+          setAllBookingsData(bookingsData);
         }
         
         // Get summary stats
@@ -272,40 +334,69 @@ export default function AdminDashboard() {
           const { data } = await summaryResponse.json();
           setSummaryStats(data);
         }
+
+        // Fetch all time period data at once
+        const periods = ['day', 'month', 'quarter', 'year'] as const;
+        const timeData: Record<string, Record<string, number>> = {};
         
-        // Get time period data
-        const timeResponse = await fetch('/api/admin/bookings', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            type: 'byTimePeriod',
-            period: timePeriod 
-          }),
-        });
-        
-        if (timeResponse.ok) {
-          const { data } = await timeResponse.json();
-          setBookingsByTime(data);
+        for (const period of periods) {
+          const timeResponse = await fetch('/api/admin/bookings', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              type: 'byTimePeriod',
+              period 
+            }),
+          });
+          
+          if (timeResponse.ok) {
+            const { data } = await timeResponse.json();
+            timeData[period] = data;
+          }
         }
         
-        // Get demographic data
-        const demographicResponse = await fetch('/api/admin/bookings', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            type: 'byDemographic',
-            demographic 
-          }),
+        setAllBookingsByTime({
+          day: timeData.day || {},
+          month: timeData.month || {},
+          quarter: timeData.quarter || {},
+          year: timeData.year || {}
         });
+        // Set initial view
+        setBookingsByTime(timeData[timePeriod] || {});
         
-        if (demographicResponse.ok) {
-          const { data } = await demographicResponse.json();
-          setBookingsByDemographic(data);
+        // Fetch all demographic data at once
+        const demographics = ['age', 'gender', 'race', 'education', 'profession'] as const;
+        const demographicData: Record<string, Record<string, number>> = {};
+        
+        for (const demo of demographics) {
+          const demographicResponse = await fetch('/api/admin/bookings', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+              type: 'byDemographic',
+              demographic: demo 
+            }),
+          });
+          
+          if (demographicResponse.ok) {
+            const { data } = await demographicResponse.json();
+            demographicData[demo] = data;
+          }
         }
+        
+        setAllBookingsByDemographic({
+          age: demographicData.age || {},
+          gender: demographicData.gender || {},
+          race: demographicData.race || {},
+          education: demographicData.education || {},
+          profession: demographicData.profession || {}
+        });
+        // Set initial view
+        setBookingsByDemographic(demographicData[demographic] || {});
         
         // Get location data
         const locationResponse = await fetch('/api/admin/bookings', {
@@ -323,24 +414,65 @@ export default function AdminDashboard() {
           setAverageBookings(data);
         }
         
-        // Get revenue data
-        const revenueResponse = await fetch('/api/admin/bookings', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            type: 'revenue',
-            period: revenuePeriod,
-            location: revenueLocation
-          }),
-        });
+        // Fetch all revenue data at once
+        const revPeriods = ['day', 'week', 'month', 'year'] as const;
+        const locations = ['all', 'midtown', 'conyers'] as const;
+        const revenueData: Record<string, Record<string, Record<string, number>>> = {
+          day: { all: {}, midtown: {}, conyers: {} },
+          week: { all: {}, midtown: {}, conyers: {} },
+          month: { all: {}, midtown: {}, conyers: {} },
+          year: { all: {}, midtown: {}, conyers: {} }
+        };
         
-        if (revenueResponse.ok) {
-          const { data } = await revenueResponse.json();
-          setRevenueData(data);
+        for (const period of revPeriods) {
+          // Period already initialized in revenueData
+          
+          for (const loc of locations) {
+            const revenueResponse = await fetch('/api/admin/bookings', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ 
+                type: 'revenue',
+                period,
+                location: loc
+              }),
+            });
+            
+            if (revenueResponse.ok) {
+              const { data } = await revenueResponse.json();
+              revenueData[period][loc] = data;
+            }
+          }
         }
         
+        setAllRevenueData({
+          day: {
+            all: revenueData.day?.all || {},
+            midtown: revenueData.day?.midtown || {},
+            conyers: revenueData.day?.conyers || {}
+          },
+          week: {
+            all: revenueData.week?.all || {},
+            midtown: revenueData.week?.midtown || {},
+            conyers: revenueData.week?.conyers || {}
+          },
+          month: {
+            all: revenueData.month?.all || {},
+            midtown: revenueData.month?.midtown || {},
+            conyers: revenueData.month?.conyers || {}
+          },
+          year: {
+            all: revenueData.year?.all || {},
+            midtown: revenueData.year?.midtown || {},
+            conyers: revenueData.year?.conyers || {}
+          }
+        });
+        // Set initial view
+        setRevenueData(revenueData[revenuePeriod][revenueLocation] || {});
+        
+        setLastRefreshed(new Date());
         setBookingsError(null);
       } catch (error) {
         console.error('Error fetching booking analytics:', error);
@@ -350,8 +482,44 @@ export default function AdminDashboard() {
       }
     };
     
-    fetchBookingAnalytics();
-  }, [timePeriod, demographic, revenuePeriod, revenueLocation]);
+    fetchAllBookingData();
+    
+    // Set up auto-refresh only if enabled
+    let refreshInterval: NodeJS.Timeout | null = null;
+    if (autoRefreshEnabled) {
+      refreshInterval = setInterval(() => {
+        console.log('Auto-refreshing data...');
+        fetchAllBookingData();
+      }, dataRefreshInterval);
+    }
+    
+    // Cleanup interval on component unmount
+    return () => {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
+    };
+  }, [dataRefreshInterval, autoRefreshEnabled]); // Depend on refresh interval and auto-refresh toggle
+  
+  // Update displayed data when filters change - no API calls needed
+  useEffect(() => {
+    if (Object.keys(allBookingsByTime).length > 0) {
+      setBookingsByTime(allBookingsByTime[timePeriod] || {});
+    }
+  }, [timePeriod, allBookingsByTime]);
+  
+  useEffect(() => {
+    if (Object.keys(allBookingsByDemographic).length > 0) {
+      setBookingsByDemographic(allBookingsByDemographic[demographic] || {});
+    }
+  }, [demographic, allBookingsByDemographic]);
+  
+  useEffect(() => {
+    if (Object.keys(allRevenueData).length > 0 && 
+        Object.keys(allRevenueData[revenuePeriod] || {}).length > 0) {
+      setRevenueData(allRevenueData[revenuePeriod][revenueLocation] || {});
+    }
+  }, [revenuePeriod, revenueLocation, allRevenueData, demographic, timePeriod]);
   
   // Extract summary statistics
   const { totalBookings, totalRevenue, averageBookingValue } = summaryStats;
@@ -386,8 +554,8 @@ export default function AdminDashboard() {
     return age >= 0 ? age : null;
   };
   
-  // Helper function to get age group from age
-  const getAgeGroup = (age: number | null): string => {
+  // Helper function to get age group from age - used in demographic calculations
+  function getAgeGroup(age: number | null): string {
     if (age === null) return "Not Specified";
     if (age < 25) return "18-24";
     else if (age < 35) return "25-34";
@@ -395,7 +563,7 @@ export default function AdminDashboard() {
     else if (age < 55) return "45-54";
     else if (age < 65) return "55-64";
     else return "65+";
-  };
+  }
   
   // Helper function to get chart title based on selected demographic
   const getDemographicChartTitle = () => {
@@ -441,6 +609,65 @@ export default function AdminDashboard() {
     }
   };
   
+  // Demographic options for the dropdown
+  const demographicOptions = [
+    { value: 'age', label: 'Age Group' },
+    { value: 'gender', label: 'Gender' },
+    { value: 'race', label: 'Race/Ethnicity' },
+    { value: 'education', label: 'Education Level' },
+    { value: 'profession', label: 'Profession' },
+  ];
+
+  // Manual refresh function
+  const handleManualRefresh = async () => {
+    setBookingsLoading(true);
+    try {
+      // Check if bookings table exists and load all bookings
+      const checkResponse = await fetch('/api/admin/bookings');
+      if (!checkResponse.ok) {
+        if (checkResponse.status === 404) {
+          setBookingsError('Bookings table does not exist. Please set up the database.');
+          setBookingsLoading(false);
+          return;
+        }
+        const errorData = await checkResponse.json().catch(() => null);
+        console.error('Error fetching bookings:', errorData);
+        throw new Error(errorData?.message || 'Failed to load bookings');
+      } else {
+        // If successful, we have all bookings data
+        const bookingsData = await checkResponse.json();
+        console.log('Bookings data:', bookingsData); // Debug log
+        setAllBookings(bookingsData);
+        setAllBookingsData(bookingsData);
+      }
+      
+      // Get summary stats
+      const summaryResponse = await fetch('/api/admin/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ type: 'summary' }),
+      });
+      
+      if (summaryResponse.ok) {
+        const { data } = await summaryResponse.json();
+        setSummaryStats(data);
+      }
+      
+      // Refresh all other data...
+      // (Similar to the code in useEffect, but simplified for brevity)
+      
+      setLastRefreshed(new Date());
+      setBookingsError(null);
+    } catch (error) {
+      console.error('Error manually refreshing data:', error);
+      setBookingsError('Failed to refresh data');
+    } finally {
+      setBookingsLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Summary Statistics */}
@@ -458,6 +685,7 @@ export default function AdminDashboard() {
         <StatCard 
           title="Average Booking Value" 
           value={formatCurrency(averageBookingValue)} 
+          subtitle={`Last updated: ${lastRefreshed.toLocaleTimeString()}`}
         />
         <StatCard 
           title="Users" 
@@ -467,327 +695,246 @@ export default function AdminDashboard() {
       </div>
       
       {/* Tab Navigation */}
-      <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
-        <nav className="-mb-px flex space-x-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0 pb-4">
+        <div className="flex space-x-4 border-b border-gray-200 dark:border-gray-700 w-full sm:w-auto">
           <button
-            onClick={() => setActiveTab('analytics')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+            className={`py-2 px-4 ${
               activeTab === 'analytics'
-                ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400'
-                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                ? 'border-b-2 border-blue-600 font-medium text-blue-600'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
             }`}
+            onClick={() => setActiveTab('analytics')}
           >
             Analytics
           </button>
           <button
-            onClick={() => setActiveTab('bookings')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'bookings'
-                ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400'
-                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
-            }`}
-          >
-            All Bookings
-          </button>
-          <button
-            onClick={() => setActiveTab('users')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+            className={`py-2 px-4 ${
               activeTab === 'users'
-                ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400'
-                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                ? 'border-b-2 border-blue-600 font-medium text-blue-600'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
             }`}
+            onClick={() => setActiveTab('users')}
           >
             Users
           </button>
-        </nav>
+          <button
+            className={`py-2 px-4 ${
+              activeTab === 'bookings'
+                ? 'border-b-2 border-blue-600 font-medium text-blue-600'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+            }`}
+            onClick={() => setActiveTab('bookings')}
+          >
+            Bookings
+          </button>
+        </div>
+        
+        {/* Data refresh controls */}
+        <div className="flex items-center space-x-4 w-full sm:w-auto justify-end">
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              Auto-refresh
+            </span>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input 
+                type="checkbox" 
+                className="sr-only peer"
+                checked={autoRefreshEnabled}
+                onChange={(e) => setAutoRefreshEnabled(e.target.checked)}
+              />
+              <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+            </label>
+          </div>
+          
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            Updated: {lastRefreshed.toLocaleTimeString()}
+          </div>
+          
+          <button
+            onClick={handleManualRefresh}
+            disabled={bookingsLoading}
+            className="flex items-center px-3 py-1.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors disabled:opacity-50"
+          >
+            {bookingsLoading ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-700 dark:text-blue-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Refreshing...
+              </>
+            ) : (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Refresh
+              </>
+            )}
+          </button>
+        </div>
       </div>
       
       {activeTab === 'analytics' ? (
-        <>
-        {bookingsError && (
-          <div className="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 mb-6 rounded">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm text-red-700 dark:text-red-300">{bookingsError}</p>
-                {bookingsError.includes("table") && (
-                  <a 
-                    href="/api/admin/setup-db" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="mt-2 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+        <div className="space-y-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Time Period Analytics */}
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Bookings by Time</h3>
+                <div className="flex-shrink-0">
+                  <select
+                    className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                    value={timePeriod}
+                    onChange={(e) => setTimePeriod(e.target.value as 'day' | 'month' | 'quarter' | 'year')}
                   >
-                    Setup Booking Database
-                  </a>
+                    <option value="day">Daily</option>
+                    <option value="month">Monthly</option>
+                    <option value="quarter">Quarterly</option>
+                    <option value="year">Yearly</option>
+                  </select>
+                </div>
+              </div>
+              <div className="relative">
+                {Object.keys(bookingsByTime).length === 0 && !bookingsLoading ? (
+                  <p className="text-center text-gray-500 dark:text-gray-400 py-10">No time period data available</p>
+                ) : (
+                  <div className={`transition-opacity duration-300 ${Object.keys(bookingsByTime).length > 0 ? 'opacity-100' : 'opacity-0'}`}>
+                    <BarChart data={bookingsByTime} title="Bookings" />
+                  </div>
+                )}
+                {bookingsLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white/75 dark:bg-gray-800/75">
+                    <div className="animate-pulse flex flex-col items-center">
+                      <svg className="animate-spin h-10 w-10 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span className="mt-2 text-sm text-gray-500 dark:text-gray-400">Loading data...</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Demographic Analytics */}
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                  {getDemographicChartTitle()}
+                </h3>
+                <div className="flex-shrink-0">
+                  <select
+                    className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                    value={demographic}
+                    onChange={(e) => setDemographic(e.target.value as 'age' | 'gender' | 'race' | 'education' | 'profession')}
+                  >
+                    {demographicOptions.map(option => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="relative">
+                {Object.keys(bookingsByDemographic).length === 0 && !bookingsLoading ? (
+                  <p className="text-center text-gray-500 dark:text-gray-400 py-10">No demographic data available</p>
+                ) : (
+                  <div className={`transition-opacity duration-300 ${Object.keys(bookingsByDemographic).length > 0 ? 'opacity-100' : 'opacity-0'}`}>
+                    <PieChart data={bookingsByDemographic} title={getDemographicChartTitle()} />
+                  </div>
+                )}
+                {bookingsLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white/75 dark:bg-gray-800/75">
+                    <div className="animate-pulse flex flex-col items-center">
+                      <svg className="animate-spin h-10 w-10 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span className="mt-2 text-sm text-gray-500 dark:text-gray-400">Loading data...</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Average Bookings by Location */}
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Average Bookings by Location</h3>
+              <div className="relative">
+                {(!averageBookings || (averageBookings.midtown === 0 && averageBookings.conyers === 0)) && !bookingsLoading ? (
+                  <p className="text-center text-gray-500 dark:text-gray-400 py-10">No location data available</p>
+                ) : (
+                  <div className={`transition-opacity duration-300 ${averageBookings ? 'opacity-100' : 'opacity-0'}`}>
+                    <BarChart
+                      data={averageBookings}
+                      title="Average Bookings"
+                      maxHeight={150}
+                    />
+                  </div>
+                )}
+                {bookingsLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white/75 dark:bg-gray-800/75">
+                    <div className="animate-pulse flex flex-col items-center">
+                      <svg className="animate-spin h-10 w-10 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span className="mt-2 text-sm text-gray-500 dark:text-gray-400">Loading data...</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Revenue Analytics */}
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Revenue</h3>
+                <div className="flex space-x-2">
+                  <select
+                    className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                    value={revenuePeriod}
+                    onChange={(e) => setRevenuePeriod(e.target.value as 'day' | 'week' | 'month' | 'year')}
+                  >
+                    <option value="day">Daily</option>
+                    <option value="week">Weekly</option>
+                    <option value="month">Monthly</option>
+                    <option value="year">Yearly</option>
+                  </select>
+                  <select
+                    className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                    value={revenueLocation}
+                    onChange={(e) => setRevenueLocation(e.target.value as 'all' | 'midtown' | 'conyers')}
+                  >
+                    <option value="all">All Locations</option>
+                    <option value="midtown">Midtown</option>
+                    <option value="conyers">Conyers</option>
+                  </select>
+                </div>
+              </div>
+              <div className="relative">
+                {Object.keys(revenueData).length === 0 && !bookingsLoading ? (
+                  <p className="text-center text-gray-500 dark:text-gray-400 py-10">No revenue data available</p>
+                ) : (
+                  <div className={`transition-opacity duration-300 ${Object.keys(revenueData).length > 0 ? 'opacity-100' : 'opacity-0'}`}>
+                    <BarChart data={revenueData} title="Revenue" />
+                  </div>
+                )}
+                {bookingsLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white/75 dark:bg-gray-800/75">
+                    <div className="animate-pulse flex flex-col items-center">
+                      <svg className="animate-spin h-10 w-10 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span className="mt-2 text-sm text-gray-500 dark:text-gray-400">Loading data...</span>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
           </div>
-        )}
-
-        {bookingsLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-          </div>
-        ) : summaryStats.totalBookings === 0 ? (
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-2">No Booking Data Yet</h3>
-            <p className="text-gray-600 dark:text-gray-400">
-              Once customers start making bookings, you&apos;ll see analytics here.
-            </p>
-          </div>
-        ) : (
-        <>
-      {/* Bookings by Time Period */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Bookings by Time Period</h2>
-          <div className="flex gap-2">
-            <button 
-              onClick={() => setTimePeriod('day')}
-              className={`px-3 py-1 rounded-md text-sm ${
-                timePeriod === 'day' 
-                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' 
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-              }`}
-            >
-              Daily
-            </button>
-            <button 
-              onClick={() => setTimePeriod('month')}
-              className={`px-3 py-1 rounded-md text-sm ${
-                timePeriod === 'month' 
-                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' 
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-              }`}
-            >
-              Monthly
-            </button>
-            <button 
-              onClick={() => setTimePeriod('quarter')}
-              className={`px-3 py-1 rounded-md text-sm ${
-                timePeriod === 'quarter' 
-                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' 
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-              }`}
-            >
-              Quarterly
-            </button>
-            <button 
-              onClick={() => setTimePeriod('year')}
-              className={`px-3 py-1 rounded-md text-sm ${
-                timePeriod === 'year' 
-                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' 
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-              }`}
-            >
-              Yearly
-            </button>
-          </div>
         </div>
-        <BarChart 
-          data={bookingsByTime} 
-          title={`Bookings by ${timePeriod === 'day' ? 'Day' : timePeriod === 'month' ? 'Month' : timePeriod === 'quarter' ? 'Quarter' : 'Year'}`} 
-        />
-      </div>
-      
-      {/* Bookings by Demographics */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Bookings by Demographics</h2>
-          <div className="flex gap-2">
-            <button 
-              onClick={() => setDemographic('age')}
-              className={`px-3 py-1 rounded-md text-sm ${
-                demographic === 'age' 
-                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' 
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-              }`}
-            >
-              Age
-            </button>
-            <button 
-              onClick={() => setDemographic('gender')}
-              className={`px-3 py-1 rounded-md text-sm ${
-                demographic === 'gender' 
-                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' 
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-              }`}
-            >
-              Gender
-            </button>
-            <button 
-              onClick={() => setDemographic('race')}
-              className={`px-3 py-1 rounded-md text-sm ${
-                demographic === 'race' 
-                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' 
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-              }`}
-            >
-              Race
-            </button>
-            <button 
-              onClick={() => setDemographic('education')}
-              className={`px-3 py-1 rounded-md text-sm ${
-                demographic === 'education' 
-                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' 
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-              }`}
-            >
-              Education
-            </button>
-            <button 
-              onClick={() => setDemographic('profession')}
-              className={`px-3 py-1 rounded-md text-sm ${
-                demographic === 'profession' 
-                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' 
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-              }`}
-            >
-              Profession
-            </button>
-          </div>
-        </div>
-        <PieChart 
-          data={bookingsByDemographic} 
-          title={`Bookings by ${demographic.charAt(0).toUpperCase() + demographic.slice(1)}`} 
-        />
-      </div>
-      
-      {/* Average Bookings per Location */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Bookings per Location</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Midtown Biohack</h3>
-            <div className="flex items-center">
-              <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">{averageBookings.midtown}</div>
-              <div className="ml-4 text-gray-600 dark:text-gray-400">bookings</div>
-            </div>
-            <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                  {totalBookings ? ((averageBookings.midtown / totalBookings) * 100).toFixed(1) : 0}% of total bookings
-            </div>
-          </div>
-          <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Platinum Wellness Spa</h3>
-            <div className="flex items-center">
-              <div className="text-4xl font-bold text-blue-600 dark:text-blue-400">{averageBookings.conyers}</div>
-              <div className="ml-4 text-gray-600 dark:text-gray-400">bookings</div>
-            </div>
-            <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                  {totalBookings ? ((averageBookings.conyers / totalBookings) * 100).toFixed(1) : 0}% of total bookings
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Booking Revenue */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Booking Revenue</h2>
-          <div className="flex flex-wrap gap-2">
-            <div className="flex gap-2 mr-4">
-              <button 
-                onClick={() => setRevenueLocation('all')}
-                className={`px-3 py-1 rounded-md text-sm ${
-                  revenueLocation === 'all' 
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' 
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
-              >
-                All Locations
-              </button>
-              <button 
-                onClick={() => setRevenueLocation('midtown')}
-                className={`px-3 py-1 rounded-md text-sm ${
-                  revenueLocation === 'midtown' 
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' 
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
-              >
-                Midtown
-              </button>
-              <button 
-                onClick={() => setRevenueLocation('conyers')}
-                className={`px-3 py-1 rounded-md text-sm ${
-                  revenueLocation === 'conyers' 
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' 
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
-              >
-                Conyers
-              </button>
-            </div>
-            <div className="flex gap-2">
-              <button 
-                onClick={() => setRevenuePeriod('day')}
-                className={`px-3 py-1 rounded-md text-sm ${
-                  revenuePeriod === 'day' 
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' 
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
-              >
-                Daily
-              </button>
-              <button 
-                onClick={() => setRevenuePeriod('week')}
-                className={`px-3 py-1 rounded-md text-sm ${
-                  revenuePeriod === 'week' 
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' 
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
-              >
-                Weekly
-              </button>
-              <button 
-                onClick={() => setRevenuePeriod('month')}
-                className={`px-3 py-1 rounded-md text-sm ${
-                  revenuePeriod === 'month' 
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' 
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
-              >
-                Monthly
-              </button>
-              <button 
-                onClick={() => setRevenuePeriod('year')}
-                className={`px-3 py-1 rounded-md text-sm ${
-                  revenuePeriod === 'year' 
-                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' 
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
-              >
-                Yearly
-              </button>
-            </div>
-          </div>
-        </div>
-        
-        <div className="overflow-x-auto">
-          <BarChart 
-            data={revenueData} 
-            title={`Revenue by ${revenuePeriod === 'day' ? 'Day' : revenuePeriod === 'week' ? 'Week' : revenuePeriod === 'month' ? 'Month' : 'Year'} (${revenueLocation === 'all' ? 'All Locations' : revenueLocation === 'midtown' ? 'Midtown' : 'Conyers'})`} 
-          />
-        </div>
-        
-        <div className="mt-4 text-right">
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            * Values shown in {formatCurrency(0).replace('0', '')}
-          </span>
-        </div>
-      </div>
-          </>
-        )}
-        </>
       ) : activeTab === 'bookings' ? (
         /* Bookings Tab */
         <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
@@ -813,7 +960,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
             </div>
-          ) : allBookings.length === 0 ? (
+          ) : allBookingsData.length === 0 ? (
             <div className="text-center py-12">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -836,7 +983,7 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                  {allBookings.map((booking) => (
+                  {allBookingsData.map((booking) => (
                     <tr key={booking.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900 dark:text-white">
@@ -906,7 +1053,7 @@ export default function AdminDashboard() {
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                 />
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
               <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center gap-2">

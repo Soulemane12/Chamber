@@ -57,6 +57,7 @@ export async function GET() {
       last_name: string;
       email: string;
       phone?: string;
+      dob?: string;
       age?: number;
       gender?: string;
       race?: string;
@@ -183,16 +184,16 @@ export async function POST(request: Request) {
     // Calculate various statistics based on the request type
     switch (type) {
       case 'byTimePeriod': {
-        const bookingsByTime: Record<string, number> = {};
+        const timeData: Record<string, number> = {};
         
         bookings.forEach(booking => {
           if (!booking.date) return;
           
           const formattedDate = formatDateForPeriod(booking.date, period);
-          bookingsByTime[formattedDate] = (bookingsByTime[formattedDate] || 0) + 1;
+          timeData[formattedDate] = (timeData[formattedDate] || 0) + 1;
         });
         
-        return NextResponse.json({ data: bookingsByTime });
+        return NextResponse.json({ data: timeData });
       }
       
       case 'byDemographic': {
@@ -200,7 +201,20 @@ export async function POST(request: Request) {
         const userIds = [...new Set(bookings.map(b => b.user_id))].filter(Boolean);
         
         // Fetch user profiles
-        let userProfiles: { [key: string]: any } = {};
+        interface ProfileType {
+          id: string;
+          first_name?: string;
+          last_name?: string;
+          email?: string;
+          phone?: string;
+          dob?: string;
+          gender?: string;
+          race?: string;
+          education?: string;
+          profession?: string;
+          [key: string]: any; // Allow other properties
+        }
+        let userProfiles: { [key: string]: ProfileType } = {};
         if (userIds.length > 0) {
           const { data: profiles, error: profilesError } = await supabase
             .from('profiles')
@@ -216,7 +230,7 @@ export async function POST(request: Request) {
           }
         }
         
-        const bookingsByDemographic: Record<string, number> = {};
+        const demographicData: Record<string, number> = {};
         
         bookings.forEach(booking => {
           // Get user profile for this booking
@@ -275,10 +289,10 @@ export async function POST(request: Request) {
               .join(' ');
           }
           
-          bookingsByDemographic[value] = (bookingsByDemographic[value] || 0) + 1;
+          demographicData[value] = (demographicData[value] || 0) + 1;
         });
         
-        return NextResponse.json({ data: bookingsByDemographic });
+        return NextResponse.json({ data: demographicData });
       }
       
       case 'byLocation': {
@@ -297,7 +311,9 @@ export async function POST(request: Request) {
       }
       
       case 'revenue': {
-        const revenueData: Record<string, number> = {};
+        const allRevenueData: Record<string, Record<string, Record<string, number>>> = {
+          day: {}, week: {}, month: {}, year: {}
+        };
         
         // Filter by location if specified
         const filteredBookings = location === 'all' 
@@ -308,10 +324,10 @@ export async function POST(request: Request) {
           if (!booking.date || !booking.amount) return;
           
           const formattedDate = formatDateForPeriod(booking.date, period);
-          revenueData[formattedDate] = (revenueData[formattedDate] || 0) + Number(booking.amount);
+          allRevenueData[formattedDate.split('-')[0]][formattedDate.split('-')[1]][formattedDate.split('-')[2]] = (allRevenueData[formattedDate.split('-')[0]][formattedDate.split('-')[1]][formattedDate.split('-')[2]] || 0) + Number(booking.amount);
         });
         
-        return NextResponse.json({ data: revenueData });
+        return NextResponse.json({ data: allRevenueData });
       }
       
       case 'summary': {
