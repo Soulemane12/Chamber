@@ -861,12 +861,12 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     >
                       <option value="">Prefer not to say</option>
-                      <option value="18">18-24</option>
-                      <option value="25">25-34</option>
-                      <option value="35">35-44</option>
-                      <option value="45">45-54</option>
-                      <option value="55">55-64</option>
-                      <option value="65">65+</option>
+                      <option value="18-24">18-24</option>
+                      <option value="25-34">25-34</option>
+                      <option value="35-44">35-44</option>
+                      <option value="45-54">45-54</option>
+                      <option value="55-64">55-64</option>
+                      <option value="65+">65+</option>
                     </select>
                   </div>
                   <div>

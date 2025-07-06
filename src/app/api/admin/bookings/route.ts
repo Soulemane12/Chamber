@@ -104,6 +104,8 @@ export async function GET() {
         education: booking.education || userProfile?.education,
         profession: booking.profession || userProfile?.profession,
         age: booking.age || userProfile?.age,
+        booking_reason: booking.booking_reason,
+        notes: booking.notes,
         user: userProfile ? {
           id: userProfile.id,
           firstName: userProfile.first_name,

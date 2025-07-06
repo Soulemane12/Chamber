@@ -196,6 +196,15 @@ export default function AdminDashboard() {
   const [bookingsByDemographic, setBookingsByDemographic] = useState<Record<string, number>>({});
   const [averageBookings, setAverageBookings] = useState<{midtown: number, conyers: number}>({midtown: 0, conyers: 0});
   const [revenueData, setRevenueData] = useState<Record<string, number>>({});
+  
+  // Demographic options for the dropdown
+  const demographicOptions = [
+    { value: 'age', label: 'Age Group' },
+    { value: 'gender', label: 'Gender' },
+    { value: 'race', label: 'Race/Ethnicity' },
+    { value: 'education', label: 'Education Level' },
+    { value: 'profession', label: 'Profession' },
+  ];
   interface Booking {
     id: string;
     user_id: string;
@@ -209,12 +218,24 @@ export default function AdminDashboard() {
     group_size: number;
     location: string;
     amount: number;
+    age?: string;
+    gender?: string;
+    race?: string;
+    education?: string;
+    profession?: string;
+    booking_reason?: string;
+    notes?: string;
     user?: {
       id: string;
       first_name: string;
       last_name: string;
       email: string;
       phone: string;
+      age?: string;
+      gender?: string;
+      race?: string;
+      education?: string;
+      profession?: string;
     } | null;
   }
 
@@ -349,12 +370,18 @@ export default function AdminDashboard() {
   
   // Helper function to format demographic values for display
   const formatDemographic = (value: string | undefined): string => {
-    if (!value) return "-";
-    // Replace underscores with spaces and capitalize each word
+    if (!value) return "Not Specified";
+    // Convert from snake_case to Title Case
     return value
       .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
+  };
+  
+  // Helper function to get chart title based on selected demographic
+  const getDemographicChartTitle = () => {
+    const option = demographicOptions.find(opt => opt.value === demographic);
+    return `Bookings by ${option?.label || 'Demographic'}`;
   };
 
   // Handle edit user button click
@@ -771,7 +798,7 @@ export default function AdminDashboard() {
             <div className="text-center py-12">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
               </div>
               <p className="text-gray-600 dark:text-gray-400 text-lg">No bookings found.</p>
@@ -785,6 +812,7 @@ export default function AdminDashboard() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Customer</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Contact</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Service</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Demographics</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Location</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Amount</th>
                   </tr>
@@ -822,10 +850,39 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900 dark:text-white">
-                          {booking.duration} min massage
+                          {booking.duration} min session
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
                           Group size: {booking.group_size}
+                        </div>
+                        {booking.booking_reason && (
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            Reason: {formatDemographic(booking.booking_reason)}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-xs space-y-1">
+                          {booking.age && (
+                            <div className="text-gray-900 dark:text-white flex">
+                              <span className="font-medium w-16">Age:</span> {booking.age}
+                            </div>
+                          )}
+                          {booking.gender && (
+                            <div className="text-gray-900 dark:text-white flex">
+                              <span className="font-medium w-16">Gender:</span> {formatDemographic(booking.gender)}
+                            </div>
+                          )}
+                          {booking.race && (
+                            <div className="text-gray-900 dark:text-white flex">
+                              <span className="font-medium w-16">Race:</span> {formatDemographic(booking.race)}
+                            </div>
+                          )}
+                          {booking.education && (
+                            <div className="text-gray-900 dark:text-white flex">
+                              <span className="font-medium w-16">Education:</span> {formatDemographic(booking.education)}
+                            </div>
+                          )}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
