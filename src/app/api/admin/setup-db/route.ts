@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS public.bookings (
   race TEXT,
   education TEXT,
   profession TEXT,
+  age TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
 );
 

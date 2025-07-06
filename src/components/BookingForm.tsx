@@ -32,6 +32,11 @@ const bookingSchema = z.object({
   groupSize: z.enum(["1", "2", "3", "4", "5"]),
   notes: z.string().optional(),
   bookingReason: z.string().optional(),
+  gender: z.string().optional(),
+  race: z.string().optional(),
+  education: z.string().optional(),
+  profession: z.string().optional(),
+  age: z.string().optional(),
 });
 
 export type BookingFormData = z.infer<typeof bookingSchema>;
@@ -73,14 +78,20 @@ interface BookingFormProps {
 export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormProps) {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [userProfile, setUserProfile] = useState<{
     firstName: string;
     lastName: string;
     email: string;
     phone: string;
+    gender?: string;
+    race?: string;
+    education?: string;
+    profession?: string;
+    age?: string;
   } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isGuest, setIsGuest] = useState(!isAuthenticated);
+  const isPersonalInfoStep = isGuest && currentStep === 1;
 
   const {
     register,
@@ -142,11 +153,21 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
             setValue('email', profileData.email || userAuth?.user?.email || '');
             setValue('phone', profileData.phone || '');
             
+            // Set demographic information from profile
+            if (profileData.gender) setValue('gender', profileData.gender);
+            if (profileData.race) setValue('race', profileData.race);
+            if (profileData.education) setValue('education', profileData.education);
+            if (profileData.profession) setValue('profession', profileData.profession);
+            
             setUserProfile({
               firstName,
               lastName,
               email: profileData.email || userAuth?.user?.email || '',
-              phone: profileData.phone || ''
+              phone: profileData.phone || '',
+              gender: profileData.gender,
+              race: profileData.race,
+              education: profileData.education,
+              profession: profileData.profession
             });
           }
         }
@@ -188,33 +209,103 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user?.id;
       
-      // Save booking to database
-      const { error } = await supabase
-        .from('bookings')
-        .insert([
-          {
-            user_id: userId,
-            first_name: data.firstName,
-            last_name: data.lastName,
-            email: data.email,
-            phone: data.phone,
-            date: data.date.toISOString().split('T')[0],
-            time: data.time,
-            duration: data.duration,
-            location: data.location,
-            group_size: parseInt(data.groupSize),
-            amount,
-            booking_reason: data.bookingReason,
-            notes: data.notes,
-          }
-        ])
-        .select()
-        .single();
+      // Basic booking data with only essential fields
+      const bookingData: {
+        user_id: string | undefined;
+        first_name: string;
+        last_name: string;
+        email: string;
+        phone: string;
+        date: string;
+        time: string;
+        duration: string;
+        location: string;
+        group_size: number;
+        amount: number;
+        created_at: string;
+        // Optional fields
+        gender?: string | null;
+        race?: string | null;
+        education?: string | null;
+        profession?: string | null;
+        age?: string | null;
+        notes?: string | null;
+        booking_reason?: string | null;
+      } = {
+        user_id: userId,
+        first_name: data.firstName,
+        last_name: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        date: data.date.toISOString().split('T')[0],
+        time: data.time,
+        duration: data.duration,
+        location: data.location,
+        group_size: parseInt(data.groupSize),
+        amount,
+        // Include demographic information from form or profile, with defensive checks
+        // to avoid errors if columns don't exist yet
+        created_at: new Date().toISOString(),
+        // Set optional fields
+        gender: data.gender || null,
+        race: data.race || null,
+        education: data.education || null,
+        profession: data.profession || null,
+        age: data.age || null,
+        notes: data.notes || null,
+        booking_reason: data.bookingReason || null
+      };
       
-      if (error) {
-        console.error('Error saving booking:', error);
-        throw new Error('Failed to save your booking');
+      // Remove any undefined properties to avoid database errors
+      try {
+        // Clean the object by removing any undefined values before sending to the API
+        Object.keys(bookingData).forEach(key => {
+          if (bookingData[key as keyof typeof bookingData] === undefined) {
+            delete bookingData[key as keyof typeof bookingData];
+          }
+        });
+      } catch (e) {
+        console.warn("Warning: Error cleaning booking data", e);
       }
+      
+      console.log('Booking data being submitted:', bookingData);
+
+      console.log('Attempting to save booking with data:', bookingData);
+      
+      // Save booking to database with error handling
+      let result, error;
+      try {
+        const response = await supabase
+          .from('bookings')
+          .insert([bookingData])
+          .select();
+          
+        result = response.data;
+        error = response.error;
+        
+        console.log('Supabase response:', { result, error });
+        
+        if (error) throw error;
+        
+      } catch (err: any) {
+        console.error('Error in booking submission:', {
+          error: err,
+          errorString: String(err),
+          errorObject: JSON.stringify(err, Object.getOwnPropertyNames(err)),
+          bookingData: JSON.stringify(bookingData, null, 2)
+        });
+
+        // Check if it's a specific column not found error
+        if (err?.message?.includes('column') && err?.message?.includes('not found')) {
+          // Redirect to the fix page
+          window.location.href = '/api/admin/fix-age-column';
+          return;
+        }
+        
+        throw new Error(err?.message || 'Failed to save your booking');
+      }
+      
+      console.log('Booking saved successfully:', result);
       
       // Send confirmation email - wrap this in a try/catch to prevent it from blocking the booking completion
       try {
@@ -247,20 +338,22 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
   };
 
   const nextStep = async () => {
-    if (currentStep === 1) {
-      // Define fields to validate with proper typing
-      const fieldsToValidate: (keyof BookingFormData)[] = ["date", "time", "location", "duration"];
-      
-      // If user is a guest, also validate personal information
-      if (isGuest) {
-        fieldsToValidate.push("firstName", "lastName", "email", "phone");
-      }
-      
-      const isValid = await trigger(fieldsToValidate);
-      if (!isValid) return;
+    // Validate current step before proceeding
+    let isValid = true;
+    
+    if (isPersonalInfoStep) {
+      // Validate personal info for guest users
+      isValid = await trigger(["firstName", "lastName", "email", "phone"]);
+    } else if (currentStep === (isGuest ? 2 : 1)) {
+      // Validate booking details
+      isValid = await trigger(["date", "time", "location", "duration"]);
     }
-
+    
+    if (!isValid) return;
     setCurrentStep((prev) => prev + 1);
+    
+    // Scroll to top when changing steps
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const prevStep = () => {
@@ -285,6 +378,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               : "text-gray-500 dark:text-gray-400"
           }`}
           disabled={currentStep === 1}
+          type="button"
         >
           <span className="block">1. {isGuest ? "Your Information" : "Select Date & Time"}</span>
         </button>
@@ -293,11 +387,25 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
             currentStep === 2
               ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
               : "text-gray-500 dark:text-gray-400"
-          }`}
-          disabled={currentStep === 2}
+          } ${isGuest && currentStep < 2 ? 'opacity-50 cursor-not-allowed' : ''}`}
+          disabled={isGuest && currentStep < 2}
+          type="button"
         >
-          <span className="block">2. Payment</span>
+          <span className="block">2. {isGuest ? "Booking Details" : "Payment"}</span>
         </button>
+        {isGuest && (
+          <button
+            className={`flex-1 py-4 text-center transition-all-300 text-xs sm:text-sm md:text-base ${
+              currentStep === 3
+                ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
+                : "text-gray-500 dark:text-gray-400"
+            } ${currentStep < 3 ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={currentStep < 3}
+            type="button"
+          >
+            <span className="block">3. Payment</span>
+          </button>
+        )}
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="p-6 sm:p-8">
@@ -326,66 +434,90 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
           )}
         </div>
 
-        {currentStep === 1 && (
+        {/* Personal Information Step - Only for guests */}
+        {isPersonalInfoStep && (
+          <div className="space-y-6 animate-fade-in">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Your Information</h2>
+            
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    First Name *
+                  </label>
+                  <input
+                    id="firstName"
+                    {...register("firstName")}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                  {errors.firstName && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.firstName.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Last Name *
+                  </label>
+                  <input
+                    id="lastName"
+                    {...register("lastName")}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                  {errors.lastName && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.lastName.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Email *
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    {...register("email")}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                  {errors.email && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Phone *
+                  </label>
+                  <input
+                    id="phone"
+                    type="tel"
+                    {...register("phone")}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                  {errors.phone && (
+                    <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.phone.message}</p>
+                  )}
+                </div>
+              </div>
+              
+              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <Button 
+                  type="button" 
+                  onClick={nextStep}
+                  className="w-full sm:w-auto float-right"
+                >
+                  Continue to Booking Details
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Booking Details Step */}
+        {currentStep === (isGuest ? 2 : 1) && (
           <div className="space-y-6 animate-fade-in">
             {isGuest && (
               <div className="space-y-4 animate-slide-in-up">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Your Information</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      First Name *
-                    </label>
-                    <input
-                      id="firstName"
-                      {...register("firstName")}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                    {errors.firstName && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.firstName.message}</p>
-                    )}
-                  </div>
-                  <div>
-                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Last Name *
-                    </label>
-                    <input
-                      id="lastName"
-                      {...register("lastName")}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                    {errors.lastName && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.lastName.message}</p>
-                    )}
-                  </div>
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Email *
-                    </label>
-                    <input
-                      id="email"
-                      type="email"
-                      {...register("email")}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                    {errors.email && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>
-                    )}
-                  </div>
-                  <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Phone *
-                    </label>
-                    <input
-                      id="phone"
-                      type="tel"
-                      {...register("phone")}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                    {errors.phone && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.phone.message}</p>
-                    )}
-                  </div>
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                  <h3 className="font-medium text-blue-800 dark:text-blue-200">Booking as: {watch('firstName')} {watch('lastName')}</h3>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">{watch('email')} • {watch('phone')}</p>
                 </div>
               </div>
             )}
@@ -699,6 +831,138 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
             </div>
 
             <div className="animate-slide-in-up animate-delay-600">
+              <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Demographic Information (Optional)</h3>
+              
+              {isGuest ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <div>
+                    <label htmlFor="gender" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Gender
+                    </label>
+                    <select
+                      id="gender"
+                      {...register("gender")}
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    >
+                      <option value="">Prefer not to say</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="non_binary">Non-binary</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="age" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Age Range
+                    </label>
+                    <select
+                      id="age"
+                      {...register("age")}
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    >
+                      <option value="">Prefer not to say</option>
+                      <option value="18">18-24</option>
+                      <option value="25">25-34</option>
+                      <option value="35">35-44</option>
+                      <option value="45">45-54</option>
+                      <option value="55">55-64</option>
+                      <option value="65">65+</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="race" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Race/Ethnicity
+                    </label>
+                    <select
+                      id="race"
+                      {...register("race")}
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    >
+                      <option value="">Prefer not to say</option>
+                      <option value="asian">Asian</option>
+                      <option value="black">Black or African American</option>
+                      <option value="hispanic">Hispanic or Latino</option>
+                      <option value="white">White</option>
+                      <option value="native">Native American or Alaskan Native</option>
+                      <option value="pacific">Native Hawaiian or Pacific Islander</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="education" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Education Level
+                    </label>
+                    <select
+                      id="education"
+                      {...register("education")}
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    >
+                      <option value="">Prefer not to say</option>
+                      <option value="high_school">High School or equivalent</option>
+                      <option value="some_college">Some College</option>
+                      <option value="associate">Associate's Degree</option>
+                      <option value="bachelor">Bachelor's Degree</option>
+                      <option value="master">Master's Degree</option>
+                      <option value="doctorate">Doctorate or higher</option>
+                    </select>
+                  </div>
+                  <div className="md:col-span-2">
+                    <label htmlFor="profession" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Profession
+                    </label>
+                    <input
+                      type="text"
+                      id="profession"
+                      {...register("profession")}
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      placeholder="Your profession (optional)"
+                    />
+                  </div>
+                </div>
+              ) : (
+                userProfile && (
+                  <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6">
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                      Using demographic information from your profile:
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                      {userProfile.gender && (
+                        <div>
+                          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Gender:</span>
+                          <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">
+                            {userProfile.gender.charAt(0).toUpperCase() + userProfile.gender.slice(1).replace('_', ' ')}
+                          </span>
+                        </div>
+                      )}
+                      {userProfile.race && (
+                        <div>
+                          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Race/Ethnicity:</span>
+                          <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">
+                            {userProfile.race.charAt(0).toUpperCase() + userProfile.race.slice(1).replace('_', ' ')}
+                          </span>
+                        </div>
+                      )}
+                      {userProfile.education && (
+                        <div>
+                          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Education:</span>
+                          <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">
+                            {userProfile.education.split('_')
+                              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                              .join(' ')}
+                          </span>
+                        </div>
+                      )}
+                      {userProfile.profession && (
+                        <div>
+                          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Profession:</span>
+                          <span className="ml-2 text-sm text-gray-700 dark:text-gray-200">{userProfile.profession}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )
+              )}
+
               <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Special Requests or Notes (Optional)
               </label>
@@ -712,18 +976,31 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
             </div>
 
             <div className="pt-4 flex justify-end">
-              <Button 
-                type="button" 
-                onClick={nextStep}
-                className="w-full sm:w-auto"
-              >
-                Next Step
-              </Button>
+              <div className="flex justify-between w-full">
+                {isGuest && (
+                  <Button 
+                    type="button" 
+                    onClick={() => setCurrentStep(1)}
+                    variant="outline"
+                    className="w-full sm:w-auto"
+                  >
+                    Back
+                  </Button>
+                )}
+                <Button 
+                  type="button" 
+                  onClick={nextStep}
+                  className={`w-full sm:w-auto ${isGuest ? 'ml-auto' : ''}`}
+                >
+                  Continue to Payment
+                </Button>
+              </div>
             </div>
           </div>
         )}
 
-        {currentStep === 2 && (
+        {/* Payment Step */}
+        {currentStep === (isGuest ? 3 : 2) && (
           <div className="space-y-6 animate-fade-in">
             <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-6 animate-scale-in">
               <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Booking Summary</h3>

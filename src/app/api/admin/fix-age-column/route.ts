@@ -9,15 +9,15 @@ const supabase = createClient(
 
 export async function GET() {
   try {
-    // Check if the profiles table exists and is accessible
+    // Check if the bookings table exists
     const { error: tableCheckError } = await supabase
-      .from('profiles')
+      .from('bookings')
       .select('id')
       .limit(1);
       
     if (tableCheckError) {
-      console.error('Error accessing profiles table:', tableCheckError);
-      return NextResponse.json({ error: 'Failed to access profiles table' }, { status: 500 });
+      console.error('Error accessing bookings table:', tableCheckError);
+      return NextResponse.json({ error: 'Failed to access bookings table' }, { status: 500 });
     }
     
     // We can't directly execute ALTER TABLE commands with the Supabase JS client
@@ -25,49 +25,18 @@ export async function GET() {
     
     const sqlInstructions = `
 -- Run this SQL in your Supabase dashboard SQL editor
--- This will ensure we have all required columns in your profiles and bookings tables
-
--- Ensure we have the full_name column (in case we need to migrate from name to full_name)
-DO $$
-BEGIN
-    -- Check if 'name' column exists but 'full_name' doesn't
-    IF EXISTS (
-        SELECT 1
-        FROM information_schema.columns
-        WHERE table_schema = 'public'
-        AND table_name = 'profiles'
-        AND column_name = 'name'
-    ) AND NOT EXISTS (
-        SELECT 1
-        FROM information_schema.columns
-        WHERE table_schema = 'public'
-        AND table_name = 'profiles'
-        AND column_name = 'full_name'
-    ) THEN
-        -- Add full_name column and copy data from name
-        ALTER TABLE public.profiles ADD COLUMN full_name TEXT;
-        UPDATE public.profiles SET full_name = name;
-        ALTER TABLE public.profiles ALTER COLUMN full_name SET NOT NULL;
-    END IF;
-END $$;
-
--- Add demographic columns if they don't exist in profiles table
-ALTER TABLE public.profiles 
-ADD COLUMN IF NOT EXISTS gender TEXT,
-ADD COLUMN IF NOT EXISTS race TEXT,
-ADD COLUMN IF NOT EXISTS education TEXT,
-ADD COLUMN IF NOT EXISTS profession TEXT;
-
--- IMPORTANT: Add demographic columns to bookings table if they don't exist
 -- This fixes the "Could not find the 'age' column of 'bookings' in the schema cache" error
+
+-- Add age column to the bookings table
 ALTER TABLE public.bookings
-ADD COLUMN IF NOT EXISTS gender TEXT,
-ADD COLUMN IF NOT EXISTS race TEXT,
-ADD COLUMN IF NOT EXISTS education TEXT,
-ADD COLUMN IF NOT EXISTS profession TEXT,
-ADD COLUMN IF NOT EXISTS age TEXT,
-ADD COLUMN IF NOT EXISTS booking_reason TEXT,
-ADD COLUMN IF NOT EXISTS notes TEXT;
+ADD COLUMN IF NOT EXISTS age TEXT;
+
+-- Verify the column was added
+SELECT column_name 
+FROM information_schema.columns 
+WHERE table_schema = 'public' 
+AND table_name = 'bookings'
+AND column_name = 'age';
     `;
     
     // Return HTML page with instructions
@@ -75,7 +44,7 @@ ADD COLUMN IF NOT EXISTS notes TEXT;
       `<!DOCTYPE html>
       <html>
         <head>
-          <title>Database Migration Instructions</title>
+          <title>Fix Age Column Error</title>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
@@ -114,6 +83,12 @@ ADD COLUMN IF NOT EXISTS notes TEXT;
             .button:hover {
               background-color: #1d4ed8;
             }
+            .error {
+              background-color: #fee2e2;
+              border-left: 4px solid #dc2626;
+              padding: 15px;
+              margin: 20px 0;
+            }
             code {
               font-family: monospace;
               background-color: #e2e8f0;
@@ -123,14 +98,15 @@ ADD COLUMN IF NOT EXISTS notes TEXT;
           </style>
         </head>
         <body>
-          <h1>Database Migration Instructions</h1>
-          <p>
-            Your application needs to update the database tables in your Supabase database.
-            Please follow these steps to complete the migration:
-          </p>
+          <h1>Fix Age Column Error</h1>
+          
+          <div class="error">
+            <h3>Error: Could not find the 'age' column of 'bookings' in the schema cache</h3>
+            <p>This error occurs because your bookings table is missing the 'age' column that the application is trying to use.</p>
+          </div>
           
           <div class="steps">
-            <h3>Steps to add the missing columns:</h3>
+            <h3>Steps to fix the error:</h3>
             <ol>
               <li>Log in to your <a href="https://app.supabase.com" target="_blank">Supabase dashboard</a></li>
               <li>Select your project</li>
@@ -138,6 +114,7 @@ ADD COLUMN IF NOT EXISTS notes TEXT;
               <li>Create a new query</li>
               <li>Copy and paste the SQL below</li>
               <li>Run the query</li>
+              <li>Return to your application and refresh the page</li>
             </ol>
           </div>
           
@@ -145,11 +122,14 @@ ADD COLUMN IF NOT EXISTS notes TEXT;
           <pre>${sqlInstructions}</pre>
           
           <p>
-            After running this SQL, your database will have the necessary columns for storing demographic information.
-            Return to your application and refresh the page to see the changes.
+            After running this SQL, your database will have the necessary 'age' column in the bookings table.
+            Return to your application and refresh the page.
           </p>
           
-          <a href="/admin" class="button">Return to Admin Dashboard</a>
+          <div style="display: flex; gap: 10px;">
+            <a href="/booking" class="button">Go to Booking</a>
+            <a href="/admin" class="button" style="background-color: #4b5563;">Go to Admin</a>
+          </div>
         </body>
       </html>`,
       {
@@ -162,7 +142,7 @@ ADD COLUMN IF NOT EXISTS notes TEXT;
     console.error('Error:', err);
     return NextResponse.json({ 
       error: 'Error occurred',
-      message: 'Please check your database table structures and ensure they have the necessary columns'
+      message: 'Failed to generate fix for age column'
     }, { status: 500 });
   }
 } 

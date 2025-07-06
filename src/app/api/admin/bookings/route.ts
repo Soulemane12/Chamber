@@ -98,6 +98,12 @@ export async function GET() {
         last_name: lastName,
         email: email,
         phone: phone,
+        // Include demographic information directly from booking record if available
+        gender: booking.gender || userProfile?.gender,
+        race: booking.race || userProfile?.race,
+        education: booking.education || userProfile?.education,
+        profession: booking.profession || userProfile?.profession,
+        age: booking.age || userProfile?.age,
         user: userProfile ? {
           id: userProfile.id,
           firstName: userProfile.first_name,
@@ -170,14 +176,62 @@ export async function POST(request: Request) {
       }
       
       case 'byDemographic': {
+        // Get all user IDs from bookings
+        const userIds = [...new Set(bookings.map(b => b.user_id))].filter(Boolean);
+        
+        // Fetch user profiles
+        let userProfiles: { [key: string]: any } = {};
+        if (userIds.length > 0) {
+          const { data: profiles, error: profilesError } = await supabase
+            .from('profiles')
+            .select('*')
+            .in('id', userIds);
+
+          if (!profilesError && profiles) {
+            // Create a map of user ID to profile
+            userProfiles = profiles.reduce((acc, profile) => {
+              acc[profile.id] = profile;
+              return acc;
+            }, {});
+          }
+        }
+        
         const bookingsByDemographic: Record<string, number> = {};
         
         bookings.forEach(booking => {
-          let value = booking[demographic];
+          // Get user profile for this booking
+          const userProfile = userProfiles[booking.user_id];
           
-          // Handle null/undefined values
+          // Get demographic value first from booking, then from user profile if not available
+          // This prioritizes the data entered at booking time over profile data
+          let value = booking[demographic] || userProfile?.[demographic];
+          
+          // Handle age ranges specifically
+          if (demographic === 'age' && value) {
+            // If value is already an age range format like "18-24", use it as is
+            if (value.includes('-') || value === '65+') {
+              // Keep as is
+            } else {
+              // Otherwise, convert to a range
+              const age = Number(value);
+              if (age < 25) value = '18-24';
+              else if (age < 35) value = '25-34';
+              else if (age < 45) value = '35-44';
+              else if (age < 55) value = '45-54';
+              else if (age < 65) value = '55-64';
+              else if (!isNaN(age)) value = '65+';
+            }
+          }
+          
+          // Handle null/undefined/empty values
           if (!value) {
             value = 'not_specified';
+          } else if (typeof value === 'string') {
+            // Convert to title case for consistency
+            value = value
+              .split('_')
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+              .join(' ');
           }
           
           bookingsByDemographic[value] = (bookingsByDemographic[value] || 0) + 1;
