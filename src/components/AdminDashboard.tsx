@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { formatCurrency } from "@/lib/utils";
 import UserEditModal, { UserProfile } from "./ui/UserEditModal";
+import AdminChatbot from './AdminChatbot';
 
 // Simple chart component using div heights
 function BarChart({ data, title, maxHeight = 200 }: { data: Record<string, number>, title: string, maxHeight?: number }) {
@@ -106,7 +107,7 @@ function PieChart({ data, title }: { data: Record<string, number>, title: string
               // Create path
               const path = `M 50 50 L ${startX} ${startY} A 50 50 0 ${largeArcFlag} 1 ${endX} ${endY} Z`;
               
-              // Update current angle for next segment
+              // Update current angle for next segmentF
               currentAngle += angle;
               
               return (
@@ -220,6 +221,13 @@ export default function AdminDashboard() {
     group_size: number;
     location: string;
     amount: number;
+    booking_reason?: string;
+    notes?: string;
+    gender?: string;
+    race?: string;
+    education?: string;
+    profession?: string;
+    age?: string | number;
     user?: {
       id: string;
       first_name: string;
@@ -231,6 +239,18 @@ export default function AdminDashboard() {
 
   // Full list of bookings (used in "Bookings" tab)
   const [allBookings, setAllBookings] = useState<Booking[]>([]);
+  const [bookingsPage, setBookingsPage] = useState<number>(1);
+  const [bookingsPageSize, setBookingsPageSize] = useState<number>(10);
+  const [totalBookingsPages, setTotalBookingsPages] = useState<number>(1);
+  const [totalBookingsCount, setTotalBookingsCount] = useState<number>(0);
+  const [bookingsSearchQuery, setBookingsSearchQuery] = useState<string>('');
+  const [bookingsDateRange, setBookingsDateRange] = useState<{startDate: string, endDate: string}>({
+    startDate: '',
+    endDate: ''
+  });
+  const [bookingsLocation, setBookingsLocation] = useState<string>('');
+  const [bookingsSortBy, setBookingsSortBy] = useState<string>('date');
+  const [bookingsSortOrder, setBookingsSortOrder] = useState<'asc' | 'desc'>('desc');
 
   // Summary statistics displayed in top cards
   const [summaryStats, setSummaryStats] = useState({
@@ -242,7 +262,7 @@ export default function AdminDashboard() {
   // Loading & error flags shared between views
   const [bookingsLoading, setBookingsLoading] = useState(true);
   const [bookingsError, setBookingsError] = useState<string | null>(null);
-  
+
   // Store all raw data for client-side filtering
   const [allBookingsData, setAllBookingsData] = useState<Booking[]>([]);
   const [allBookingsByTime, setAllBookingsByTime] = useState<{
@@ -297,191 +317,221 @@ export default function AdminDashboard() {
     year: { all: {}, midtown: {}, conyers: {} }
   });
   
-  // Fetch all booking data once
-  useEffect(() => {
-    const fetchAllBookingData = async () => {
-      setBookingsLoading(true);
-      try {
-        // Check if bookings table exists and load all bookings
-        const checkResponse = await fetch('/api/admin/bookings');
-        if (!checkResponse.ok) {
-          if (checkResponse.status === 404) {
-            setBookingsError('Bookings table does not exist. Please set up the database.');
-            setBookingsLoading(false);
-            return;
-          }
-          const errorData = await checkResponse.json().catch(() => null);
-          console.error('Error fetching bookings:', errorData);
-          throw new Error(errorData?.message || 'Failed to load bookings');
-        } else {
-          // If successful, we have all bookings data
-          const bookingsData = await checkResponse.json();
-          console.log('Bookings data:', bookingsData); // Debug log
-          setAllBookings(bookingsData);
-          setAllBookingsData(bookingsData);
+  // Update fetchAllBookingData to handle pagination and filtering
+  const fetchAllBookingData = async () => {
+    setBookingsLoading(true);
+    try {
+      // Build query string with filters
+      const params = new URLSearchParams();
+      if (bookingsSearchQuery) params.append('search', bookingsSearchQuery);
+      if (bookingsDateRange.startDate) params.append('startDate', bookingsDateRange.startDate);
+      if (bookingsDateRange.endDate) params.append('endDate', bookingsDateRange.endDate);
+      if (bookingsLocation) params.append('location', bookingsLocation);
+      if (bookingsSortBy) params.append('sortBy', bookingsSortBy);
+      if (bookingsSortOrder) params.append('sortOrder', bookingsSortOrder);
+      params.append('page', bookingsPage.toString());
+      params.append('pageSize', bookingsPageSize.toString());
+      
+      // Check if bookings table exists and load all bookings
+      const checkResponse = await fetch(`/api/admin/bookings?${params}`);
+      if (!checkResponse.ok) {
+        if (checkResponse.status === 404) {
+          setBookingsError('Bookings table does not exist. Please set up the database.');
+          setBookingsLoading(false);
+          return;
         }
-        
-        // Get summary stats
-        const summaryResponse = await fetch('/api/admin/bookings', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ type: 'summary' }),
-        });
-        
-        if (summaryResponse.ok) {
-          const { data } = await summaryResponse.json();
-          setSummaryStats(data);
+        const errorData = await checkResponse.json().catch(() => null);
+        console.error('Error fetching bookings:', errorData);
+        throw new Error(errorData?.message || 'Failed to load bookings');
+      } else {
+        // If successful, we have all bookings data
+        const responseData = await checkResponse.json();
+        setAllBookings(responseData.data || []);
+        if (responseData.pagination) {
+          setTotalBookingsCount(responseData.pagination.total);
+          setTotalBookingsPages(responseData.pagination.totalPages);
         }
-
-        // Fetch all time period data at once
-        const periods = ['day', 'month', 'quarter', 'year'] as const;
-        const timeData: Record<string, Record<string, number>> = {};
-        
-        for (const period of periods) {
-          const timeResponse = await fetch('/api/admin/bookings', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-              type: 'byTimePeriod',
-              period 
-            }),
-          });
-          
-          if (timeResponse.ok) {
-            const { data } = await timeResponse.json();
-            timeData[period] = data;
-          }
-        }
-        
-        setAllBookingsByTime({
-          day: timeData.day || {},
-          month: timeData.month || {},
-          quarter: timeData.quarter || {},
-          year: timeData.year || {}
-        });
-        // Set initial view
-        setBookingsByTime(timeData[timePeriod] || {});
-        
-        // Fetch all demographic data at once
-        const demographics = ['age', 'gender', 'race', 'education', 'profession'] as const;
-        const demographicData: Record<string, Record<string, number>> = {};
-        
-        for (const demo of demographics) {
-          const demographicResponse = await fetch('/api/admin/bookings', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-              type: 'byDemographic',
-              demographic: demo 
-            }),
-          });
-          
-          if (demographicResponse.ok) {
-            const { data } = await demographicResponse.json();
-            demographicData[demo] = data;
-          }
-        }
-        
-        setAllBookingsByDemographic({
-          age: demographicData.age || {},
-          gender: demographicData.gender || {},
-          race: demographicData.race || {},
-          education: demographicData.education || {},
-          profession: demographicData.profession || {}
-        });
-        // Set initial view
-        setBookingsByDemographic(demographicData[demographic] || {});
-        
-        // Get location data
-        const locationResponse = await fetch('/api/admin/bookings', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            type: 'byLocation'
-          }),
-        });
-        
-        if (locationResponse.ok) {
-          const { data } = await locationResponse.json();
-          setAverageBookings(data);
-        }
-        
-        // Fetch all revenue data at once
-        const revPeriods = ['day', 'week', 'month', 'year'] as const;
-        const locations = ['all', 'midtown', 'conyers'] as const;
-        const revenueData: Record<string, Record<string, Record<string, number>>> = {
-          day: { all: {}, midtown: {}, conyers: {} },
-          week: { all: {}, midtown: {}, conyers: {} },
-          month: { all: {}, midtown: {}, conyers: {} },
-          year: { all: {}, midtown: {}, conyers: {} }
-        };
-        
-        for (const period of revPeriods) {
-          // Period already initialized in revenueData
-          
-          for (const loc of locations) {
-            const revenueResponse = await fetch('/api/admin/bookings', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ 
-                type: 'revenue',
-                period,
-                location: loc
-              }),
-            });
-            
-            if (revenueResponse.ok) {
-              const { data } = await revenueResponse.json();
-              revenueData[period][loc] = data;
-            }
-          }
-        }
-        
-        setAllRevenueData({
-          day: {
-            all: revenueData.day?.all || {},
-            midtown: revenueData.day?.midtown || {},
-            conyers: revenueData.day?.conyers || {}
-          },
-          week: {
-            all: revenueData.week?.all || {},
-            midtown: revenueData.week?.midtown || {},
-            conyers: revenueData.week?.conyers || {}
-          },
-          month: {
-            all: revenueData.month?.all || {},
-            midtown: revenueData.month?.midtown || {},
-            conyers: revenueData.month?.conyers || {}
-          },
-          year: {
-            all: revenueData.year?.all || {},
-            midtown: revenueData.year?.midtown || {},
-            conyers: revenueData.year?.conyers || {}
-          }
-        });
-        // Set initial view
-        setRevenueData(revenueData[revenuePeriod][revenueLocation] || {});
-        
-        setLastRefreshed(new Date());
-        setBookingsError(null);
-      } catch (error) {
-        console.error('Error fetching booking analytics:', error);
-        setBookingsError('Failed to load booking analytics');
-      } finally {
-        setBookingsLoading(false);
+        setAllBookingsData(responseData.data || []);
       }
-    };
-    
+      
+      // Get summary stats
+      const summaryResponse = await fetch('/api/admin/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ type: 'summary' }),
+      });
+      
+      if (summaryResponse.ok) {
+        const { data } = await summaryResponse.json();
+        setSummaryStats(data);
+      }
+      
+      // Fetch all time period data at once
+      const periods = ['day', 'month', 'quarter', 'year'] as const;
+      const timeData: Record<string, Record<string, number>> = {};
+      
+      for (const period of periods) {
+      const timeResponse = await fetch('/api/admin/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          type: 'byTimePeriod',
+            period 
+        }),
+      });
+      
+      if (timeResponse.ok) {
+        const { data } = await timeResponse.json();
+          timeData[period] = data;
+        }
+      }
+      
+      setAllBookingsByTime({
+        day: timeData.day || {},
+        month: timeData.month || {},
+        quarter: timeData.quarter || {},
+        year: timeData.year || {}
+      });
+      // Set initial view
+      setBookingsByTime(timeData[timePeriod] || {});
+      
+      // Fetch all demographic data at once
+      const demographics = ['age', 'gender', 'race', 'education', 'profession'] as const;
+      const demographicData: Record<string, Record<string, number>> = {};
+      
+      for (const demo of demographics) {
+      const demographicResponse = await fetch('/api/admin/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          type: 'byDemographic',
+            demographic: demo 
+        }),
+      });
+      
+      if (demographicResponse.ok) {
+        const { data } = await demographicResponse.json();
+          demographicData[demo] = data;
+        }
+      }
+      
+      setAllBookingsByDemographic({
+        age: demographicData.age || {},
+        gender: demographicData.gender || {},
+        race: demographicData.race || {},
+        education: demographicData.education || {},
+        profession: demographicData.profession || {}
+      });
+      // Set initial view
+      setBookingsByDemographic(demographicData[demographic] || {});
+      
+      // Get location data
+      const locationResponse = await fetch('/api/admin/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          type: 'byLocation'
+        }),
+      });
+      
+      if (locationResponse.ok) {
+        const { data } = await locationResponse.json();
+        setAverageBookings(data);
+      }
+      
+      // Fetch all revenue data at once
+      const revPeriods = ['day', 'week', 'month', 'year'] as const;
+      const locations = ['all', 'midtown', 'conyers'] as const;
+      const revenueData: Record<string, Record<string, Record<string, number>>> = {
+        day: { all: {}, midtown: {}, conyers: {} },
+        week: { all: {}, midtown: {}, conyers: {} },
+        month: { all: {}, midtown: {}, conyers: {} },
+        year: { all: {}, midtown: {}, conyers: {} }
+      };
+      
+      for (const period of revPeriods) {
+        // Period already initialized in revenueData
+        
+        for (const loc of locations) {
+      const revenueResponse = await fetch('/api/admin/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          type: 'revenue',
+              period,
+              location: loc
+        }),
+      });
+      
+      if (revenueResponse.ok) {
+        const { data } = await revenueResponse.json();
+            revenueData[period][loc] = data;
+          }
+        }
+      }
+      
+      setAllRevenueData({
+        day: {
+          all: revenueData.day?.all || {},
+          midtown: revenueData.day?.midtown || {},
+          conyers: revenueData.day?.conyers || {}
+        },
+        week: {
+          all: revenueData.week?.all || {},
+          midtown: revenueData.week?.midtown || {},
+          conyers: revenueData.week?.conyers || {}
+        },
+        month: {
+          all: revenueData.month?.all || {},
+          midtown: revenueData.month?.midtown || {},
+          conyers: revenueData.month?.conyers || {}
+        },
+        year: {
+          all: revenueData.year?.all || {},
+          midtown: revenueData.year?.midtown || {},
+          conyers: revenueData.year?.conyers || {}
+        }
+      });
+      // Set initial view
+      setRevenueData(revenueData[revenuePeriod][revenueLocation] || {});
+      
+      setLastRefreshed(new Date());
+      setBookingsError(null);
+    } catch (error) {
+      console.error('Error fetching booking analytics:', error);
+      setBookingsError('Failed to load booking analytics');
+    } finally {
+      setBookingsLoading(false);
+    }
+  };
+  
+  // Add this useEffect to fetch bookings when filters change
+  useEffect(() => {
+    if (activeTab === 'bookings') {
+      fetchAllBookingData();
+    }
+  }, [
+    activeTab,
+    bookingsPage,
+    bookingsPageSize,
+    bookingsSortBy,
+    bookingsSortOrder,
+    bookingsLocation
+  ]);
+  
+  // Initial data loading and auto-refresh
+  useEffect(() => {
+    // Initial data load
     fetchAllBookingData();
     
     // Set up auto-refresh only if enabled
@@ -500,6 +550,13 @@ export default function AdminDashboard() {
       }
     };
   }, [dataRefreshInterval, autoRefreshEnabled]); // Depend on refresh interval and auto-refresh toggle
+  
+  // Add handler for search form submission
+  const handleBookingsSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setBookingsPage(1); // Reset to first page
+    fetchAllBookingData();
+  };
   
   // Update displayed data when filters change - no API calls needed
   useEffect(() => {
@@ -667,7 +724,7 @@ export default function AdminDashboard() {
       setBookingsLoading(false);
     }
   };
-
+  
   return (
     <div className="space-y-8">
       {/* Summary Statistics */}
@@ -793,30 +850,30 @@ export default function AdminDashboard() {
                     <option value="quarter">Quarterly</option>
                     <option value="year">Yearly</option>
                   </select>
-                </div>
               </div>
+            </div>
               <div className="relative">
                 {Object.keys(bookingsByTime).length === 0 && !bookingsLoading ? (
                   <p className="text-center text-gray-500 dark:text-gray-400 py-10">No time period data available</p>
                 ) : (
                   <div className={`transition-opacity duration-300 ${Object.keys(bookingsByTime).length > 0 ? 'opacity-100' : 'opacity-0'}`}>
                     <BarChart data={bookingsByTime} title="Bookings" />
-                  </div>
-                )}
+          </div>
+        )}
                 {bookingsLoading && (
                   <div className="absolute inset-0 flex items-center justify-center bg-white/75 dark:bg-gray-800/75">
                     <div className="animate-pulse flex flex-col items-center">
                       <svg className="animate-spin h-10 w-10 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
+              </svg>
                       <span className="mt-2 text-sm text-gray-500 dark:text-gray-400">Loading data...</span>
-                    </div>
-                  </div>
-                )}
-              </div>
             </div>
-
+          </div>
+                )}
+          </div>
+      </div>
+      
             {/* Demographic Analytics */}
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
               <div className="flex justify-between items-center mb-4">
@@ -833,28 +890,28 @@ export default function AdminDashboard() {
                       <option key={option.value} value={option.value}>{option.label}</option>
                     ))}
                   </select>
-                </div>
-              </div>
+          </div>
+        </div>
               <div className="relative">
                 {Object.keys(bookingsByDemographic).length === 0 && !bookingsLoading ? (
                   <p className="text-center text-gray-500 dark:text-gray-400 py-10">No demographic data available</p>
                 ) : (
                   <div className={`transition-opacity duration-300 ${Object.keys(bookingsByDemographic).length > 0 ? 'opacity-100' : 'opacity-0'}`}>
                     <PieChart data={bookingsByDemographic} title={getDemographicChartTitle()} />
-                  </div>
+      </div>
                 )}
                 {bookingsLoading && (
                   <div className="absolute inset-0 flex items-center justify-center bg-white/75 dark:bg-gray-800/75">
                     <div className="animate-pulse flex flex-col items-center">
-                      <svg className="animate-spin h-10 w-10 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <svg className="animate-spin h-10 w-10 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
                       <span className="mt-2 text-sm text-gray-500 dark:text-gray-400">Loading data...</span>
-                    </div>
-                  </div>
+            </div>
+            </div>
                 )}
-              </div>
+          </div>
             </div>
 
             {/* Average Bookings by Location */}
@@ -870,22 +927,22 @@ export default function AdminDashboard() {
                       title="Average Bookings"
                       maxHeight={150}
                     />
-                  </div>
+            </div>
                 )}
                 {bookingsLoading && (
                   <div className="absolute inset-0 flex items-center justify-center bg-white/75 dark:bg-gray-800/75">
                     <div className="animate-pulse flex flex-col items-center">
-                      <svg className="animate-spin h-10 w-10 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <svg className="animate-spin h-10 w-10 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
                       <span className="mt-2 text-sm text-gray-500 dark:text-gray-400">Loading data...</span>
-                    </div>
+          </div>
                   </div>
                 )}
-              </div>
-            </div>
-
+        </div>
+      </div>
+      
             {/* Revenue Analytics */}
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
               <div className="flex justify-between items-center mb-4">
@@ -910,29 +967,29 @@ export default function AdminDashboard() {
                     <option value="midtown">Midtown</option>
                     <option value="conyers">Conyers</option>
                   </select>
-                </div>
-              </div>
+            </div>
+            </div>
               <div className="relative">
                 {Object.keys(revenueData).length === 0 && !bookingsLoading ? (
                   <p className="text-center text-gray-500 dark:text-gray-400 py-10">No revenue data available</p>
                 ) : (
                   <div className={`transition-opacity duration-300 ${Object.keys(revenueData).length > 0 ? 'opacity-100' : 'opacity-0'}`}>
                     <BarChart data={revenueData} title="Revenue" />
-                  </div>
+          </div>
                 )}
                 {bookingsLoading && (
                   <div className="absolute inset-0 flex items-center justify-center bg-white/75 dark:bg-gray-800/75">
                     <div className="animate-pulse flex flex-col items-center">
-                      <svg className="animate-spin h-10 w-10 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <svg className="animate-spin h-10 w-10 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
                       <span className="mt-2 text-sm text-gray-500 dark:text-gray-400">Loading data...</span>
-                    </div>
-                  </div>
+        </div>
+        </div>
                 )}
-              </div>
-            </div>
+        </div>
+      </div>
           </div>
         </div>
       ) : activeTab === 'bookings' ? (
@@ -941,6 +998,80 @@ export default function AdminDashboard() {
           <div className="mb-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">All Bookings</h2>
             <p className="text-gray-600 dark:text-gray-400">View and manage all bookings</p>
+          </div>
+          
+          {/* Search and filters */}
+          <div className="mb-6">
+            <form onSubmit={handleBookingsSearch} className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="relative col-span-1 md:col-span-4 lg:col-span-2">
+                <input
+                  type="text"
+                  placeholder="Search bookings..."
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  value={bookingsSearchQuery}
+                  onChange={(e) => setBookingsSearchQuery(e.target.value)}
+                />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date</label>
+                <input
+                  type="date"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  value={bookingsDateRange.startDate}
+                  onChange={(e) => setBookingsDateRange({...bookingsDateRange, startDate: e.target.value})}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">End Date</label>
+                <input
+                  type="date"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  value={bookingsDateRange.endDate}
+                  onChange={(e) => setBookingsDateRange({...bookingsDateRange, endDate: e.target.value})}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Location</label>
+                <select
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  value={bookingsLocation}
+                  onChange={(e) => setBookingsLocation(e.target.value)}
+                >
+                  <option value="">All Locations</option>
+                  <option value="midtown">Midtown</option>
+                  <option value="conyers">Conyers</option>
+                </select>
+              </div>
+
+              <div className="flex space-x-2 items-end col-span-1 md:col-span-4 lg:col-span-2">
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                >
+                  Apply Filters
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setBookingsSearchQuery('');
+                    setBookingsDateRange({ startDate: '', endDate: '' });
+                    setBookingsLocation('');
+                    setBookingsSortBy('date');
+                    setBookingsSortOrder('desc');
+                    setBookingsPage(1);
+                  }}
+                  className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-white rounded-lg transition-colors"
+                >
+                  Reset Filters
+                </button>
+              </div>
+            </form>
           </div>
           
           {bookingsLoading ? (
@@ -960,7 +1091,7 @@ export default function AdminDashboard() {
                 </div>
               </div>
             </div>
-          ) : allBookingsData.length === 0 ? (
+          ) : allBookings.length === 0 ? (
             <div className="text-center py-12">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -970,74 +1101,141 @@ export default function AdminDashboard() {
               <p className="text-gray-600 dark:text-gray-400 text-lg">No bookings found.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead className="bg-gray-50 dark:bg-gray-700">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date & Time</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Customer</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Contact</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Service</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Location</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Amount</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                  {allBookingsData.map((booking) => (
-                    <tr key={booking.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">
-                          {new Date(booking.date).toLocaleDateString()}
-                        </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {booking.time}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">
-                          {booking.first_name} {booking.last_name}
-                        </div>
-                        {booking.user?.email && (
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
-                            {booking.user.email}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900 dark:text-white">
-                          {booking.phone}
-                        </div>
-                        {booking.user?.phone && booking.user.phone !== booking.phone && (
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
-                            {booking.user.phone}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900 dark:text-white">
-                          {booking.duration} min massage
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                          Group size: {booking.group_size}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          booking.location === 'midtown' 
-                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
-                            : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                        }`}>
-                          {booking.location === 'midtown' ? 'Midtown' : 'Conyers'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900 dark:text-white">
-                        {formatCurrency(booking.amount)}
-                      </td>
+            <>
+              <div className="mb-4 flex justify-between items-center">
+                <div className="flex items-center space-x-2">
+                  <label className="text-sm text-gray-600 dark:text-gray-400">Sort by:</label>
+                  <select
+                    className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-sm dark:bg-gray-700 dark:text-white"
+                    value={bookingsSortBy}
+                    onChange={(e) => {
+                      setBookingsSortBy(e.target.value);
+                      setBookingsPage(1);
+                    }}
+                  >
+                    <option value="date">Date</option>
+                    <option value="time">Time</option>
+                    <option value="first_name">First Name</option>
+                    <option value="last_name">Last Name</option>
+                    <option value="location">Location</option>
+                    <option value="amount">Amount</option>
+                    <option value="created_at">Created At</option>
+                  </select>
+                  <button
+                    onClick={() => {
+                      setBookingsSortOrder(bookingsSortOrder === 'asc' ? 'desc' : 'asc');
+                      setBookingsPage(1);
+                    }}
+                    className="p-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                    title={bookingsSortOrder === 'asc' ? 'Sort Descending' : 'Sort Ascending'}
+                  >
+                    {bookingsSortOrder === 'asc' ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+                
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  Showing {allBookings.length} of {totalBookingsCount} bookings
+                </div>
+              </div>
+              
+              <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                  <thead className="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date & Time</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Customer</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Contact</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Service</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Location</th>
+                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Amount</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    {allBookings.map((booking) => (
+                      <tr key={booking.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            {new Date(booking.date).toLocaleDateString()}
+                          </div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                            {booking.time}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            {booking.first_name} {booking.last_name}
+                          </div>
+                          {booking.user?.email && (
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                              {booking.user.email}
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900 dark:text-white">
+                            {booking.email}
+                          </div>
+                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                            {booking.phone}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900 dark:text-white">
+                            {booking.duration} min
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            Group size: {booking.group_size}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            booking.location === 'midtown' 
+                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
+                              : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                          }`}>
+                            {booking.location === 'midtown' ? 'Midtown' : 'Conyers'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900 dark:text-white">
+                          {formatCurrency(booking.amount)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              {/* Pagination */}
+              <div className="mt-4 flex justify-between items-center">
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  Page {bookingsPage} of {totalBookingsPages}
+                </div>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => setBookingsPage(Math.max(1, bookingsPage - 1))}
+                    disabled={bookingsPage <= 1}
+                    className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => setBookingsPage(Math.min(totalBookingsPages, bookingsPage + 1))}
+                    disabled={bookingsPage >= totalBookingsPages}
+                    className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </>
           )}
         </div>
       ) : (
@@ -1196,6 +1394,8 @@ export default function AdminDashboard() {
         }}
         onSave={handleSaveUser}
       />
+      {/* Keep the floating AI Assistant button */}
+      <AdminChatbot mode="floating" />
     </div>
   );
 } 

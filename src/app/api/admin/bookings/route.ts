@@ -29,13 +29,46 @@ const formatDateForPeriod = (date: string, period: 'day' | 'week' | 'month' | 'q
   }
 };
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    // First, get all bookings
-    const { data: bookings, error: bookingsError } = await supabase
-      .from('bookings')
-      .select('*')
-      .order('date', { ascending: false });
+    // Parse query parameters for filtering
+    const { searchParams } = new URL(request.url);
+    const searchQuery = searchParams.get('search') || '';
+    const startDate = searchParams.get('startDate') || '';
+    const endDate = searchParams.get('endDate') || '';
+    const location = searchParams.get('location') || '';
+    const sortBy = searchParams.get('sortBy') || 'date';
+    const sortOrder = searchParams.get('sortOrder') || 'desc';
+    const page = parseInt(searchParams.get('page') || '1');
+    const pageSize = parseInt(searchParams.get('pageSize') || '50');
+
+    // Build the base query
+    let query = supabase.from('bookings').select('*');
+    
+    // Apply filters
+    if (startDate) {
+      query = query.gte('date', startDate);
+    }
+    
+    if (endDate) {
+      query = query.lte('date', endDate);
+    }
+    
+    if (location && (location === 'midtown' || location === 'conyers')) {
+      query = query.eq('location', location);
+    }
+    
+    // Apply sorting
+    if (sortBy && ['date', 'time', 'first_name', 'last_name', 'location', 'amount', 'created_at'].includes(sortBy)) {
+      const order = sortOrder === 'asc' ? true : false;
+      query = query.order(sortBy, { ascending: order });
+    } else {
+      // Default sorting by date descending
+      query = query.order('date', { ascending: false });
+    }
+    
+    // Execute the query
+    const { data: bookings, error: bookingsError } = await query;
       
     if (bookingsError) {
       console.error('Error accessing bookings table:', bookingsError);
@@ -83,7 +116,7 @@ export async function GET() {
     }
 
     // Format the response to include user data
-    const formattedBookings = bookings.map(booking => {
+    let formattedBookings = bookings.map(booking => {
       // Use the user data if available, otherwise use the booking's contact info
       const userProfile = userProfiles[booking.user_id] || null;
       
@@ -139,8 +172,39 @@ export async function GET() {
         } : null
       };
     });
-
-    return NextResponse.json(formattedBookings);
+    
+    // Apply text search filter (client-side since we need to search across joined data)
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      formattedBookings = formattedBookings.filter(booking => 
+        booking.first_name.toLowerCase().includes(query) ||
+        booking.last_name.toLowerCase().includes(query) ||
+        booking.email.toLowerCase().includes(query) ||
+        booking.phone.toLowerCase().includes(query) ||
+        booking.location.toLowerCase().includes(query) ||
+        (booking.booking_reason && booking.booking_reason.toLowerCase().includes(query)) ||
+        (booking.notes && booking.notes.toLowerCase().includes(query))
+      );
+    }
+    
+    // Get total count for pagination
+    const total = formattedBookings.length;
+    
+    // Apply pagination
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize;
+    const paginatedBookings = formattedBookings.slice(start, end);
+    
+    // Return paginated results with metadata
+    return NextResponse.json({
+      data: paginatedBookings,
+      pagination: {
+        total,
+        page,
+        pageSize,
+        totalPages: Math.ceil(total / pageSize)
+      }
+    });
   } catch (err) {
     console.error('Error in GET /api/admin/bookings:', err);
     return NextResponse.json({ 
@@ -311,9 +375,8 @@ export async function POST(request: Request) {
       }
       
       case 'revenue': {
-        const allRevenueData: Record<string, Record<string, Record<string, number>>> = {
-          day: {}, week: {}, month: {}, year: {}
-        };
+        // Initialize revenue data structure properly
+        const allRevenueData: Record<string, number> = {};
         
         // Filter by location if specified
         const filteredBookings = location === 'all' 
@@ -324,7 +387,7 @@ export async function POST(request: Request) {
           if (!booking.date || !booking.amount) return;
           
           const formattedDate = formatDateForPeriod(booking.date, period);
-          allRevenueData[formattedDate.split('-')[0]][formattedDate.split('-')[1]][formattedDate.split('-')[2]] = (allRevenueData[formattedDate.split('-')[0]][formattedDate.split('-')[1]][formattedDate.split('-')[2]] || 0) + Number(booking.amount);
+          allRevenueData[formattedDate] = (allRevenueData[formattedDate] || 0) + Number(booking.amount);
         });
         
         return NextResponse.json({ data: allRevenueData });
