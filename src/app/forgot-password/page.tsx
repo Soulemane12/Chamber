@@ -2,25 +2,23 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Head from "next/head";
 
 export default function ForgotPasswordPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
     
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: `${location.origin}/reset-password`,
       });
       
       if (error) {
@@ -28,9 +26,10 @@ export default function ForgotPasswordPage() {
       }
       
       setMessage("Check your email for the password reset link!");
-    } catch (err: any) {
-      console.error("Error sending reset email:", err);
-      setError(err.message || "An error occurred while sending the reset email.");
+    } catch (error: unknown) {
+      console.error("Error sending reset email:", error);
+      const errorMessage = error instanceof Error ? error.message : "An error occurred while sending the reset email.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -85,8 +84,8 @@ export default function ForgotPasswordPage() {
           </div>
         ) : (
           <>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Enter your email address and we'll send you a link to reset your password.
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+              Enter your email and we&apos;ll send you a link to reset your password.
             </p>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="flex flex-col">

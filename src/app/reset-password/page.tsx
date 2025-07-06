@@ -1,36 +1,33 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Head from "next/head";
 
-export default function ResetPasswordPage() {
-  const router = useRouter();
+function ResetPasswordContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [refreshToken, setRefreshToken] = useState<string | null>(null);
 
   useEffect(() => {
     // Check for access token in URL (from password reset email)
     const accessToken = searchParams.get('access_token');
-    const refreshToken = searchParams.get('refresh_token');
     const type = searchParams.get('type');
     
     if (accessToken && type === 'recovery') {
       setAccessToken(accessToken);
-      setRefreshToken(refreshToken);
     } else {
       setError("Invalid or expired password reset link");
     }
   }, [searchParams]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     
@@ -67,9 +64,10 @@ export default function ResetPasswordPage() {
         router.push("/login");
       }, 2000);
       
-    } catch (err: any) {
-      console.error("Error updating password:", err);
-      setError(err.message || "An error occurred while updating your password.");
+    } catch (error: unknown) {
+      console.error("Error updating password:", error);
+      const errorMessage = error instanceof Error ? error.message : "An error occurred while updating your password.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -106,11 +104,17 @@ export default function ResetPasswordPage() {
         <title>Reset Password - WellNex02</title>
       </Head>
       <div className="bg-white dark:bg-gray-800 p-10 rounded-xl shadow-2xl w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">Set New Password</h1>
-          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            Please enter your new password below.
-          </p>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">Reset Password</h1>
+          <a 
+            href="/login" 
+            className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Login
+          </a>
         </div>
         
         {error && (
@@ -188,5 +192,13 @@ export default function ResetPasswordPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

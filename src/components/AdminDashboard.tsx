@@ -196,7 +196,29 @@ export default function AdminDashboard() {
   const [bookingsByDemographic, setBookingsByDemographic] = useState<Record<string, number>>({});
   const [averageBookings, setAverageBookings] = useState<{midtown: number, conyers: number}>({midtown: 0, conyers: 0});
   const [revenueData, setRevenueData] = useState<Record<string, number>>({});
-  const [allBookings, setAllBookings] = useState<any[]>([]);
+  interface Booking {
+    id: string;
+    user_id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone: string;
+    date: string;
+    time: string;
+    duration: number;
+    group_size: number;
+    location: string;
+    amount: number;
+    user?: {
+      id: string;
+      first_name: string;
+      last_name: string;
+      email: string;
+      phone: string;
+    } | null;
+  }
+
+  const [allBookings, setAllBookings] = useState<Booking[]>([]);
   const [summaryStats, setSummaryStats] = useState({
     totalBookings: 0,
     totalRevenue: 0,
