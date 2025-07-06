@@ -92,6 +92,24 @@ export async function GET() {
       const email = userProfile?.email || booking.email || '';
       const phone = userProfile?.phone || booking.phone || '';
       
+      // Calculate age from date of birth if available
+      let calculatedAge = null;
+      if (userProfile?.dob) {
+        const dob = new Date(userProfile.dob);
+        if (!isNaN(dob.getTime())) {
+          const today = new Date();
+          let age = today.getFullYear() - dob.getFullYear();
+          const monthDiff = today.getMonth() - dob.getMonth();
+          
+          // Adjust age if birthday hasn't occurred this year yet
+          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+            age--;
+          }
+          
+          calculatedAge = age;
+        }
+      }
+      
       return {
         ...booking,
         first_name: firstName,
@@ -103,20 +121,20 @@ export async function GET() {
         race: booking.race || userProfile?.race,
         education: booking.education || userProfile?.education,
         profession: booking.profession || userProfile?.profession,
-        age: booking.age || userProfile?.age,
-        booking_reason: booking.booking_reason,
-        notes: booking.notes,
+        age: booking.age || calculatedAge || null,
+        calculated_age: calculatedAge,
         user: userProfile ? {
           id: userProfile.id,
           firstName: userProfile.first_name,
           lastName: userProfile.last_name,
           email: userProfile.email,
           phone: userProfile.phone,
-          age: userProfile.age,
+          age: calculatedAge,
           gender: userProfile.gender,
           race: userProfile.race,
           education: userProfile.education,
-          profession: userProfile.profession
+          profession: userProfile.profession,
+          dob: userProfile.dob
         } : null
       };
     });
@@ -209,19 +227,40 @@ export async function POST(request: Request) {
           let value = booking[demographic] || userProfile?.[demographic];
           
           // Handle age ranges specifically
-          if (demographic === 'age' && value) {
+          if (demographic === 'age') {
             // If value is already an age range format like "18-24", use it as is
-            if (value.includes('-') || value === '65+') {
+            if (value && (value.includes('-') || value === '65+')) {
               // Keep as is
-            } else {
-              // Otherwise, convert to a range
-              const age = Number(value);
+            } else if (booking.age) {
+              // Use booking age if available
+              const age = Number(booking.age);
               if (age < 25) value = '18-24';
               else if (age < 35) value = '25-34';
               else if (age < 45) value = '35-44';
               else if (age < 55) value = '45-54';
               else if (age < 65) value = '55-64';
               else if (!isNaN(age)) value = '65+';
+            } else if (userProfile?.dob) {
+              // Calculate age from date of birth if available
+              const dob = new Date(userProfile.dob);
+              if (!isNaN(dob.getTime())) {
+                const today = new Date();
+                let age = today.getFullYear() - dob.getFullYear();
+                const monthDiff = today.getMonth() - dob.getMonth();
+                
+                // Adjust age if birthday hasn't occurred this year yet
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+                  age--;
+                }
+                
+                // Assign age group
+                if (age < 25) value = '18-24';
+                else if (age < 35) value = '25-34';
+                else if (age < 45) value = '35-44';
+                else if (age < 55) value = '45-54';
+                else if (age < 65) value = '55-64';
+                else value = '65+';
+              }
             }
           }
           

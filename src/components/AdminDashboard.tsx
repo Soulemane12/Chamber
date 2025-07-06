@@ -218,24 +218,12 @@ export default function AdminDashboard() {
     group_size: number;
     location: string;
     amount: number;
-    age?: string;
-    gender?: string;
-    race?: string;
-    education?: string;
-    profession?: string;
-    booking_reason?: string;
-    notes?: string;
     user?: {
       id: string;
       first_name: string;
       last_name: string;
       email: string;
       phone: string;
-      age?: string;
-      gender?: string;
-      race?: string;
-      education?: string;
-      profession?: string;
     } | null;
   }
 
@@ -376,6 +364,37 @@ export default function AdminDashboard() {
       .split('_')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
+  };
+  
+  // Helper function to calculate age from date of birth
+  const calculateAge = (dob: string): number | null => {
+    if (!dob) return null;
+    
+    const birthDate = new Date(dob);
+    // Check if birthDate is valid
+    if (isNaN(birthDate.getTime())) return null;
+    
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    // If hasn't had birthday this year yet, subtract one year
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    
+    return age >= 0 ? age : null;
+  };
+  
+  // Helper function to get age group from age
+  const getAgeGroup = (age: number | null): string => {
+    if (age === null) return "Not Specified";
+    if (age < 25) return "18-24";
+    else if (age < 35) return "25-34";
+    else if (age < 45) return "35-44";
+    else if (age < 55) return "45-54";
+    else if (age < 65) return "55-64";
+    else return "65+";
   };
   
   // Helper function to get chart title based on selected demographic
@@ -812,7 +831,6 @@ export default function AdminDashboard() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Customer</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Contact</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Service</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Demographics</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Location</th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Amount</th>
                   </tr>
@@ -850,39 +868,10 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900 dark:text-white">
-                          {booking.duration} min session
+                          {booking.duration} min massage
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
                           Group size: {booking.group_size}
-                        </div>
-                        {booking.booking_reason && (
-                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            Reason: {formatDemographic(booking.booking_reason)}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-xs space-y-1">
-                          {booking.age && (
-                            <div className="text-gray-900 dark:text-white flex">
-                              <span className="font-medium w-16">Age:</span> {booking.age}
-                            </div>
-                          )}
-                          {booking.gender && (
-                            <div className="text-gray-900 dark:text-white flex">
-                              <span className="font-medium w-16">Gender:</span> {formatDemographic(booking.gender)}
-                            </div>
-                          )}
-                          {booking.race && (
-                            <div className="text-gray-900 dark:text-white flex">
-                              <span className="font-medium w-16">Race:</span> {formatDemographic(booking.race)}
-                            </div>
-                          )}
-                          {booking.education && (
-                            <div className="text-gray-900 dark:text-white flex">
-                              <span className="font-medium w-16">Education:</span> {formatDemographic(booking.education)}
-                            </div>
-                          )}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -974,7 +963,7 @@ export default function AdminDashboard() {
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Address</th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Phone</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">DOB</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Age</th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Gender</th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Race</th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Education</th>
@@ -1007,7 +996,11 @@ export default function AdminDashboard() {
                         <a href={`tel:${p.phone}`} className="hover:text-blue-600 dark:hover:text-blue-400">{p.phone}</a>
                           ) : '-'}
                       </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{p.dob || '-'}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                          <span title={p.dob || ''}>
+                            {calculateAge(p.dob) !== null ? `${calculateAge(p.dob)} years` : '-'}
+                          </span>
+                        </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{formatDemographic(p.gender)}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{formatDemographic(p.race)}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{formatDemographic(p.education)}</td>

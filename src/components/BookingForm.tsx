@@ -147,6 +147,24 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
             const firstName = nameParts[0] || '';
             const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
             
+            // Calculate age from DOB if available
+            let calculatedAge: string | undefined = undefined;
+            if (profileData.dob) {
+              const dob = new Date(profileData.dob);
+              if (!isNaN(dob.getTime())) {
+                const today = new Date();
+                let age = today.getFullYear() - dob.getFullYear();
+                const monthDiff = today.getMonth() - dob.getMonth();
+                
+                // Adjust age if birthday hasn't occurred this year yet
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+                  age--;
+                }
+                
+                calculatedAge = String(age);
+              }
+            }
+            
             // Set form values
             setValue('firstName', firstName);
             setValue('lastName', lastName);
@@ -158,6 +176,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
             if (profileData.race) setValue('race', profileData.race);
             if (profileData.education) setValue('education', profileData.education);
             if (profileData.profession) setValue('profession', profileData.profession);
+            if (calculatedAge) setValue('age', calculatedAge);
             
             setUserProfile({
               firstName,
@@ -167,7 +186,8 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               gender: profileData.gender,
               race: profileData.race,
               education: profileData.education,
-              profession: profileData.profession
+              profession: profileData.profession,
+              age: calculatedAge || undefined
             });
           }
         }
@@ -861,12 +881,12 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                     >
                       <option value="">Prefer not to say</option>
-                      <option value="18-24">18-24</option>
-                      <option value="25-34">25-34</option>
-                      <option value="35-44">35-44</option>
-                      <option value="45-54">45-54</option>
-                      <option value="55-64">55-64</option>
-                      <option value="65+">65+</option>
+                      <option value="18">18-24</option>
+                      <option value="25">25-34</option>
+                      <option value="35">35-44</option>
+                      <option value="45">45-54</option>
+                      <option value="55">55-64</option>
+                      <option value="65">65+</option>
                     </select>
                   </div>
                   <div>
