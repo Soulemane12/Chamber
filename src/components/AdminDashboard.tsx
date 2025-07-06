@@ -1,13 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { 
-  mockBookings, 
-  getBookingsByTimePeriod, 
-  getBookingsByDemographic,
-  getAverageBookingsByLocation,
-  getBookingRevenueByLocation
-} from "@/lib/mockData";
 import { formatCurrency } from "@/lib/utils";
 import UserEditModal, { UserProfile } from "./ui/UserEditModal";
 
@@ -198,16 +191,131 @@ export default function AdminDashboard() {
     loadProfiles();
   }, []);
   
-  // Get data for charts
-  const bookingsByTime = getBookingsByTimePeriod(timePeriod);
-  const bookingsByDemographic = getBookingsByDemographic(demographic);
-  const averageBookings = getAverageBookingsByLocation();
-  const revenueData = getBookingRevenueByLocation(revenueLocation, revenuePeriod);
+  // State for booking data
+  const [bookingsByTime, setBookingsByTime] = useState<Record<string, number>>({});
+  const [bookingsByDemographic, setBookingsByDemographic] = useState<Record<string, number>>({});
+  const [averageBookings, setAverageBookings] = useState<{midtown: number, conyers: number}>({midtown: 0, conyers: 0});
+  const [revenueData, setRevenueData] = useState<Record<string, number>>({});
+  const [summaryStats, setSummaryStats] = useState({
+    totalBookings: 0,
+    totalRevenue: 0,
+    averageBookingValue: 0
+  });
+  const [bookingsLoading, setBookingsLoading] = useState(true);
+  const [bookingsError, setBookingsError] = useState<string | null>(null);
+
+  // Fetch booking data
+  useEffect(() => {
+    const fetchBookingAnalytics = async () => {
+      setBookingsLoading(true);
+      try {
+        // Check if bookings table exists
+        const checkResponse = await fetch('/api/admin/bookings');
+        if (!checkResponse.ok) {
+          if (checkResponse.status === 404) {
+            setBookingsError('Bookings table does not exist. Please set up the database.');
+            setBookingsLoading(false);
+            return;
+          }
+          throw new Error('Failed to check bookings table');
+        }
+        
+        // Get summary stats
+        const summaryResponse = await fetch('/api/admin/bookings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ type: 'summary' }),
+        });
+        
+        if (summaryResponse.ok) {
+          const { data } = await summaryResponse.json();
+          setSummaryStats(data);
+        }
+        
+        // Get time period data
+        const timeResponse = await fetch('/api/admin/bookings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            type: 'byTimePeriod',
+            period: timePeriod 
+          }),
+        });
+        
+        if (timeResponse.ok) {
+          const { data } = await timeResponse.json();
+          setBookingsByTime(data);
+        }
+        
+        // Get demographic data
+        const demographicResponse = await fetch('/api/admin/bookings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            type: 'byDemographic',
+            demographic 
+          }),
+        });
+        
+        if (demographicResponse.ok) {
+          const { data } = await demographicResponse.json();
+          setBookingsByDemographic(data);
+        }
+        
+        // Get location data
+        const locationResponse = await fetch('/api/admin/bookings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            type: 'byLocation'
+          }),
+        });
+        
+        if (locationResponse.ok) {
+          const { data } = await locationResponse.json();
+          setAverageBookings(data);
+        }
+        
+        // Get revenue data
+        const revenueResponse = await fetch('/api/admin/bookings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            type: 'revenue',
+            period: revenuePeriod,
+            location: revenueLocation
+          }),
+        });
+        
+        if (revenueResponse.ok) {
+          const { data } = await revenueResponse.json();
+          setRevenueData(data);
+        }
+        
+        setBookingsError(null);
+      } catch (error) {
+        console.error('Error fetching booking analytics:', error);
+        setBookingsError('Failed to load booking analytics');
+      } finally {
+        setBookingsLoading(false);
+      }
+    };
+    
+    fetchBookingAnalytics();
+  }, [timePeriod, demographic, revenuePeriod, revenueLocation]);
   
-  // Calculate summary statistics
-  const totalBookings = mockBookings.length;
-  const totalRevenue = mockBookings.reduce((sum, booking) => sum + booking.amount, 0);
-  const averageBookingValue = totalRevenue / totalBookings;
+  // Extract summary statistics
+  const { totalBookings, totalRevenue, averageBookingValue } = summaryStats;
   
   // Helper function to format demographic values for display
   const formatDemographic = (value: string | undefined): string => {
@@ -283,7 +391,8 @@ export default function AdminDashboard() {
       </div>
       
       {/* Tab Navigation */}
-      <div className="flex border-b border-gray-200 dark:border-gray-700">
+      <div className="flex flex-wrap justify-between items-center border-b border-gray-200 dark:border-gray-700">
+        <div className="flex">
         <button
           className={`py-4 px-6 font-medium text-sm ${
             activeTab === 'analytics'
@@ -304,9 +413,67 @@ export default function AdminDashboard() {
         >
           User Management
         </button>
+        </div>
+        <div className="py-2 px-6">
+          <a 
+            href="/api/admin/setup-db" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Database Setup
+          </a>
+        </div>
       </div>
       
       {activeTab === 'analytics' ? (
+        <>
+        {bookingsError && (
+          <div className="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 mb-6 rounded">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-700 dark:text-red-300">{bookingsError}</p>
+                {bookingsError.includes("table") && (
+                  <a 
+                    href="/api/admin/setup-db" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="mt-2 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  >
+                    Setup Booking Database
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {bookingsLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          </div>
+        ) : summaryStats.totalBookings === 0 ? (
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-2">No Booking Data Yet</h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Once customers start making bookings, you&apos;ll see analytics here.
+            </p>
+          </div>
+        ) : (
         <>
       {/* Bookings by Time Period */}
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
@@ -426,7 +593,7 @@ export default function AdminDashboard() {
       
       {/* Average Bookings per Location */}
       <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Average Bookings per Location</h2>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Bookings per Location</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-6">
             <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Midtown Biohack</h3>
@@ -435,7 +602,7 @@ export default function AdminDashboard() {
               <div className="ml-4 text-gray-600 dark:text-gray-400">bookings</div>
             </div>
             <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              {((averageBookings.midtown / totalBookings) * 100).toFixed(1)}% of total bookings
+                  {totalBookings ? ((averageBookings.midtown / totalBookings) * 100).toFixed(1) : 0}% of total bookings
             </div>
           </div>
           <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-6">
@@ -445,7 +612,7 @@ export default function AdminDashboard() {
               <div className="ml-4 text-gray-600 dark:text-gray-400">bookings</div>
             </div>
             <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              {((averageBookings.conyers / totalBookings) * 100).toFixed(1)}% of total bookings
+                  {totalBookings ? ((averageBookings.conyers / totalBookings) * 100).toFixed(1) : 0}% of total bookings
             </div>
           </div>
         </div>
@@ -546,6 +713,8 @@ export default function AdminDashboard() {
           </span>
         </div>
       </div>
+          </>
+        )}
         </>
       ) : (
         /* User Management Tab */

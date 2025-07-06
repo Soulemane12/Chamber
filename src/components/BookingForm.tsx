@@ -179,8 +179,42 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
   const onSubmit = async (data: BookingFormData) => {
     setIsSubmitting(true);
     try {
-      // Simulate API call to book session
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Calculate booking amount
+      const basePrice = pricingOptions[data.duration as keyof typeof pricingOptions] || 0;
+      const multiplier = groupSizeMultipliers[data.groupSize as keyof typeof groupSizeMultipliers] || 1.0;
+      const amount = basePrice * multiplier;
+      
+      // Get user ID if authenticated
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id;
+      
+      // Save booking to database
+      const { error } = await supabase
+        .from('bookings')
+        .insert([
+          {
+            user_id: userId,
+            first_name: data.firstName,
+            last_name: data.lastName,
+            email: data.email,
+            phone: data.phone,
+            date: data.date.toISOString().split('T')[0],
+            time: data.time,
+            duration: data.duration,
+            location: data.location,
+            group_size: parseInt(data.groupSize),
+            amount,
+            booking_reason: data.bookingReason,
+            notes: data.notes,
+          }
+        ])
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Error saving booking:', error);
+        throw new Error('Failed to save your booking');
+      }
       
       // Send confirmation email - wrap this in a try/catch to prevent it from blocking the booking completion
       try {
