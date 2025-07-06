@@ -158,7 +158,7 @@ export default function AdminDashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'analytics' | 'users'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'users' | 'bookings'>('analytics');
 
   useEffect(() => {
     const loadProfiles = async () => {
@@ -196,6 +196,7 @@ export default function AdminDashboard() {
   const [bookingsByDemographic, setBookingsByDemographic] = useState<Record<string, number>>({});
   const [averageBookings, setAverageBookings] = useState<{midtown: number, conyers: number}>({midtown: 0, conyers: 0});
   const [revenueData, setRevenueData] = useState<Record<string, number>>({});
+  const [allBookings, setAllBookings] = useState<any[]>([]);
   const [summaryStats, setSummaryStats] = useState({
     totalBookings: 0,
     totalRevenue: 0,
@@ -209,7 +210,7 @@ export default function AdminDashboard() {
     const fetchBookingAnalytics = async () => {
       setBookingsLoading(true);
       try {
-        // Check if bookings table exists
+        // Check if bookings table exists and load all bookings
         const checkResponse = await fetch('/api/admin/bookings');
         if (!checkResponse.ok) {
           if (checkResponse.status === 404) {
@@ -217,7 +218,14 @@ export default function AdminDashboard() {
             setBookingsLoading(false);
             return;
           }
-          throw new Error('Failed to check bookings table');
+          const errorData = await checkResponse.json().catch(() => null);
+          console.error('Error fetching bookings:', errorData);
+          throw new Error(errorData?.message || 'Failed to load bookings');
+        } else {
+          // If successful, we have all bookings data
+          const bookingsData = await checkResponse.json();
+          console.log('Bookings data:', bookingsData); // Debug log
+          setAllBookings(bookingsData);
         }
         
         // Get summary stats
@@ -391,43 +399,39 @@ export default function AdminDashboard() {
       </div>
       
       {/* Tab Navigation */}
-      <div className="flex flex-wrap justify-between items-center border-b border-gray-200 dark:border-gray-700">
-        <div className="flex">
-        <button
-          className={`py-4 px-6 font-medium text-sm ${
-            activeTab === 'analytics'
-              ? 'border-b-2 border-blue-500 text-blue-600 dark:text-blue-400'
-              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-          }`}
-          onClick={() => setActiveTab('analytics')}
-        >
-          Analytics
-        </button>
-        <button
-          className={`py-4 px-6 font-medium text-sm ${
-            activeTab === 'users'
-              ? 'border-b-2 border-blue-500 text-blue-600 dark:text-blue-400'
-              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-          }`}
-          onClick={() => setActiveTab('users')}
-        >
-          User Management
-        </button>
-        </div>
-        <div className="py-2 px-6">
-          <a 
-            href="/api/admin/setup-db" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center"
+      <div className="border-b border-gray-200 dark:border-gray-700 mb-6">
+        <nav className="-mb-px flex space-x-8">
+          <button
+            onClick={() => setActiveTab('analytics')}
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'analytics'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+            }`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            Database Setup
-          </a>
-        </div>
+            Analytics
+          </button>
+          <button
+            onClick={() => setActiveTab('bookings')}
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'bookings'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+            }`}
+          >
+            All Bookings
+          </button>
+          <button
+            onClick={() => setActiveTab('users')}
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'users'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+            }`}
+          >
+            Users
+          </button>
+        </nav>
       </div>
       
       {activeTab === 'analytics' ? (
@@ -716,9 +720,114 @@ export default function AdminDashboard() {
           </>
         )}
         </>
+      ) : activeTab === 'bookings' ? (
+        /* Bookings Tab */
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">All Bookings</h2>
+            <p className="text-gray-600 dark:text-gray-400">View and manage all bookings</p>
+          </div>
+          
+          {bookingsLoading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : bookingsError ? (
+            <div className="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 mb-6 rounded">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-red-700 dark:text-red-300">{bookingsError}</p>
+                </div>
+              </div>
+            </div>
+          ) : allBookings.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <p className="text-gray-600 dark:text-gray-400 text-lg">No bookings found.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-700">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date & Time</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Customer</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Contact</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Service</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Location</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Amount</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                  {allBookings.map((booking) => (
+                    <tr key={booking.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          {new Date(booking.date).toLocaleDateString()}
+                        </div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          {booking.time}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          {booking.first_name} {booking.last_name}
+                        </div>
+                        {booking.user?.email && (
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {booking.user.email}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900 dark:text-white">
+                          {booking.phone}
+                        </div>
+                        {booking.user?.phone && booking.user.phone !== booking.phone && (
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {booking.user.phone}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900 dark:text-white">
+                          {booking.duration} min massage
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          Group size: {booking.group_size}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          booking.location === 'midtown' 
+                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
+                            : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                        }`}>
+                          {booking.location === 'midtown' ? 'Midtown' : 'Conyers'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900 dark:text-white">
+                        {formatCurrency(booking.amount)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       ) : (
         /* User Management Tab */
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">User Management</h2>
             <div className="flex items-center gap-4">

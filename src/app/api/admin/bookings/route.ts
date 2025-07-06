@@ -31,7 +31,7 @@ const formatDateForPeriod = (date: string, period: 'day' | 'week' | 'month' | 'q
 
 export async function GET() {
   try {
-    // Check if the bookings table exists
+    // First, get all bookings
     const { data: bookings, error: bookingsError } = await supabase
       .from('bookings')
       .select('*')
@@ -42,9 +42,80 @@ export async function GET() {
       return NextResponse.json({ error: 'Failed to access bookings table' }, { status: 500 });
     }
 
-    return NextResponse.json(bookings);
+    // If no bookings, return empty array
+    if (!bookings || bookings.length === 0) {
+      return NextResponse.json([]);
+    }
+
+    // Get all user IDs from bookings
+    const userIds = [...new Set(bookings.map(b => b.user_id))].filter(Boolean);
+
+    // Define the user profile type
+    interface UserProfile {
+      id: string;
+      first_name: string;
+      last_name: string;
+      email: string;
+      phone?: string;
+      age?: number;
+      gender?: string;
+      race?: string;
+      education?: string;
+      profession?: string;
+    }
+
+    // Fetch user profiles in a separate query
+    let userProfiles: { [key: string]: UserProfile } = {};
+    if (userIds.length > 0) {
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*')
+        .in('id', userIds);
+
+      if (!profilesError && profiles) {
+        // Create a map of user ID to profile
+        userProfiles = profiles.reduce((acc, profile) => {
+          acc[profile.id] = profile;
+          return acc;
+        }, {});
+      }
+    }
+
+    // Format the response to include user data
+    const formattedBookings = bookings.map(booking => {
+      // Use the user data if available, otherwise use the booking's contact info
+      const userProfile = userProfiles[booking.user_id] || null;
+      
+      // Ensure we always have first_name and last_name, even if user profile is missing
+      const firstName = userProfile?.first_name || booking.first_name || '';
+      const lastName = userProfile?.last_name || booking.last_name || '';
+      const email = userProfile?.email || booking.email || '';
+      const phone = userProfile?.phone || booking.phone || '';
+      
+      return {
+        ...booking,
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        phone: phone,
+        user: userProfile ? {
+          id: userProfile.id,
+          firstName: userProfile.first_name,
+          lastName: userProfile.last_name,
+          email: userProfile.email,
+          phone: userProfile.phone,
+          age: userProfile.age,
+          gender: userProfile.gender,
+          race: userProfile.race,
+          education: userProfile.education,
+          profession: userProfile.profession
+        } : null
+      };
+    });
+
+    return NextResponse.json(formattedBookings);
   } catch (err) {
-    console.error('Error:', err);
+    console.error('Error in GET /api/admin/bookings:', err);
     return NextResponse.json({ 
       error: 'Error occurred',
       message: 'Failed to fetch bookings data'
@@ -57,6 +128,7 @@ export async function POST(request: Request) {
   try {
     const { type, period, demographic, location } = await request.json();
     
+    // First, get all bookings
     const { data: bookings, error: bookingsError } = await supabase
       .from('bookings')
       .select('*');
@@ -64,6 +136,18 @@ export async function POST(request: Request) {
     if (bookingsError) {
       console.error('Error accessing bookings table:', bookingsError);
       return NextResponse.json({ error: 'Failed to access bookings table' }, { status: 500 });
+    }
+
+    // If no bookings, return empty data
+    if (!bookings || bookings.length === 0) {
+      return NextResponse.json({
+        data: {},
+        stats: {
+          totalBookings: 0,
+          totalRevenue: 0,
+          averageBookingValue: 0
+        }
+      });
     }
 
     if (!bookings || bookings.length === 0) {

@@ -160,7 +160,7 @@ function LoginForm() {
           <div className="flex flex-col">
             <div className="flex justify-between mb-1">
               <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Password</label>
-              <a href="#" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Forgot password?</a>
+              <Link href="/forgot-password" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Forgot password?</Link>
             </div>
             <input 
               type="password" 
