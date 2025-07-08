@@ -217,15 +217,15 @@ export default function SignupPage() {
                 <div className="flex flex-col">
                   <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Password *</label>
                   <div className="relative">
-                    <input 
+                  <input 
                       type={showPassword ? "text" : "password"}
-                      name="password" 
-                      value={form.password} 
-                      onChange={handleChange} 
-                      required 
+                    name="password" 
+                    value={form.password} 
+                    onChange={handleChange} 
+                    required 
                       className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" 
-                      placeholder="Minimum 6 characters"
-                    />
+                    placeholder="Minimum 6 characters"
+                  />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
@@ -247,15 +247,15 @@ export default function SignupPage() {
                 <div className="flex flex-col">
                   <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Confirm Password *</label>
                   <div className="relative">
-                    <input 
+                  <input 
                       type={showConfirmPassword ? "text" : "password"}
-                      name="confirmPassword" 
-                      value={form.confirmPassword} 
-                      onChange={handleChange} 
-                      required 
+                    name="confirmPassword" 
+                    value={form.confirmPassword} 
+                    onChange={handleChange} 
+                    required 
                       className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" 
-                      placeholder="Re-enter your password"
-                    />
+                    placeholder="Re-enter your password"
+                  />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -338,6 +338,7 @@ export default function SignupPage() {
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                   >
                     <option value="">Select age group</option>
+                    <option value="Under 18">Under 18</option>
                     <option value="18-24">18-24</option>
                     <option value="25-34">25-34</option>
                     <option value="35-44">35-44</option>
@@ -345,6 +346,19 @@ export default function SignupPage() {
                     <option value="55-64">55-64</option>
                     <option value="65+">65+</option>
                   </select>
+                  {form.age === "Under 18" && (
+                    <div className="mt-2 p-3 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-lg">
+                      <div className="flex items-start">
+                        <svg className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                        </svg>
+                        <div className="text-sm text-yellow-800 dark:text-yellow-200">
+                          <p className="font-medium">Important:</p>
+                          <p>Patients under 18 must be accompanied by an adult during their session.</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="flex flex-col">
                   <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Gender *</label>

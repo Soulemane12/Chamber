@@ -213,6 +213,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'GROQ_API_KEY is not configured' }, { status: 500 });
     }
 
+    // Check if this is a document request
+    const isDocumentRequest = /(generate|create|make|download|get).*(report|document|pdf|file)/i.test(message);
+    
+    if (isDocumentRequest) {
+      return NextResponse.json({ 
+        response: "I can help you generate PDF documents! Please use the document generation feature in the chat interface. You can ask for:\n\n• Booking reports\n• User reports\n• Revenue reports\n• Custom documents\n\nJust type your request and I'll create a downloadable PDF for you."
+      });
+    }
+
     // Fetch data for context
     let data;
     try {
