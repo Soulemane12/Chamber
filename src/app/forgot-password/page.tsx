@@ -17,8 +17,10 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     
     try {
+      // Ensure we're using the complete URL with proper parameters
+      // Supabase expects the redirectTo to be the base URL that will receive the auth parameters
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${location.origin}/reset-password`,
+        redirectTo: `${location.origin}/reset-password?type=recovery`,
       });
       
       if (error) {
