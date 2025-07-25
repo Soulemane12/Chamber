@@ -9,7 +9,6 @@ import { DatePickerField } from "@/components/ui/DatePickerField";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency, getLocationData } from "@/lib/utils";
 import { supabase } from "@/lib/supabaseClient";
-import { SeatSelector, SeatInfo } from "@/components/ui/SeatSelector";
 import { FileUpload } from "@/components/ui/FileUpload";
 
 // Define the form schema with zod validation
@@ -40,12 +39,6 @@ const bookingSchema = z.object({
   education: z.string().min(1, "Please select your education level"),
   profession: z.string().min(1, "Please select your profession"),
   age: z.string().min(1, "Please select your age range"),
-  // Add new fields for seats
-  selectedSeats: z.array(z.object({
-    id: z.number(),
-    selected: z.boolean(),
-    name: z.string().optional()
-  })).optional(),
   // Add field for uploaded files
   uploadedFiles: z.array(z.any()).optional()
 });
@@ -90,13 +83,6 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [selectedSeats, setSelectedSeats] = useState<SeatInfo[]>([
-    { id: 1, selected: false, name: '' },
-    { id: 2, selected: false, name: '' },
-    { id: 3, selected: false, name: '' },
-    { id: 4, selected: false, name: '' },
-  ]);
-  const [validateSeatNames, setValidateSeatNames] = useState(false);
   
   const [userProfile, setUserProfile] = useState<{
     firstName: string;
@@ -115,12 +101,11 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
   // Add loading state for step transitions
   const [isStepLoading, setIsStepLoading] = useState(false);
 
-  // Update step definitions - swap Booking Details and Seating Options
+  // Update step definitions - Remove seating step
   const isPersonalInfoStep = isGuest && currentStep === 1;
   const isLocationStep = isGuest ? currentStep === 2 : currentStep === 1;
-  const isBookingDetailsStep = isGuest ? currentStep === 3 : currentStep === 2; // Now comes before Seating Options
-  const isSeatingOptionsStep = isGuest ? currentStep === 4 : currentStep === 3; // Now comes after Booking Details
-  const isPaymentStep = isGuest ? currentStep === 5 : currentStep === 4; // Still the last step
+  const isBookingDetailsStep = isGuest ? currentStep === 3 : currentStep === 2;
+  const isPaymentStep = isGuest ? currentStep === 4 : currentStep === 3; // One less step now
 
   const {
     register,
@@ -142,7 +127,6 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       duration: "60",
       location: "midtown",
       groupSize: "1",
-      selectedSeats: selectedSeats,
       uploadedFiles: []
     },
   });
@@ -153,70 +137,10 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
     setValue('uploadedFiles', files);
   };
 
-  // Update the handleSeatChange function to make it more bidirectional
-  const handleSeatChange = (seats: SeatInfo[]) => {
-    setSelectedSeats(seats);
-    setValue('selectedSeats', seats);
-    
-    // Update group size based on selected seats
-    const selectedCount = seats.filter(seat => seat.selected).length;
-    if (selectedCount > 0) {
-      setValue('groupSize', selectedCount.toString() as any);
-    }
-    
-    // Automatically set the first selected seat's name to the user's name if empty
-    if (selectedCount > 0) {
-      const firstSelectedSeat = seats.find(seat => seat.selected);
-      if (firstSelectedSeat && !firstSelectedSeat.name) {
-        const userName = `${watch("firstName")} ${watch("lastName")}`.trim();
-        if (userName) {
-          const updatedSeats = seats.map(seat => 
-            seat.id === firstSelectedSeat.id ? { ...seat, name: userName } : seat
-          );
-          setSelectedSeats(updatedSeats);
-          setValue('selectedSeats', updatedSeats);
-        }
-      }
-    }
-    
-    // Check if any selected seats are missing names
-    const hasNameErrors = seats.some(seat => seat.selected && (!seat.name?.trim()));
-    if (hasNameErrors && validateSeatNames) {
-      // Keep validation active if we're already validating
-      setValidateSeatNames(true);
-    }
-  };
-
   // Add a new function to handle group size changes
   const handleGroupSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newSize = e.target.value as "1" | "2" | "3" | "4";
     setValue('groupSize', newSize);
-    
-    // Update seat selection to match the new group size
-    const sizeNum = parseInt(newSize);
-    
-    // Create an updated array of seats with the appropriate number selected
-    const updatedSeats = selectedSeats.map((seat, index) => ({
-      ...seat,
-      // Select seats up to the chosen group size
-      selected: index < sizeNum,
-      // Clear error state when deselected
-      error: index < sizeNum ? (validateSeatNames ? !seat.name?.trim() : false) : false
-    }));
-
-    // If there's at least one seat selected and the user has a name, set the first seat name
-    if (sizeNum > 0) {
-      const userName = `${watch("firstName")} ${watch("lastName")}`.trim();
-      if (userName) {
-        updatedSeats[0] = {
-          ...updatedSeats[0],
-          name: userName
-        };
-      }
-    }
-    
-    setSelectedSeats(updatedSeats);
-    setValue('selectedSeats', updatedSeats);
   };
 
   // Fetch user profile on component mount (only if authenticated)
@@ -323,20 +247,6 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
   const onSubmit = async (data: BookingFormData) => {
     setIsSubmitting(true);
     try {
-      // Validate seat names before submitting if there are selected seats
-      const selectedSeatsData = data.selectedSeats?.filter(seat => seat.selected) || [];
-      if (selectedSeatsData.length > 0) {
-        const hasNameErrors = selectedSeatsData.some(seat => !seat.name?.trim());
-        if (hasNameErrors) {
-          setValidateSeatNames(true);
-          setIsSubmitting(false);
-          // Scroll to seat selector
-          const seatSelector = document.querySelector('.animate-delay-450');
-          seatSelector?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          return;
-        }
-      }
-      
       // Calculate booking amount
       const basePrice = pricingOptions[data.duration as keyof typeof pricingOptions] || 0;
       const multiplier = groupSizeMultipliers[data.groupSize as keyof typeof groupSizeMultipliers] || 1.0;
@@ -345,13 +255,6 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       // Get user ID if authenticated
       const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user?.id;
-      
-      // Process seat information - ensure seat information is properly formatted
-      // Create a simple array of objects with just the necessary seat data
-      const seatNames = selectedSeatsData.map(seat => ({
-        seatId: seat.id,
-        name: seat.name?.trim() || ''
-      }));
       
       // Basic booking data with only essential fields
       const bookingData: {
@@ -375,7 +278,6 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         age?: string | null;
         notes?: string | null;
         booking_reason?: string | null;
-        seat_data?: string | null;
       } = {
         user_id: userId,
         first_name: data.firstName,
@@ -398,8 +300,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         profession: data.profession || null,
         age: data.age || null,
         notes: data.notes || null,
-        booking_reason: data.bookingReason || null,
-        seat_data: seatNames.length > 0 ? JSON.stringify(seatNames) : null
+        booking_reason: data.bookingReason || null
       };
       
       // Remove any undefined properties to avoid database errors
@@ -560,19 +461,6 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       } else if (isBookingDetailsStep) {
         // Validate booking details
         isValid = await trigger(["date", "time", "duration"]);
-      } else if (isSeatingOptionsStep) {
-        // Validate seats if there are selected seats
-        const selectedSeatsCount = selectedSeats.filter(seat => seat.selected).length;
-        if (selectedSeatsCount > 0) {
-          // Trigger seat name validation
-          setValidateSeatNames(true);
-          
-          // Check if any selected seats are missing names
-          const hasNameErrors = selectedSeats.some(seat => seat.selected && (!seat.name?.trim()));
-          if (hasNameErrors) {
-            isValid = false;
-          }
-        }
       }
       
       if (!isValid) {
@@ -669,30 +557,19 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
           disabled={currentStep < 3}
           type="button"
         >
-          <span className="block">3. {isGuest ? "Booking Details" : "Seating Options"}</span>
-        </button>
-        <button
-          className={`flex-1 py-4 text-center transition-all-300 text-xs sm:text-sm md:text-base ${
-            currentStep === 4
-              ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
-              : "text-gray-500 dark:text-gray-400"
-          } ${currentStep < 4 ? 'opacity-50 cursor-not-allowed' : ''}`}
-          disabled={currentStep < 4}
-          type="button"
-        >
-          <span className="block">4. {isGuest ? "Seating Options" : "Payment"}</span>
+          <span className="block">3. {isGuest ? "Booking Details" : "Payment"}</span>
         </button>
         {isGuest && (
           <button
             className={`flex-1 py-4 text-center transition-all-300 text-xs sm:text-sm md:text-base ${
-              currentStep === 5
+              currentStep === 4
                 ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
                 : "text-gray-500 dark:text-gray-400"
-            } ${currentStep < 5 ? 'opacity-50 cursor-not-allowed' : ''}`}
-            disabled={currentStep < 5}
+            } ${currentStep < 4 ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={currentStep < 4}
             type="button"
           >
-            <span className="block">5. Payment</span>
+            <span className="block">4. Payment</span>
           </button>
         )}
       </div>
@@ -1101,7 +978,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
           </div>
         )}
         
-        {/* Booking Details Step - Now comes before Seating Options */}
+        {/* Booking Details Step */}
         {isBookingDetailsStep && (
           <div className="space-y-6 animate-fade-in">
             {isGuest && (
@@ -1299,6 +1176,50 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               )}
             </div>
 
+            <div className="animate-slide-in-up animate-delay-300">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Group Size *
+              </label>
+              <div className="grid grid-cols-4 gap-4">
+                {["1", "2", "3", "4"].map((size) => (
+                  <label
+                    key={size}
+                    className={`
+                      relative flex flex-col items-center justify-center p-4 border rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md
+                      ${
+                        watch("groupSize") === size
+                          ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400 shadow-lg"
+                          : "bg-white border-gray-200 dark:bg-gray-700 dark:border-gray-600"
+                      }
+                    `}
+                  >
+                    <input
+                      type="radio"
+                      value={size}
+                      {...register("groupSize")}
+                      onChange={handleGroupSizeChange}
+                      className="sr-only"
+                    />
+                    <span className={`text-3xl font-bold mb-1 ${
+                      watch("groupSize") === size
+                        ? "text-blue-600 dark:text-blue-400"
+                        : "text-gray-700 dark:text-gray-300"
+                    }`}>
+                      {size}
+                    </span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      {size === "1" ? "Person" : "People"}
+                    </span>
+                    {size !== "1" && (
+                      <span className="mt-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full dark:bg-green-900/30 dark:text-green-400">
+                        {size === "2" ? "10%" : size === "3" ? "15%" : "20%"} discount
+                      </span>
+                    )}
+                  </label>
+                ))}
+              </div>
+            </div>
+
             <div className="animate-slide-in-up animate-delay-500">
               <label htmlFor="bookingReason" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Purpose of Visit (Optional)
@@ -1393,185 +1314,13 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                   isLoading={isStepLoading}
                   className="w-full sm:w-auto ml-auto"
                 >
-                  Continue to Seating Options
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {/* Seating Options Step - Now comes after Booking Details */}
-        {isSeatingOptionsStep && (
-          <div className="space-y-6 animate-fade-in">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Seating Options</h2>
-            
-            {/* Show booking as info for guests */}
-            {isGuest && (
-              <div className="space-y-4 animate-slide-in-up">
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                  <h3 className="font-medium text-blue-800 dark:text-blue-200">Booking as: {watch('firstName')} {watch('lastName')}</h3>
-                  <p className="text-sm text-blue-700 dark:text-blue-300">{watch('email')} • {watch('phone')}</p>
-                </div>
-              </div>
-            )}
-
-            {/* Location info */}
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0 mr-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 dark:text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-medium text-blue-800 dark:text-blue-200">Selected Location: {getLocationData(watch("location"))?.name}</h3>
-                  <p className="text-sm text-blue-700 dark:text-blue-300">{getLocationData(watch("location"))?.address}</p>
-                </div>
-              </div>
-            </div>
-            
-            {/* Booking details summary */}
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0 mr-3">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 dark:text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-medium text-blue-800 dark:text-blue-200">Booking Details</h3>
-                  <p className="text-sm text-blue-700 dark:text-blue-300">
-                    {format(watch("date"), "MMMM d, yyyy")} at {watch("time")} • {watch("duration")} min session
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Group Size Selection */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden mb-8">
-              <div className="p-5 bg-blue-50 dark:bg-blue-900/20 border-b border-gray-200 dark:border-gray-700">
-                <h4 className="flex items-center text-lg font-medium text-gray-900 dark:text-white">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-                  </svg>
-                  Group Size *
-                </h4>
-              </div>
-
-              <div className="p-6">
-                <div className="mb-4">
-                  <p className="text-base text-gray-700 dark:text-gray-300 mb-4">
-                    Select the number of people who will attend the session together.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-4 gap-4">
-                  {["1", "2", "3", "4"].map((size) => (
-                    <label
-                      key={size}
-                      className={`
-                        relative flex flex-col items-center justify-center p-4 border rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md
-                        ${
-                          watch("groupSize") === size
-                            ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400 shadow-lg"
-                            : "bg-white border-gray-200 dark:bg-gray-700 dark:border-gray-600"
-                        }
-                      `}
-                    >
-                      <input
-                        type="radio"
-                        value={size}
-                        {...register("groupSize")}
-                        onChange={handleGroupSizeChange}
-                        className="sr-only"
-                      />
-                      <span className={`text-3xl font-bold mb-1 ${
-                        watch("groupSize") === size
-                          ? "text-blue-600 dark:text-blue-400"
-                          : "text-gray-700 dark:text-gray-300"
-                      }`}>
-                        {size}
-                      </span>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {size === "1" ? "Person" : "People"}
-                      </span>
-                      {size !== "1" && (
-                        <span className="mt-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full dark:bg-green-900/30 dark:text-green-400">
-                          {size === "2" ? "10%" : size === "3" ? "15%" : "20%"} discount
-                        </span>
-                      )}
-                    </label>
-                  ))}
-                </div>
-                
-                <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <div className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zm-1 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-                    </svg>
-                    <p className="text-sm text-blue-700 dark:text-blue-300">
-                      You've selected <span className="font-bold">{watch("groupSize")}</span> {parseInt(watch("groupSize")) === 1 ? 'person' : 'people'}.
-                      {watch("groupSize") === "4" && (
-                        <span className="ml-1 font-medium">
-                          You qualify for our maximum 20% discount per person!
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Seat Selection */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden mb-8">
-              <div className="p-5 bg-blue-50 dark:bg-blue-900/20 border-b border-gray-200 dark:border-gray-700">
-                <h4 className="flex items-center text-lg font-medium text-gray-900 dark:text-white">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
-                  </svg>
-                  Select Your Seats
-                </h4>
-              </div>
-
-              <div className="p-6">
-                <div className="mb-4">
-                  <p className="text-base text-gray-700 dark:text-gray-300 mb-4">
-                    Choose specific seats in the hyperbaric chamber for each person in your group.
-                  </p>
-                </div>
-                
-                <SeatSelector 
-                  onSeatChange={handleSeatChange} 
-                  selectedSeats={selectedSeats}
-                  validateNames={validateSeatNames}
-                />
-              </div>
-            </div>
-
-            <div className="pt-4 flex justify-end">
-              <div className="flex justify-between w-full">
-                <Button 
-                  type="button" 
-                  onClick={prevStep}
-                  variant="outline"
-                  isLoading={isStepLoading}
-                  className="w-full sm:w-auto"
-                >
-                  Back to Booking Details
-                </Button>
-                <Button 
-                  type="button" 
-                  onClick={nextStep}
-                  isLoading={isStepLoading}
-                  className="w-full sm:w-auto ml-auto"
-                >
                   Continue to Payment
                 </Button>
               </div>
             </div>
           </div>
         )}
-
+        
         {/* Payment Step */}
         {isPaymentStep && (
           <div className="space-y-6 animate-fade-in">
@@ -1628,23 +1377,6 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     <p className="text-sm text-gray-500 dark:text-gray-400">Total</p>
                     <p className="font-bold text-xl text-gray-900 dark:text-white">{formatCurrency(calculateTotal())}</p>
                   </div>
-                  
-                  {/* Add seat information if any seats are selected */}
-                  {selectedSeats.some(seat => seat.selected) && (
-                    <div className="md:col-span-2">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Selected Seats</p>
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        {selectedSeats
-                          .filter(seat => seat.selected)
-                          .map(seat => (
-                            <span key={seat.id} className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded dark:bg-blue-900 dark:text-blue-300">
-                              Seat {seat.id}{seat.name ? `: ${seat.name}` : ''}
-                            </span>
-                          ))
-                        }
-                      </div>
-                    </div>
-                  )}
 
                   {/* Show uploaded files if any */}
                   {uploadedFiles.length > 0 && (
