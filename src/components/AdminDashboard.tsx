@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { formatCurrency } from "@/lib/utils";
 import UserEditModal, { UserProfile } from "./ui/UserEditModal";
 import AdminChatbot from './AdminChatbot';
+import BookingDetailsModal, { GuestBookingInfo } from "./ui/BookingDetailsModal";
 
 // Simple chart component using div heights
 function BarChart({ data, title, maxHeight = 200 }: { data: Record<string, number>, title: string, maxHeight?: number }) {
@@ -157,6 +158,8 @@ export default function AdminDashboard() {
   const [profiles, setProfiles] = useState<UserProfile[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<GuestBookingInfo | null>(null);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'analytics' | 'users' | 'bookings'>('analytics');
@@ -228,6 +231,7 @@ export default function AdminDashboard() {
     education?: string;
     profession?: string;
     age?: string | number;
+    seat_data?: string | null;
     user?: {
       id: string;
       first_name: string;
@@ -725,6 +729,13 @@ export default function AdminDashboard() {
     }
   };
   
+  // Handle click on a booking
+  const handleBookingClick = (booking: Booking) => {
+    // Show booking details for all users (both registered and guest users)
+    setSelectedBooking(booking as unknown as GuestBookingInfo);
+    setIsBookingModalOpen(true);
+  };
+  
   return (
     <div className="space-y-8">
       {/* Summary Statistics */}
@@ -828,28 +839,6 @@ export default function AdminDashboard() {
                 Refresh
               </>
             )}
-          </button>
-          
-          <button
-            onClick={async () => {
-              try {
-                const response = await fetch('/api/admin/setup-chat-sessions');
-                if (response.ok) {
-                  alert('Chat sessions table setup successfully!');
-                } else {
-                  alert('Failed to setup chat sessions table');
-                }
-              } catch (error) {
-                alert('Error setting up chat sessions table');
-              }
-            }}
-            className="flex items-center px-3 py-1.5 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded hover:bg-green-200 dark:hover:bg-green-800 transition-colors"
-            title="Setup Chat Sessions Table"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-            Setup Chat
           </button>
         </div>
       </div>
@@ -1176,13 +1165,18 @@ export default function AdminDashboard() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Customer</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Contact</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Service</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Seats</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Location</th>
                       <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Amount</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     {allBookings.map((booking) => (
-                      <tr key={booking.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                      <tr 
+                        key={booking.id} 
+                        className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
+                        onClick={() => handleBookingClick(booking)}
+                      >
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900 dark:text-white">
                             {new Date(booking.date).toLocaleDateString()}
@@ -1195,11 +1189,17 @@ export default function AdminDashboard() {
                           <div className="text-sm font-medium text-gray-900 dark:text-white">
                             {booking.first_name} {booking.last_name}
                           </div>
-                          {booking.user?.email && (
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                              {booking.user.email}
-                            </div>
-                          )}
+                          <div className="flex items-center">
+                            {booking.user_id ? (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 mt-1">
+                                Registered
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 mt-1">
+                                Guest
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900 dark:text-white">
@@ -1216,6 +1216,22 @@ export default function AdminDashboard() {
                           <div className="text-xs text-gray-500 dark:text-gray-400">
                             Group size: {booking.group_size}
                           </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {booking.seat_data ? (
+                            <div className="flex flex-wrap gap-1">
+                              {(typeof booking.seat_data === 'string' 
+                                ? JSON.parse(booking.seat_data) 
+                                : booking.seat_data
+                              ).map((seat: {seatId: number, name: string}) => (
+                                <span key={seat.seatId} className="inline-flex items-center px-1.5 py-0.5 bg-blue-100 text-blue-800 text-xs rounded dark:bg-blue-900 dark:text-blue-300">
+                                  {seat.seatId}{seat.name ? `: ${seat.name}` : ''}
+                                </span>
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="text-xs text-gray-500 dark:text-gray-400">No seat data</span>
+                          )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -1416,6 +1432,17 @@ export default function AdminDashboard() {
         }}
         onSave={handleSaveUser}
       />
+
+      {/* Booking Details Modal */}
+      <BookingDetailsModal
+        booking={selectedBooking}
+        isOpen={isBookingModalOpen}
+        onClose={() => {
+          setIsBookingModalOpen(false);
+          setSelectedBooking(null);
+        }}
+      />
+      
       {/* Keep the floating AI Assistant button */}
       <AdminChatbot mode="floating" />
     </div>

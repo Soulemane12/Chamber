@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="400" viewBox="0 0 600 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Chamber outline -->
+  <rect x="50" y="50" width="500" height="300" rx="20" ry="20" fill="#FFFFFF" stroke="#333333" stroke-width="4"/>
+  
+  <!-- Windows on top -->
+  <rect x="100" y="50" width="100" height="20" rx="5" ry="5" fill="#A5D8FF" stroke="#333333" stroke-width="2"/>
+  <rect x="250" y="50" width="100" height="20" rx="5" ry="5" fill="#A5D8FF" stroke="#333333" stroke-width="2"/>
+  <rect x="400" y="50" width="100" height="20" rx="5" ry="5" fill="#A5D8FF" stroke="#333333" stroke-width="2"/>
+  
+  <!-- Door on right side -->
+  <rect x="550" y="150" width="15" height="100" rx="2" ry="2" fill="#666666" stroke="#333333" stroke-width="2"/>
+  <text x="558" y="200" font-family="Arial" font-size="12" text-anchor="middle" fill="#FFFFFF" transform="rotate(90, 558, 200)">door</text>
+  
+  <!-- Seats -->
+  <g id="seat1">
+    <!-- Seat 1 -->
+    <rect x="100" y="150" width="80" height="80" rx="10" ry="10" fill="#E9ECEF" stroke="#666666" stroke-width="3"/>
+    <text x="140" y="200" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle" fill="#666666">1</text>
+    <text x="140" y="250" font-family="Arial" font-size="14" text-anchor="middle" fill="#666666">Seat 1</text>
+  </g>
+  
+  <g id="seat2">
+    <!-- Seat 2 -->
+    <rect x="200" y="150" width="80" height="80" rx="10" ry="10" fill="#E9ECEF" stroke="#666666" stroke-width="3"/>
+    <text x="240" y="200" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle" fill="#666666">2</text>
+    <text x="240" y="250" font-family="Arial" font-size="14" text-anchor="middle" fill="#666666">Seat 2</text>
+  </g>
+  
+  <g id="seat3">
+    <!-- Seat 3 -->
+    <rect x="320" y="150" width="80" height="80" rx="10" ry="10" fill="#E9ECEF" stroke="#666666" stroke-width="3"/>
+    <text x="360" y="200" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle" fill="#666666">3</text>
+    <text x="360" y="250" font-family="Arial" font-size="14" text-anchor="middle" fill="#666666">Seat 3</text>
+  </g>
+  
+  <g id="seat4">
+    <!-- Seat 4 -->
+    <rect x="420" y="150" width="80" height="80" rx="10" ry="10" fill="#E9ECEF" stroke="#666666" stroke-width="3"/>
+    <text x="460" y="200" font-family="Arial" font-size="24" font-weight="bold" text-anchor="middle" fill="#666666">4</text>
+    <text x="460" y="250" font-family="Arial" font-size="14" text-anchor="middle" fill="#666666">Seat 4</text>
+  </g>
+  
+  <!-- Floor line -->
+  <line x1="50" y1="280" x2="550" y2="280" stroke="#333333" stroke-width="2"/>
+  
+  <!-- Legend -->
+  <rect x="50" y="320" width="20" height="20" rx="2" ry="2" fill="#E9ECEF" stroke="#666666" stroke-width="2"/>
+  <text x="80" y="335" font-family="Arial" font-size="14" fill="#333333">Available</text>
+  
+  <rect x="150" y="320" width="20" height="20" rx="2" ry="2" fill="#BBDEFB" stroke="#1976D2" stroke-width="2"/>
+  <text x="180" y="335" font-family="Arial" font-size="14" fill="#333333">Selected</text>
+</svg> 

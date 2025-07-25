@@ -9,6 +9,8 @@ import { DatePickerField } from "@/components/ui/DatePickerField";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency, getLocationData } from "@/lib/utils";
 import { supabase } from "@/lib/supabaseClient";
+import { SeatSelector, SeatInfo } from "@/components/ui/SeatSelector";
+import { FileUpload } from "@/components/ui/FileUpload";
 
 // Define the form schema with zod validation
 const bookingSchema = z.object({
@@ -29,14 +31,23 @@ const bookingSchema = z.object({
   location: z.enum(["midtown", "conyers"], {
     required_error: "Please select a location",
   }),
-  groupSize: z.enum(["1", "2", "3", "4", "5"]),
+  groupSize: z.enum(["1", "2", "3", "4"]),
   notes: z.string().optional(),
   bookingReason: z.string().optional(),
-  gender: z.string().optional(),
-  race: z.string().optional(),
-  education: z.string().optional(),
-  profession: z.string().optional(),
-  age: z.string().optional(),
+  // Make demographic fields required for guest users, the form component will conditionally validate
+  gender: z.string().min(1, "Please select your gender"),
+  race: z.string().min(1, "Please select your race/ethnicity"),
+  education: z.string().min(1, "Please select your education level"),
+  profession: z.string().min(1, "Please select your profession"),
+  age: z.string().min(1, "Please select your age range"),
+  // Add new fields for seats
+  selectedSeats: z.array(z.object({
+    id: z.number(),
+    selected: z.boolean(),
+    name: z.string().optional()
+  })).optional(),
+  // Add field for uploaded files
+  uploadedFiles: z.array(z.any()).optional()
 });
 
 export type BookingFormData = z.infer<typeof bookingSchema>;
@@ -67,7 +78,6 @@ const groupSizeMultipliers = {
   "2": 1.8,    // 10% discount per person
   "3": 2.55,   // 15% discount per person
   "4": 3.2,    // 20% discount per person
-  "5": 3.75,   // 25% discount per person
 };
 
 interface BookingFormProps {
@@ -79,6 +89,15 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [selectedSeats, setSelectedSeats] = useState<SeatInfo[]>([
+    { id: 1, selected: false, name: '' },
+    { id: 2, selected: false, name: '' },
+    { id: 3, selected: false, name: '' },
+    { id: 4, selected: false, name: '' },
+  ]);
+  const [validateSeatNames, setValidateSeatNames] = useState(false);
+  
   const [userProfile, setUserProfile] = useState<{
     firstName: string;
     lastName: string;
@@ -90,11 +109,15 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
     profession?: string;
     age?: string;
   } | null>(null);
+  
   const [isGuest, setIsGuest] = useState(!isAuthenticated);
+
+  // Update step definitions - swap Booking Details and Seating Options
   const isPersonalInfoStep = isGuest && currentStep === 1;
   const isLocationStep = isGuest ? currentStep === 2 : currentStep === 1;
-  const isBookingDetailsStep = isGuest ? currentStep === 3 : currentStep === 2;
-  const isPaymentStep = isGuest ? currentStep === 4 : currentStep === 3;
+  const isBookingDetailsStep = isGuest ? currentStep === 3 : currentStep === 2; // Now comes before Seating Options
+  const isSeatingOptionsStep = isGuest ? currentStep === 4 : currentStep === 3; // Now comes after Booking Details
+  const isPaymentStep = isGuest ? currentStep === 5 : currentStep === 4; // Still the last step
 
   const {
     register,
@@ -116,8 +139,82 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       duration: "60",
       location: "midtown",
       groupSize: "1",
+      selectedSeats: selectedSeats,
+      uploadedFiles: []
     },
   });
+
+  // Handle file upload
+  const handleFileUpload = (files: File[]) => {
+    setUploadedFiles(files);
+    setValue('uploadedFiles', files);
+  };
+
+  // Update the handleSeatChange function to make it more bidirectional
+  const handleSeatChange = (seats: SeatInfo[]) => {
+    setSelectedSeats(seats);
+    setValue('selectedSeats', seats);
+    
+    // Update group size based on selected seats
+    const selectedCount = seats.filter(seat => seat.selected).length;
+    if (selectedCount > 0) {
+      setValue('groupSize', selectedCount.toString() as any);
+    }
+    
+    // Automatically set the first selected seat's name to the user's name if empty
+    if (selectedCount > 0) {
+      const firstSelectedSeat = seats.find(seat => seat.selected);
+      if (firstSelectedSeat && !firstSelectedSeat.name) {
+        const userName = `${watch("firstName")} ${watch("lastName")}`.trim();
+        if (userName) {
+          const updatedSeats = seats.map(seat => 
+            seat.id === firstSelectedSeat.id ? { ...seat, name: userName } : seat
+          );
+          setSelectedSeats(updatedSeats);
+          setValue('selectedSeats', updatedSeats);
+        }
+      }
+    }
+    
+    // Check if any selected seats are missing names
+    const hasNameErrors = seats.some(seat => seat.selected && (!seat.name?.trim()));
+    if (hasNameErrors && validateSeatNames) {
+      // Keep validation active if we're already validating
+      setValidateSeatNames(true);
+    }
+  };
+
+  // Add a new function to handle group size changes
+  const handleGroupSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newSize = e.target.value as "1" | "2" | "3" | "4";
+    setValue('groupSize', newSize);
+    
+    // Update seat selection to match the new group size
+    const sizeNum = parseInt(newSize);
+    
+    // Create an updated array of seats with the appropriate number selected
+    const updatedSeats = selectedSeats.map((seat, index) => ({
+      ...seat,
+      // Select seats up to the chosen group size
+      selected: index < sizeNum,
+      // Clear error state when deselected
+      error: index < sizeNum ? (validateSeatNames ? !seat.name?.trim() : false) : false
+    }));
+
+    // If there's at least one seat selected and the user has a name, set the first seat name
+    if (sizeNum > 0) {
+      const userName = `${watch("firstName")} ${watch("lastName")}`.trim();
+      if (userName) {
+        updatedSeats[0] = {
+          ...updatedSeats[0],
+          name: userName
+        };
+      }
+    }
+    
+    setSelectedSeats(updatedSeats);
+    setValue('selectedSeats', updatedSeats);
+  };
 
   // Fetch user profile on component mount (only if authenticated)
   useEffect(() => {
@@ -223,6 +320,20 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
   const onSubmit = async (data: BookingFormData) => {
     setIsSubmitting(true);
     try {
+      // Validate seat names before submitting if there are selected seats
+      const selectedSeatsData = data.selectedSeats?.filter(seat => seat.selected) || [];
+      if (selectedSeatsData.length > 0) {
+        const hasNameErrors = selectedSeatsData.some(seat => !seat.name?.trim());
+        if (hasNameErrors) {
+          setValidateSeatNames(true);
+          setIsSubmitting(false);
+          // Scroll to seat selector
+          const seatSelector = document.querySelector('.animate-delay-450');
+          seatSelector?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+      }
+      
       // Calculate booking amount
       const basePrice = pricingOptions[data.duration as keyof typeof pricingOptions] || 0;
       const multiplier = groupSizeMultipliers[data.groupSize as keyof typeof groupSizeMultipliers] || 1.0;
@@ -231,6 +342,13 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       // Get user ID if authenticated
       const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user?.id;
+      
+      // Process seat information - ensure seat information is properly formatted
+      // Create a simple array of objects with just the necessary seat data
+      const seatNames = selectedSeatsData.map(seat => ({
+        seatId: seat.id,
+        name: seat.name?.trim() || ''
+      }));
       
       // Basic booking data with only essential fields
       const bookingData: {
@@ -254,6 +372,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         age?: string | null;
         notes?: string | null;
         booking_reason?: string | null;
+        seat_data?: string | null;
       } = {
         user_id: userId,
         first_name: data.firstName,
@@ -276,7 +395,8 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         profession: data.profession || null,
         age: data.age || null,
         notes: data.notes || null,
-        booking_reason: data.bookingReason || null
+        booking_reason: data.bookingReason || null,
+        seat_data: seatNames.length > 0 ? JSON.stringify(seatNames) : null
       };
       
       // Remove any undefined properties to avoid database errors
@@ -293,8 +413,6 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       
       console.log('Booking data being submitted:', bookingData);
 
-      console.log('Attempting to save booking with data:', bookingData);
-      
       // Save booking to database with error handling
       let result, error;
       try {
@@ -308,14 +426,43 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         
         console.log('Supabase response:', { result, error });
         
-        if (error) throw error;
+        if (error) {
+          console.error('Supabase error:', error);
+          throw error;
+        }
         
-      } catch (err: unknown) {
+        // If there are files to upload, upload them
+        if (uploadedFiles.length > 0 && result && result[0]?.id) {
+          const bookingId = result[0].id;
+          
+          try {
+            for (const file of uploadedFiles) {
+              const fileExt = file.name.split('.').pop();
+              const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+              const filePath = `${bookingId}/${fileName}`;
+              
+              const { error: uploadError } = await supabase
+                .storage
+                .from('booking-documents')
+                .upload(filePath, file);
+                
+              if (uploadError) {
+                console.error('Error uploading file:', uploadError);
+              }
+            }
+          } catch (uploadErr) {
+            console.error('File upload error:', uploadErr);
+            // Continue with booking even if file upload fails
+          }
+        }
+        
+      } catch (err: any) {
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';
         console.error('Error in booking submission:', {
           error: err,
+          message: errorMessage,
           errorString: String(err),
-          errorObject: JSON.stringify(err, Object.getOwnPropertyNames(err)),
+          errorObject: err ? JSON.stringify(err, Object.getOwnPropertyNames(err)) : 'No error object',
           bookingData: JSON.stringify(bookingData, null, 2)
         });
 
@@ -323,12 +470,32 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         if (err instanceof Error && 
             err.message.includes('column') && 
             err.message.includes('not found')) {
-          // Redirect to the fix page
-          window.location.href = '/api/admin/fix-age-column';
-          return;
+          // Try running the migration and retry
+          try {
+            // Try to run the migration first
+            const migrationResponse = await fetch('/api/admin/migrate-seat-selection');
+            if (migrationResponse.ok) {
+              console.log('Migration completed, retrying booking submission');
+              // Retry the booking submission
+              const retryResponse = await supabase
+                .from('bookings')
+                .insert([bookingData])
+                .select();
+                
+              result = retryResponse.data;
+              error = retryResponse.error;
+              
+              if (error) throw error;
+            } else {
+              throw new Error('Migration failed');
+            }
+          } catch (migrationErr) {
+            console.error('Migration attempt failed:', migrationErr);
+            throw new Error('Failed to save your booking. Please try again later.');
+          }
+        } else {
+          throw new Error(errorMessage || 'Failed to save your booking');
         }
-        
-        throw new Error(errorMessage || 'Failed to save your booking');
       }
       
       console.log('Booking saved successfully:', result);
@@ -369,13 +536,36 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
     
     if (isPersonalInfoStep) {
       // Validate personal info for guest users
-      isValid = await trigger(["firstName", "lastName", "email", "phone"]);
+      isValid = await trigger([
+        "firstName", 
+        "lastName", 
+        "email", 
+        "phone", 
+        "gender", 
+        "age", 
+        "race", 
+        "education", 
+        "profession"
+      ]);
     } else if (isLocationStep) {
-      // Validate location for guest users
+      // Validate location
       isValid = await trigger(["location"]);
     } else if (isBookingDetailsStep) {
       // Validate booking details
       isValid = await trigger(["date", "time", "duration"]);
+    } else if (isSeatingOptionsStep) {
+      // Validate seats if there are selected seats
+      const selectedSeatsCount = selectedSeats.filter(seat => seat.selected).length;
+      if (selectedSeatsCount > 0) {
+        // Trigger seat name validation
+        setValidateSeatNames(true);
+        
+        // Check if any selected seats are missing names
+        const hasNameErrors = selectedSeats.some(seat => seat.selected && (!seat.name?.trim()));
+        if (hasNameErrors) {
+          isValid = false;
+        }
+      }
     }
     
     if (!isValid) return;
@@ -431,19 +621,30 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
           disabled={currentStep < 3}
           type="button"
         >
-          <span className="block">3. {isGuest ? "Booking Details" : "Payment"}</span>
+          <span className="block">3. {isGuest ? "Booking Details" : "Seating Options"}</span>
+        </button>
+        <button
+          className={`flex-1 py-4 text-center transition-all-300 text-xs sm:text-sm md:text-base ${
+            currentStep === 4
+              ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
+              : "text-gray-500 dark:text-gray-400"
+          } ${currentStep < 4 ? 'opacity-50 cursor-not-allowed' : ''}`}
+          disabled={currentStep < 4}
+          type="button"
+        >
+          <span className="block">4. {isGuest ? "Seating Options" : "Payment"}</span>
         </button>
         {isGuest && (
           <button
             className={`flex-1 py-4 text-center transition-all-300 text-xs sm:text-sm md:text-base ${
-              currentStep === 4
+              currentStep === 5
                 ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
                 : "text-gray-500 dark:text-gray-400"
-            } ${currentStep < 4 ? 'opacity-50 cursor-not-allowed' : ''}`}
-            disabled={currentStep < 4}
+            } ${currentStep < 5 ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={currentStep < 5}
             type="button"
           >
-            <span className="block">4. Payment</span>
+            <span className="block">5. Payment</span>
           </button>
         )}
       </div>
@@ -535,6 +736,138 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.phone.message}</p>
                   )}
                 </div>
+              </div>
+              
+              {/* Demographic Information Section - Added for guests */}
+              <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Demographic Information</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <div>
+                    <label htmlFor="gender" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Gender *
+                    </label>
+                    <select
+                      id="gender"
+                      {...register("gender")}
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    >
+                      <option value="">Select your gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="non_binary">Non-binary</option>
+                      <option value="other">Other</option>
+                      <option value="prefer_not_to_say">Prefer not to say</option>
+                    </select>
+                    {errors.gender && (
+                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.gender.message}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label htmlFor="age" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Age Range *
+                    </label>
+                    <select
+                      id="age"
+                      {...register("age")}
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    >
+                      <option value="">Select your age range</option>
+                      <option value="18">18-24</option>
+                      <option value="25">25-34</option>
+                      <option value="35">35-44</option>
+                      <option value="45">45-54</option>
+                      <option value="55">55-64</option>
+                      <option value="65">65+</option>
+                      <option value="prefer_not_to_say">Prefer not to say</option>
+                    </select>
+                    {errors.age && (
+                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.age.message}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label htmlFor="race" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Race/Ethnicity *
+                    </label>
+                    <select
+                      id="race"
+                      {...register("race")}
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    >
+                      <option value="">Select your race/ethnicity</option>
+                      <option value="asian">Asian</option>
+                      <option value="black">Black or African American</option>
+                      <option value="hispanic">Hispanic or Latino</option>
+                      <option value="white">White</option>
+                      <option value="native">Native American or Alaskan Native</option>
+                      <option value="pacific">Native Hawaiian or Pacific Islander</option>
+                      <option value="other">Other</option>
+                      <option value="prefer_not_to_say">Prefer not to say</option>
+                    </select>
+                    {errors.race && (
+                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.race.message}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label htmlFor="education" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Education Level *
+                    </label>
+                    <select
+                      id="education"
+                      {...register("education")}
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    >
+                      <option value="">Select your education level</option>
+                      <option value="high_school">High School or equivalent</option>
+                      <option value="some_college">Some College</option>
+                      <option value="associate">Associate's Degree</option>
+                      <option value="bachelor">Bachelor's Degree</option>
+                      <option value="master">Master's Degree</option>
+                      <option value="doctorate">Doctorate or higher</option>
+                      <option value="prefer_not_to_say">Prefer not to say</option>
+                    </select>
+                    {errors.education && (
+                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.education.message}</p>
+                    )}
+                  </div>
+                  <div className="md:col-span-2">
+                    <label htmlFor="profession" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Profession *
+                    </label>
+                    <select
+                      id="profession"
+                      {...register("profession")}
+                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    >
+                      <option value="">Select your profession</option>
+                      <option value="healthcare">Healthcare Professional</option>
+                      <option value="education">Education Professional</option>
+                      <option value="technology">Technology Professional</option>
+                      <option value="finance">Finance Professional</option>
+                      <option value="legal">Legal Professional</option>
+                      <option value="engineering">Engineering Professional</option>
+                      <option value="business">Business Professional</option>
+                      <option value="service">Service Professional</option>
+                      <option value="arts">Arts and Entertainment</option>
+                      <option value="student">Student</option>
+                      <option value="retired">Retired</option>
+                      <option value="unemployed">Unemployed</option>
+                      <option value="other">Other</option>
+                      <option value="prefer_not_to_say">Prefer not to say</option>
+                    </select>
+                    {errors.profession && (
+                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.profession.message}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Add the file upload component */}
+              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <FileUpload 
+                  onFileUpload={handleFileUpload}
+                  label="Upload Documents (Optional)"
+                  description="Upload JotForms or other supporting documents"
+                />
               </div>
               
               <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -717,7 +1050,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
           </div>
         )}
         
-        {/* Booking Details Step */}
+        {/* Booking Details Step - Now comes before Seating Options */}
         {isBookingDetailsStep && (
           <div className="space-y-6 animate-fade-in">
             {isGuest && (
@@ -915,59 +1248,6 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               )}
             </div>
 
-            <div className="animate-slide-in-up animate-delay-400">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mt-6 mb-1">
-                Group Size *
-              </label>
-              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 mb-4">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                  Book for multiple people and save! Group discounts available.
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {["1", "2", "3", "4", "5"].map((size) => (
-                    <label
-                      key={size}
-                      className={`
-                        relative flex items-center justify-center px-5 py-2 border rounded-lg cursor-pointer transition-all-300
-                        ${
-                          watch("groupSize") === size
-                            ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
-                            : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
-                        }
-                      `}
-                    >
-                      <input
-                        type="radio"
-                        value={size}
-                        {...register("groupSize")}
-                        className="sr-only"
-                      />
-                      <span 
-                        className={`text-lg font-medium ${
-                          watch("groupSize") === size
-                            ? "text-blue-600 dark:text-blue-400"
-                            : "text-gray-700 dark:text-gray-300"
-                        }`}
-                      >
-                        {size}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-                {watch("groupSize") !== "1" && (
-                  <div className="mt-3 text-sm text-green-600 dark:text-green-400 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    {watch("groupSize") === "2" && "10% discount per person"}
-                    {watch("groupSize") === "3" && "15% discount per person"}
-                    {watch("groupSize") === "4" && "20% discount per person"}
-                    {watch("groupSize") === "5" && "25% discount per person"}
-                  </div>
-                )}
-              </div>
-            </div>
-
             <div className="animate-slide-in-up animate-delay-500">
               <label htmlFor="bookingReason" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Purpose of Visit (Optional)
@@ -988,96 +1268,9 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
             </div>
 
             <div className="animate-slide-in-up animate-delay-600">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Demographic Information (Optional)</h3>
-              
-              {isGuest ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  <div>
-                    <label htmlFor="gender" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Gender
-                    </label>
-                    <select
-                      id="gender"
-                      {...register("gender")}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    >
-                      <option value="">Prefer not to say</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="non_binary">Non-binary</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="age" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Age Range
-                    </label>
-                    <select
-                      id="age"
-                      {...register("age")}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    >
-                      <option value="">Prefer not to say</option>
-                      <option value="18">18-24</option>
-                      <option value="25">25-34</option>
-                      <option value="35">35-44</option>
-                      <option value="45">45-54</option>
-                      <option value="55">55-64</option>
-                      <option value="65">65+</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="race" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Race/Ethnicity
-                    </label>
-                    <select
-                      id="race"
-                      {...register("race")}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    >
-                      <option value="">Prefer not to say</option>
-                      <option value="asian">Asian</option>
-                      <option value="black">Black or African American</option>
-                      <option value="hispanic">Hispanic or Latino</option>
-                      <option value="white">White</option>
-                      <option value="native">Native American or Alaskan Native</option>
-                      <option value="pacific">Native Hawaiian or Pacific Islander</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label htmlFor="education" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Education Level
-                    </label>
-                    <select
-                      id="education"
-                      {...register("education")}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    >
-                      <option value="">Prefer not to say</option>
-                      <option value="high_school">High School or equivalent</option>
-                      <option value="some_college">Some College</option>
-                      <option value="associate">Associate&apos;s Degree</option>
-                      <option value="bachelor">Bachelor&apos;s Degree</option>
-                      <option value="master">Master&apos;s Degree</option>
-                      <option value="doctorate">Doctorate or higher</option>
-                    </select>
-                  </div>
-                  <div className="md:col-span-2">
-                    <label htmlFor="profession" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Profession
-                    </label>
-                    <input
-                      type="text"
-                      id="profession"
-                      {...register("profession")}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      placeholder="Your profession (optional)"
-                    />
-                  </div>
-                </div>
-              ) : (
-                userProfile && (
+              {!isGuest && userProfile && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Demographic Information</h3>
                   <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6">
                     <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
                       Using demographic information from your profile:
@@ -1117,7 +1310,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       )}
                     </div>
                   </div>
-                )
+                </div>
               )}
 
               <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -1141,6 +1334,176 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                   className="w-full sm:w-auto"
                 >
                   Back to Location
+                </Button>
+                <Button 
+                  type="button" 
+                  onClick={nextStep}
+                  className="w-full sm:w-auto ml-auto"
+                >
+                  Continue to Seating Options
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Seating Options Step - Now comes after Booking Details */}
+        {isSeatingOptionsStep && (
+          <div className="space-y-6 animate-fade-in">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Seating Options</h2>
+            
+            {/* Show booking as info for guests */}
+            {isGuest && (
+              <div className="space-y-4 animate-slide-in-up">
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                  <h3 className="font-medium text-blue-800 dark:text-blue-200">Booking as: {watch('firstName')} {watch('lastName')}</h3>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">{watch('email')} • {watch('phone')}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Location info */}
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 dark:text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-medium text-blue-800 dark:text-blue-200">Selected Location: {getLocationData(watch("location"))?.name}</h3>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">{getLocationData(watch("location"))?.address}</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Booking details summary */}
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 mr-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 dark:text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-medium text-blue-800 dark:text-blue-200">Booking Details</h3>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                    {format(watch("date"), "MMMM d, yyyy")} at {watch("time")} • {watch("duration")} min session
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Group Size Selection */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden mb-8">
+              <div className="p-5 bg-blue-50 dark:bg-blue-900/20 border-b border-gray-200 dark:border-gray-700">
+                <h4 className="flex items-center text-lg font-medium text-gray-900 dark:text-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                  </svg>
+                  Group Size *
+                </h4>
+              </div>
+
+              <div className="p-6">
+                <div className="mb-4">
+                  <p className="text-base text-gray-700 dark:text-gray-300 mb-4">
+                    Select the number of people who will attend the session together.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-4 gap-4">
+                  {["1", "2", "3", "4"].map((size) => (
+                    <label
+                      key={size}
+                      className={`
+                        relative flex flex-col items-center justify-center p-4 border rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md
+                        ${
+                          watch("groupSize") === size
+                            ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400 shadow-lg"
+                            : "bg-white border-gray-200 dark:bg-gray-700 dark:border-gray-600"
+                        }
+                      `}
+                    >
+                      <input
+                        type="radio"
+                        value={size}
+                        {...register("groupSize")}
+                        onChange={handleGroupSizeChange}
+                        className="sr-only"
+                      />
+                      <span className={`text-3xl font-bold mb-1 ${
+                        watch("groupSize") === size
+                          ? "text-blue-600 dark:text-blue-400"
+                          : "text-gray-700 dark:text-gray-300"
+                      }`}>
+                        {size}
+                      </span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        {size === "1" ? "Person" : "People"}
+                      </span>
+                      {size !== "1" && (
+                        <span className="mt-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full dark:bg-green-900/30 dark:text-green-400">
+                          {size === "2" ? "10%" : size === "3" ? "15%" : "20%"} discount
+                        </span>
+                      )}
+                    </label>
+                  ))}
+                </div>
+                
+                <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <div className="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zm-1 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                    </svg>
+                    <p className="text-sm text-blue-700 dark:text-blue-300">
+                      You've selected <span className="font-bold">{watch("groupSize")}</span> {parseInt(watch("groupSize")) === 1 ? 'person' : 'people'}.
+                      {watch("groupSize") === "4" && (
+                        <span className="ml-1 font-medium">
+                          You qualify for our maximum 20% discount per person!
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Seat Selection */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden mb-8">
+              <div className="p-5 bg-blue-50 dark:bg-blue-900/20 border-b border-gray-200 dark:border-gray-700">
+                <h4 className="flex items-center text-lg font-medium text-gray-900 dark:text-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+                  </svg>
+                  Select Your Seats
+                </h4>
+              </div>
+
+              <div className="p-6">
+                <div className="mb-4">
+                  <p className="text-base text-gray-700 dark:text-gray-300 mb-4">
+                    Choose specific seats in the hyperbaric chamber for each person in your group.
+                  </p>
+                </div>
+                
+                <SeatSelector 
+                  onSeatChange={handleSeatChange} 
+                  selectedSeats={selectedSeats}
+                  validateNames={validateSeatNames}
+                />
+              </div>
+            </div>
+
+            <div className="pt-4 flex justify-end">
+              <div className="flex justify-between w-full">
+                <Button 
+                  type="button" 
+                  onClick={prevStep}
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                >
+                  Back to Booking Details
                 </Button>
                 <Button 
                   type="button" 
@@ -1210,6 +1573,33 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     <p className="text-sm text-gray-500 dark:text-gray-400">Total</p>
                     <p className="font-bold text-xl text-gray-900 dark:text-white">{formatCurrency(calculateTotal())}</p>
                   </div>
+                  
+                  {/* Add seat information if any seats are selected */}
+                  {selectedSeats.some(seat => seat.selected) && (
+                    <div className="md:col-span-2">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Selected Seats</p>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {selectedSeats
+                          .filter(seat => seat.selected)
+                          .map(seat => (
+                            <span key={seat.id} className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded dark:bg-blue-900 dark:text-blue-300">
+                              Seat {seat.id}{seat.name ? `: ${seat.name}` : ''}
+                            </span>
+                          ))
+                        }
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Show uploaded files if any */}
+                  {uploadedFiles.length > 0 && (
+                    <div className="md:col-span-2">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Uploaded Documents</p>
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {uploadedFiles.length} file{uploadedFiles.length !== 1 ? 's' : ''} uploaded
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
