@@ -17,10 +17,14 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     
     try {
+      // Determine the site URL - try to handle both local and production
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 
+        process.env.NEXT_PUBLIC_VERCEL_URL ||
+        typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+      
       // Ensure we're using the complete URL with proper parameters
-      // Supabase expects the redirectTo to be the base URL that will receive the auth parameters
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${location.origin}/reset-password?type=recovery`,
+        redirectTo: `${siteUrl}/reset-password?type=recovery`,
       });
       
       if (error) {
