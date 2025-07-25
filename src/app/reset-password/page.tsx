@@ -16,41 +16,27 @@ function ResetPasswordContent() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const checkForAccessToken = async () => {
-      // First try the query parameter
-      const queryToken = searchParams.get('access_token');
-      const type = searchParams.get('type');
-      
-      // If we have a token and proper type, use it
-      if (queryToken && type === 'recovery') {
-        setAccessToken(queryToken);
-        return;
-      }
-      
-      // If no token in query, try to get it from the URL hash (Supabase often puts it there)
-      if (typeof window !== 'undefined' && window.location.hash) {
-        const hash = window.location.hash.substring(1); // Remove the '#'
-        const hashParams = new URLSearchParams(hash);
-        const hashToken = hashParams.get('access_token');
-        
-        if (hashToken) {
-          setAccessToken(hashToken);
-          
-          // Verify the token is valid by checking the session
-          const { data, error } = await supabase.auth.getSession();
-          if (error || !data.session) {
-            setError("Invalid or expired password reset link");
-            setAccessToken(null);
-          }
-          return;
-        }
-      }
-      
-      // If we get here, no valid token was found
-      setError("Invalid or expired password reset link");
-    };
+    // Check for access token in URL (from password reset email)
+    const accessToken = searchParams.get('access_token');
+    const type = searchParams.get('type');
     
-    checkForAccessToken();
+    // Check hash fragment if we don't have a token in query params
+    if (accessToken) {
+      setAccessToken(accessToken);
+    } else if (typeof window !== 'undefined') {
+      // Try to extract token from hash fragment (Supabase often uses this format)
+      const hash = window.location.hash.substring(1);
+      const hashParams = new URLSearchParams(hash);
+      const hashToken = hashParams.get('access_token');
+      
+      if (hashToken) {
+        setAccessToken(hashToken);
+      } else {
+        setError("Invalid or expired password reset link");
+      }
+    } else {
+      setError("Invalid or expired password reset link");
+    }
   }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
