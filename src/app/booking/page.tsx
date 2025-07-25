@@ -72,8 +72,21 @@ export default function BookingPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <div className="animate-pulse text-blue-600 dark:text-blue-400">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
+        <div className="py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 animate-pulse">
+            <div className="flex flex-col items-center justify-center h-64 space-y-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+              <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300">Loading Booking Page</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Please wait while we prepare your booking form...</p>
+              <div className="w-full max-w-md">
+                <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div className="mt-3 h-2 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+                <div className="mt-3 h-2 bg-gray-200 dark:bg-gray-700 rounded w-4/6"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

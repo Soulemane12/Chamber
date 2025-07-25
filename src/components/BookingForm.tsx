@@ -112,6 +112,9 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
   
   const [isGuest, setIsGuest] = useState(!isAuthenticated);
 
+  // Add loading state for step transitions
+  const [isStepLoading, setIsStepLoading] = useState(false);
+
   // Update step definitions - swap Booking Details and Seating Options
   const isPersonalInfoStep = isGuest && currentStep === 1;
   const isLocationStep = isGuest ? currentStep === 2 : currentStep === 1;
@@ -530,65 +533,110 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
     }
   };
 
+  // Update the nextStep function to show loading
   const nextStep = async () => {
     // Validate current step before proceeding
     let isValid = true;
     
-    if (isPersonalInfoStep) {
-      // Validate personal info for guest users
-      isValid = await trigger([
-        "firstName", 
-        "lastName", 
-        "email", 
-        "phone", 
-        "gender", 
-        "age", 
-        "race", 
-        "education", 
-        "profession"
-      ]);
-    } else if (isLocationStep) {
-      // Validate location
-      isValid = await trigger(["location"]);
-    } else if (isBookingDetailsStep) {
-      // Validate booking details
-      isValid = await trigger(["date", "time", "duration"]);
-    } else if (isSeatingOptionsStep) {
-      // Validate seats if there are selected seats
-      const selectedSeatsCount = selectedSeats.filter(seat => seat.selected).length;
-      if (selectedSeatsCount > 0) {
-        // Trigger seat name validation
-        setValidateSeatNames(true);
-        
-        // Check if any selected seats are missing names
-        const hasNameErrors = selectedSeats.some(seat => seat.selected && (!seat.name?.trim()));
-        if (hasNameErrors) {
-          isValid = false;
+    setIsStepLoading(true);
+    
+    try {
+      if (isPersonalInfoStep) {
+        // Validate personal info for guest users
+        isValid = await trigger([
+          "firstName", 
+          "lastName", 
+          "email", 
+          "phone", 
+          "gender", 
+          "age", 
+          "race", 
+          "education", 
+          "profession"
+        ]);
+      } else if (isLocationStep) {
+        // Validate location
+        isValid = await trigger(["location"]);
+      } else if (isBookingDetailsStep) {
+        // Validate booking details
+        isValid = await trigger(["date", "time", "duration"]);
+      } else if (isSeatingOptionsStep) {
+        // Validate seats if there are selected seats
+        const selectedSeatsCount = selectedSeats.filter(seat => seat.selected).length;
+        if (selectedSeatsCount > 0) {
+          // Trigger seat name validation
+          setValidateSeatNames(true);
+          
+          // Check if any selected seats are missing names
+          const hasNameErrors = selectedSeats.some(seat => seat.selected && (!seat.name?.trim()));
+          if (hasNameErrors) {
+            isValid = false;
+          }
         }
       }
+      
+      if (!isValid) {
+        setIsStepLoading(false);
+        return;
+      }
+      
+      // Add small artificial delay to show loading state
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      setCurrentStep((prev) => prev + 1);
+      
+      // Scroll to top when changing steps
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (error) {
+      console.error("Error navigating to next step:", error);
+    } finally {
+      setIsStepLoading(false);
     }
-    
-    if (!isValid) return;
-    setCurrentStep((prev) => prev + 1);
-    
-    // Scroll to top when changing steps
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const prevStep = () => {
-    setCurrentStep(currentStep - 1);
+  // Update the prevStep function to show loading
+  const prevStep = async () => {
+    setIsStepLoading(true);
+    
+    try {
+      // Add small artificial delay to show loading state
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      setCurrentStep(currentStep - 1);
+      
+      // Scroll to top when changing steps
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (error) {
+      console.error("Error navigating to previous step:", error);
+    } finally {
+      setIsStepLoading(false);
+    }
   };
 
   if (isLoading) {
     return (
-      <div className="p-8 flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden p-8 animate-pulse">
+        <div className="flex flex-col items-center justify-center h-64 space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300">Loading your booking form</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Retrieving your information...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden animate-scale-in">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden animate-scale-in relative">
+      {/* Loading overlay for step transitions */}
+      {isStepLoading && (
+        <div className="absolute inset-0 bg-white/80 dark:bg-gray-800/80 flex items-center justify-center z-50 backdrop-blur-sm">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Loading...</p>
+          </div>
+        </div>
+      )}
+      
       <div className="flex flex-wrap border-b border-gray-200 dark:border-gray-700">
         <button
           className={`flex-1 py-4 text-center transition-all-300 text-xs sm:text-sm md:text-base ${
@@ -874,6 +922,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                 <Button 
                   type="button" 
                   onClick={nextStep}
+                  isLoading={isStepLoading}
                   className="w-full sm:w-auto float-right"
                 >
                   Continue to Booking Details
@@ -1032,6 +1081,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     type="button" 
                     onClick={prevStep}
                     variant="outline"
+                    isLoading={isStepLoading}
                     className="w-full sm:w-auto"
                   >
                     Back
@@ -1040,8 +1090,9 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                 <Button 
                   type="button" 
                   onClick={nextStep}
+                  isLoading={isStepLoading}
                   className={`w-full sm:w-auto ${isGuest ? 'sm:ml-auto' : ''}`}
-                  disabled={!watch("location")}
+                  disabled={!watch("location") || isStepLoading}
                 >
                   Continue to Booking Details
                 </Button>
@@ -1331,6 +1382,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                   type="button" 
                   onClick={prevStep}
                   variant="outline"
+                  isLoading={isStepLoading}
                   className="w-full sm:w-auto"
                 >
                   Back to Location
@@ -1338,6 +1390,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                 <Button 
                   type="button" 
                   onClick={nextStep}
+                  isLoading={isStepLoading}
                   className="w-full sm:w-auto ml-auto"
                 >
                   Continue to Seating Options
@@ -1501,6 +1554,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                   type="button" 
                   onClick={prevStep}
                   variant="outline"
+                  isLoading={isStepLoading}
                   className="w-full sm:w-auto"
                 >
                   Back to Booking Details
@@ -1508,6 +1562,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                 <Button 
                   type="button" 
                   onClick={nextStep}
+                  isLoading={isStepLoading}
                   className="w-full sm:w-auto ml-auto"
                 >
                   Continue to Payment
@@ -1663,16 +1718,17 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                 type="button" 
                 onClick={prevStep}
                 variant="outline"
+                isLoading={isStepLoading}
                 className="w-full sm:w-auto order-2 sm:order-1"
               >
                 Back
               </Button>
               <Button 
                 type="submit"
-                isLoading={isSubmitting}
+                isLoading={isSubmitting || isStepLoading}
                 size="lg"
                 className="w-full sm:w-auto order-1 sm:order-2"
-                disabled={isSubmitting}
+                disabled={isSubmitting || isStepLoading}
               >
                 <span className="hidden sm:inline">{`Complete Booking • ${formatCurrency(calculateTotal())}`}</span>
                 <span className="sm:hidden">{`Book • ${formatCurrency(calculateTotal())}`}</span>
