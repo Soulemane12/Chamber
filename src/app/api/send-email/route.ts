@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'billydduc@gmail.com',
+        user: 'info@atmoshyperbaric.com',
         pass: process.env.EMAIL_PASSWORD // This should be set in your environment variables
       }
     });
@@ -53,11 +53,9 @@ export async function POST(request: Request) {
     const multiplier = groupSizeMultipliers[groupSize as keyof typeof groupSizeMultipliers] || 1.0;
     const totalPrice = basePrice * multiplier;
     
-    // Location details
-    const locationName = bookingData.location === 'midtown' ? 'Midtown Biohack' : 'Platinum Wellness Spa';
-    const locationAddress = bookingData.location === 'midtown' 
-      ? '575 Madison Ave, 20th floor, New York, NY' 
-      : '1900 Parker Rd SE, Conyers, GA 30094';
+    // Update location details to use ATMOS location
+    const locationName = 'ATMOS Hyperbaric';
+    const locationAddress = '166 laurel rd, east north NY, 11731';
 
     // Group discount info
     let discountInfo = '';
@@ -71,9 +69,9 @@ export async function POST(request: Request) {
       discountInfo = `<p><strong>Group Discount:</strong> ${discountPercentages[groupSize as "2" | "3" | "4" | "5"]} off per person</p>`;
     }
 
-    // Email content
+    // Update contact information to match ATMOS
     const mailOptions = {
-      from: 'billydduc@gmail.com',
+      from: 'info@atmoshyperbaric.com',
       to: bookingData.email,
       subject: 'Your Hyperbaric Chamber Session Confirmation',
       html: `
@@ -90,16 +88,16 @@ export async function POST(request: Request) {
             <p><strong>Duration:</strong> ${bookingData.duration} minutes</p>
             <p><strong>Location:</strong> ${locationName}</p>
             <p><strong>Address:</strong> ${locationAddress}</p>
-            <p><strong>Group Size:</strong> ${groupSize} ${parseInt(groupSize) > 1 ? 'people' : 'person'}</p>
+            <p><strong>Group Size:</strong> ${groupSize} ${parseInt(groupSize) > 1 ? 'clients' : 'client'}</p>
             ${discountInfo}
             <p><strong>Total Amount:</strong> ${formatCurrency(totalPrice)}</p>
           </div>
           
           <div style="margin: 20px 0; padding: 15px; background-color: #eff6ff; border-radius: 5px; border-left: 4px solid #3b82f6;">
             <h3 style="color: #1e3a8a; font-size: 16px; margin-bottom: 10px;">Contact Information</h3>
-            <p><strong>Owner:</strong> Billy Duc</p>
+            <p><strong>Owner:</strong> ATMOS Hyperbaric</p>
             <p><strong>Phone:</strong> +1 (646) 262-8794</p>
-            <p><strong>Email:</strong> billydduc@gmail.com</p>
+            <p><strong>Email:</strong> info@atmoshyperbaric.com</p>
           </div>
           
           <p style="text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px;">
