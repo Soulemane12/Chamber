@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'info@atmoshyperbaric.com',
+        user: 'billydduc@gmail.com',
         pass: process.env.EMAIL_PASSWORD // This should be set in your environment variables
       }
     });
@@ -71,7 +71,7 @@ export async function POST(request: Request) {
 
     // Update contact information to match ATMOS
     const mailOptions = {
-      from: 'info@atmoshyperbaric.com',
+      from: 'billydduc@gmail.com',
       to: bookingData.email,
       subject: 'Your Hyperbaric Chamber Session Confirmation',
       html: `
