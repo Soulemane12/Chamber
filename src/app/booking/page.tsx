@@ -151,10 +151,11 @@ export default function BookingPage() {
             <div className="flex justify-center mb-6 animate-fade-in animate-delay-200">
               <div className="relative w-full max-w-md h-48 md:h-64 overflow-hidden rounded-lg bg-white p-4">
                 <Image
-                  src="/atmos_logo.jpg"
+                  src="/atmos_screenshot.png"
                   alt="ATMOS Hyperbaric"
-                  fill
-                  className="object-contain"
+                  width={400}
+                  height={200}
+                  style={{objectFit: "contain", width: "100%", height: "100%"}}
                   priority
                 />
               </div>

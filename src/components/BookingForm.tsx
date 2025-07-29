@@ -954,7 +954,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                   {/* Add an image of the location */}
                   <div className="mt-4 rounded-lg overflow-hidden">
                     <Image 
-                      src="/atmos_logo.jpg"
+                      src="/atmos_screenshot.png"
                       alt="ATMOS Hyperbaric facility"
                       width={600}
                       height={300}

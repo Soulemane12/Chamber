@@ -60,7 +60,7 @@ export const locationData = {
       saturday: "10:00 AM - 4:00 PM",
       sunday: "Closed"
     },
-    imageUrl: "/atmos_logo.jpg"
+    imageUrl: "/atmos_screenshot.png"
   }
 };
 
