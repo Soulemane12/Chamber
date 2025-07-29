@@ -82,44 +82,11 @@ export async function GET() {
       }
     }
 
-    // Create a storage bucket for booking documents if it doesn't exist
-    const { data: buckets, error: bucketsError } = await supabaseAdmin
-      .storage
-      .listBuckets();
-      
-    if (bucketsError) {
-      console.error('Error listing buckets:', bucketsError);
-      return NextResponse.json(
-        { error: 'Failed to list storage buckets', details: bucketsError.message },
-        { status: 500 }
-      );
-    }
-    
-    const bookingDocumentsBucketExists = buckets?.some(bucket => bucket.name === 'booking-documents');
-    
-    if (!bookingDocumentsBucketExists) {
-      const { error: createBucketError } = await supabaseAdmin
-        .storage
-        .createBucket('booking-documents', {
-          public: false,
-          fileSizeLimit: 10485760, // 10MB limit
-        });
-        
-      if (createBucketError) {
-        console.error('Error creating booking-documents bucket:', createBucketError);
-        return NextResponse.json(
-          { error: 'Failed to create storage bucket', details: createBucketError.message },
-          { status: 500 }
-        );
-      }
-    }
-
     return NextResponse.json(
       { 
         message: 'Migration completed successfully',
         updates: [
-          'Added seat_data column to bookings table',
-          'Verified booking-documents storage bucket'
+          'Added seat_data column to bookings table'
         ]
       },
       { status: 200 }

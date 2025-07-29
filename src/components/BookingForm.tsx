@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/Button";
 import { formatCurrency, getLocationData } from "@/lib/utils";
 import { supabase } from "@/lib/supabaseClient";
 import { SeatSelector, SeatInfo } from "@/components/ui/SeatSelector";
-import { FileUpload } from "@/components/ui/FileUpload";
 
 // Define the form schema with zod validation
 const bookingSchema = z.object({
@@ -45,9 +44,7 @@ const bookingSchema = z.object({
     id: z.number(),
     selected: z.boolean(),
     name: z.string().optional()
-  })).optional(),
-  // Add field for uploaded files
-  uploadedFiles: z.array(z.any()).optional()
+  })).optional()
 });
 
 export type BookingFormData = z.infer<typeof bookingSchema>;
@@ -89,7 +86,6 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [selectedSeats, setSelectedSeats] = useState<SeatInfo[]>([
     { id: 1, selected: false, name: '' },
     { id: 2, selected: false, name: '' },
@@ -141,16 +137,9 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       duration: "60",
       location: "atmos",
       groupSize: "1",
-      selectedSeats: selectedSeats,
-      uploadedFiles: []
+      selectedSeats: selectedSeats
     },
   });
-
-  // Handle file upload
-  const handleFileUpload = (files: File[]) => {
-    setUploadedFiles(files);
-    setValue('uploadedFiles', files);
-  };
 
   // Update the handleSeatChange function to make it more bidirectional
   const handleSeatChange = (seats: SeatInfo[]) => {
@@ -431,31 +420,6 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         if (error) {
           console.error('Supabase error:', error);
           throw error;
-        }
-        
-        // If there are files to upload, upload them
-        if (uploadedFiles.length > 0 && result && result[0]?.id) {
-          const bookingId = result[0].id;
-          
-          try {
-            for (const file of uploadedFiles) {
-              const fileExt = file.name.split('.').pop();
-              const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-              const filePath = `${bookingId}/${fileName}`;
-              
-              const { error: uploadError } = await supabase
-                .storage
-                .from('booking-documents')
-                .upload(filePath, file);
-                
-              if (uploadError) {
-                console.error('Error uploading file:', uploadError);
-              }
-            }
-          } catch (uploadErr) {
-            console.error('File upload error:', uploadErr);
-            // Continue with booking even if file upload fails
-          }
         }
         
       } catch (err: any) {
@@ -873,15 +837,6 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     )}
                   </div>
                 </div>
-              </div>
-              
-              {/* Add the file upload component */}
-              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <FileUpload 
-                  onFileUpload={handleFileUpload}
-                  label="Upload Documents (Optional)"
-                  description="Upload JotForms or other supporting documents"
-                />
               </div>
               
               <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
