@@ -152,9 +152,9 @@ export default function BookingPage() {
               <div className="relative w-full max-w-md h-48 md:h-64 overflow-hidden rounded-lg">
                 <Image
                   src="/atmos_screenshot.png"
-                  alt="ATMOS Hyperbaric Facility"
+                  alt="ATMOS Hyperbaric"
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   priority
                 />
               </div>

@@ -17,6 +17,16 @@ export default function Home() {
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6 animate-slide-in-up">
             {t('heroTitle')}
           </h1>
+
+          {/* ATMOS Logo Image */}
+          <div className="relative w-full max-w-md h-48 mx-auto mb-6 animate-fade-in">
+            <img 
+              src="/atmos_screenshot.png" 
+              alt="ATMOS Hyperbaric" 
+              className="object-contain w-full h-full"
+            />
+          </div>
+
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto animate-slide-in-up animate-delay-200">
             {t('heroSubtitle')}
           </p>
