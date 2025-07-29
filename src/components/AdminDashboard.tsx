@@ -154,7 +154,7 @@ export default function AdminDashboard() {
   const [timePeriod, setTimePeriod] = useState<'day' | 'month' | 'quarter' | 'year'>('month');
   const [demographic, setDemographic] = useState<'age' | 'gender' | 'race' | 'education' | 'profession'>('age');
   const [revenuePeriod, setRevenuePeriod] = useState<'day' | 'week' | 'month' | 'year'>('month');
-  const [revenueLocation, setRevenueLocation] = useState<'all' | 'midtown' | 'conyers'>('all');
+  const [revenueLocation, setRevenueLocation] = useState<'all' | 'atmos'>('all');
   const [profiles, setProfiles] = useState<UserProfile[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -202,7 +202,7 @@ export default function AdminDashboard() {
   // State for booking data
   const [bookingsByTime, setBookingsByTime] = useState<Record<string, number>>({});
   const [bookingsByDemographic, setBookingsByDemographic] = useState<Record<string, number>>({});
-  const [averageBookings, setAverageBookings] = useState<{midtown: number, conyers: number}>({midtown: 0, conyers: 0});
+  const [averageBookings, setAverageBookings] = useState<{atmos: number}>({atmos: 0});
   const [revenueData, setRevenueData] = useState<Record<string, number>>({});
   
   // -------------------------------------------------
@@ -296,29 +296,25 @@ export default function AdminDashboard() {
   const [allRevenueData, setAllRevenueData] = useState<{
     day: {
       all: Record<string, number>;
-      midtown: Record<string, number>;
-      conyers: Record<string, number>;
+      atmos: Record<string, number>;
     };
     week: {
       all: Record<string, number>;
-      midtown: Record<string, number>;
-      conyers: Record<string, number>;
+      atmos: Record<string, number>;
     };
     month: {
       all: Record<string, number>;
-      midtown: Record<string, number>;
-      conyers: Record<string, number>;
+      atmos: Record<string, number>;
     };
     year: {
       all: Record<string, number>;
-      midtown: Record<string, number>;
-      conyers: Record<string, number>;
+      atmos: Record<string, number>;
     };
   }>({
-    day: { all: {}, midtown: {}, conyers: {} },
-    week: { all: {}, midtown: {}, conyers: {} },
-    month: { all: {}, midtown: {}, conyers: {} },
-    year: { all: {}, midtown: {}, conyers: {} }
+    day: { all: {}, atmos: {} },
+    week: { all: {}, atmos: {} },
+    month: { all: {}, atmos: {} },
+    year: { all: {}, atmos: {} }
   });
   
   // Update fetchAllBookingData to handle pagination and filtering
@@ -453,12 +449,12 @@ export default function AdminDashboard() {
       
       // Fetch all revenue data at once
       const revPeriods = ['day', 'week', 'month', 'year'] as const;
-      const locations = ['all', 'midtown', 'conyers'] as const;
+      const locations = ['all', 'atmos'] as const;
       const revenueData: Record<string, Record<string, Record<string, number>>> = {
-        day: { all: {}, midtown: {}, conyers: {} },
-        week: { all: {}, midtown: {}, conyers: {} },
-        month: { all: {}, midtown: {}, conyers: {} },
-        year: { all: {}, midtown: {}, conyers: {} }
+        day: { all: {}, atmos: {} },
+        week: { all: {}, atmos: {} },
+        month: { all: {}, atmos: {} },
+        year: { all: {}, atmos: {} }
       };
       
       for (const period of revPeriods) {
@@ -487,23 +483,19 @@ export default function AdminDashboard() {
       setAllRevenueData({
         day: {
           all: revenueData.day?.all || {},
-          midtown: revenueData.day?.midtown || {},
-          conyers: revenueData.day?.conyers || {}
+          atmos: revenueData.day?.atmos || {}
         },
         week: {
           all: revenueData.week?.all || {},
-          midtown: revenueData.week?.midtown || {},
-          conyers: revenueData.week?.conyers || {}
+          atmos: revenueData.week?.atmos || {}
         },
         month: {
           all: revenueData.month?.all || {},
-          midtown: revenueData.month?.midtown || {},
-          conyers: revenueData.month?.conyers || {}
+          atmos: revenueData.month?.atmos || {}
         },
         year: {
           all: revenueData.year?.all || {},
-          midtown: revenueData.year?.midtown || {},
-          conyers: revenueData.year?.conyers || {}
+          atmos: revenueData.year?.atmos || {}
         }
       });
       // Set initial view
@@ -929,7 +921,7 @@ export default function AdminDashboard() {
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Average Bookings by Location</h3>
               <div className="relative">
-                {(!averageBookings || (averageBookings.midtown === 0 && averageBookings.conyers === 0)) && !bookingsLoading ? (
+                {(!averageBookings || (averageBookings.atmos === 0)) && !bookingsLoading ? (
                   <p className="text-center text-gray-500 dark:text-gray-400 py-10">No location data available</p>
                 ) : (
                   <div className={`transition-opacity duration-300 ${averageBookings ? 'opacity-100' : 'opacity-0'}`}>
@@ -972,11 +964,10 @@ export default function AdminDashboard() {
                   <select
                     className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
                     value={revenueLocation}
-                    onChange={(e) => setRevenueLocation(e.target.value as 'all' | 'midtown' | 'conyers')}
+                    onChange={(e) => setRevenueLocation(e.target.value as 'all' | 'atmos')}
                   >
                     <option value="all">All Locations</option>
-                    <option value="midtown">Midtown</option>
-                    <option value="conyers">Conyers</option>
+                    <option value="atmos">ATMOS Hyperbaric</option>
                   </select>
             </div>
             </div>
@@ -1055,8 +1046,7 @@ export default function AdminDashboard() {
                   onChange={(e) => setBookingsLocation(e.target.value)}
                 >
                   <option value="">All Locations</option>
-                  <option value="midtown">Midtown</option>
-                  <option value="conyers">Conyers</option>
+                  <option value="atmos">ATMOS Hyperbaric</option>
                 </select>
               </div>
 
@@ -1234,12 +1224,8 @@ export default function AdminDashboard() {
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            booking.location === 'midtown' 
-                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
-                              : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                          }`}>
-                            {booking.location === 'midtown' ? 'Midtown' : 'Conyers'}
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200`}>
+                            ATMOS Hyperbaric
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900 dark:text-white">

@@ -56,8 +56,7 @@ export default function BookingDetailsModal({ booking, isOpen, onClose }: Bookin
 
   // Format location for display
   const formatLocation = (loc: string) => {
-    if (loc === 'midtown') return 'Midtown Biohack';
-    if (loc === 'conyers') return 'Platinum Wellness Spa';
+    if (loc === 'atmos') return 'ATMOS Hyperbaric';
     return loc.charAt(0).toUpperCase() + loc.slice(1);
   };
 
