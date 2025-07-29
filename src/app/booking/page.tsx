@@ -151,8 +151,8 @@ export default function BookingPage() {
             <div className="flex justify-center mb-6 animate-fade-in animate-delay-200">
               <div className="relative w-full max-w-md h-48 md:h-64 overflow-hidden rounded-lg">
                 <Image
-                  src="/HBOT.jpg"
-                  alt="Hyperbaric Chamber"
+                  src="/atmos_screenshot.png"
+                  alt="ATMOS Hyperbaric Facility"
                   fill
                   className="object-cover"
                   priority
