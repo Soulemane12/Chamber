@@ -539,6 +539,17 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       }
       
       if (!isValid) {
+        let alertMsg = "Please complete the required information before continuing.";
+        if (isPersonalInfoStep) {
+          alertMsg = "Please fill in all required personal information fields.";
+        } else if (isLocationStep) {
+          alertMsg = "Please select a location before continuing.";
+        } else if (isBookingDetailsStep) {
+          alertMsg = "Please choose the date, time, and duration for your session.";
+        } else if (isSeatingOptionsStep) {
+          alertMsg = "Please enter a name for each selected seat before continuing.";
+        }
+        alert(alertMsg);
         setIsStepLoading(false);
         return;
       }
