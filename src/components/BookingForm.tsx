@@ -318,6 +318,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         const hasNameErrors = selectedSeatsData.some(seat => !seat.name?.trim());
         if (hasNameErrors) {
           setValidateSeatNames(true);
+          alert("Please enter a name for each selected seat before continuing.");
           setIsSubmitting(false);
           // Scroll to seat selector
           const seatSelector = document.querySelector('.animate-delay-450');
