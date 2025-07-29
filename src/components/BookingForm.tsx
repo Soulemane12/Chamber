@@ -466,8 +466,26 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       }
       
       console.log('Booking saved successfully:', result);
-      
-      // Complete booking without payment step
+
+      // Send confirmation email (non-blocking)
+      try {
+        const emailResponse = await fetch('/api/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        });
+
+        const emailResult = await emailResponse.json();
+        if (!emailResult.success) {
+          console.error('Failed to send confirmation email:', emailResult.message);
+        }
+      } catch (emailError) {
+        console.error('Error sending email:', emailError);
+      }
+
+      // Complete booking after attempting to send email
       onBookingComplete(data);
     } catch (error) {
       console.error("Booking failed", error);
