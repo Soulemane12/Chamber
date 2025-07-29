@@ -28,7 +28,7 @@ const bookingSchema = z.object({
   duration: z.enum(["60", "90", "120"], {
     required_error: "Please select a duration",
   }),
-  location: z.enum(["midtown", "conyers"], {
+  location: z.enum(["atmos"], {
     required_error: "Please select a location",
   }),
   groupSize: z.enum(["1", "2", "3", "4"]),
@@ -115,12 +115,11 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
   // Add loading state for step transitions
   const [isStepLoading, setIsStepLoading] = useState(false);
 
-  // Update step definitions - swap Booking Details and Seating Options
+  // Update step definitions - remove payment step
   const isPersonalInfoStep = isGuest && currentStep === 1;
   const isLocationStep = isGuest ? currentStep === 2 : currentStep === 1;
   const isBookingDetailsStep = isGuest ? currentStep === 3 : currentStep === 2; // Now comes before Seating Options
   const isSeatingOptionsStep = isGuest ? currentStep === 4 : currentStep === 3; // Now comes after Booking Details
-  const isPaymentStep = isGuest ? currentStep === 5 : currentStep === 4; // Still the last step
 
   const {
     register,
@@ -140,7 +139,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       notes: "",
       bookingReason: "",
       duration: "60",
-      location: "midtown",
+      location: "atmos",
       groupSize: "1",
       selectedSeats: selectedSeats,
       uploadedFiles: []
@@ -503,27 +502,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       
       console.log('Booking saved successfully:', result);
       
-      // Send confirmation email - wrap this in a try/catch to prevent it from blocking the booking completion
-      try {
-        const emailResponse = await fetch('/api/send-email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data),
-        });
-        
-        const emailResult = await emailResponse.json();
-        if (!emailResult.success) {
-          console.error('Failed to send confirmation email:', emailResult.message);
-          // Still continue with booking even if email fails
-        }
-      } catch (emailError) {
-        console.error('Error sending email:', emailError);
-        // Continue with booking even if email fails
-      }
-      
-      // Complete booking regardless of email success
+      // Complete booking without payment step
       onBookingComplete(data);
     } catch (error) {
       console.error("Booking failed", error);
@@ -680,21 +659,8 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
           disabled={currentStep < 4}
           type="button"
         >
-          <span className="block">4. {isGuest ? "Seating Options" : "Payment"}</span>
+          <span className="block">4. {isGuest ? "Seating Options" : "Confirmation"}</span>
         </button>
-        {isGuest && (
-          <button
-            className={`flex-1 py-4 text-center transition-all-300 text-xs sm:text-sm md:text-base ${
-              currentStep === 5
-                ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
-                : "text-gray-500 dark:text-gray-400"
-            } ${currentStep < 5 ? 'opacity-50 cursor-not-allowed' : ''}`}
-            disabled={currentStep < 5}
-            type="button"
-          >
-            <span className="block">5. Payment</span>
-          </button>
-        )}
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="p-6 sm:p-8">
@@ -703,7 +669,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
             Book Your Hyperbaric Chamber Session
           </h1>
           <p className="text-gray-600 dark:text-gray-300">
-            Fill out the form below to schedule your hyperbaric oxygen therapy session at one of Billy Duc&apos;s premium wellness centers.
+            Fill out the form below to schedule your hyperbaric oxygen therapy session at ATMOS Hyperbaric.
           </p>
           
           {isGuest && (
@@ -932,7 +898,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
           </div>
         )}
         
-        {/* Location Selection Step */}
+        {/* Location Selection Step - Update to show only ATMOS location */}
         {isLocationStep && (
           <div className="space-y-6 animate-fade-in">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Select Location</h2>
@@ -947,60 +913,25 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
             )}
             
             <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+              <div className="grid grid-cols-1 gap-4 mb-6">
                 <label
-                  className={`
+                  className="
                     relative flex items-center p-4 border rounded-lg cursor-pointer transition-all-300
-                    ${
-                      watch("location") === "midtown"
-                        ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
-                        : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
-                    }
-                  `}
+                    bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400
+                  "
                 >
                   <input
                     type="radio"
-                    value="midtown"
+                    value="atmos"
                     {...register("location")}
                     className="sr-only"
+                    checked
                   />
                   <div className="flex-1">
-                    <h3 className={`font-medium ${
-                      watch("location") === "midtown"
-                        ? "text-blue-600 dark:text-blue-400"
-                        : "text-gray-900 dark:text-white"
-                    }`}>
-                      Midtown Biohack
+                    <h3 className="font-medium text-blue-600 dark:text-blue-400">
+                      ATMOS Hyperbaric
                     </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">575 Madison Ave, 20th floor, NY, NY</p>
-                  </div>
-                </label>
-
-                <label
-                  className={`
-                    relative flex items-center p-4 border rounded-lg cursor-pointer transition-all-300
-                    ${
-                      watch("location") === "conyers"
-                        ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
-                        : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
-                    }
-                  `}
-                >
-                  <input
-                    type="radio"
-                    value="conyers"
-                    {...register("location")}
-                    className="sr-only"
-                  />
-                  <div className="flex-1">
-                    <h3 className={`font-medium ${
-                      watch("location") === "conyers"
-                        ? "text-blue-600 dark:text-blue-400"
-                        : "text-gray-900 dark:text-white"
-                    }`}>
-                      Platinum Wellness Spa
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">1900 Parker Rd SE, Conyers, GA 30094</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">166 laurel rd, east north NY, 11731</p>
                   </div>
                 </label>
               </div>
@@ -1012,20 +943,20 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               {watch("location") && (
                 <div className="mt-6 mb-6 p-4 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-100 dark:border-blue-800 animate-fade-in">
                   <h3 className="font-medium text-lg text-blue-800 dark:text-blue-300 mb-2">
-                    {getLocationData(watch("location"))?.name} Information
+                    {getLocationData("atmos")?.name} Information
                   </h3>
                   
                   <div className="space-y-3">
                     <p className="text-sm text-gray-700 dark:text-gray-300">
-                      {getLocationData(watch("location"))?.description}
+                      {getLocationData("atmos")?.description}
                     </p>
                     <ul className="list-disc list-inside text-sm text-gray-700 dark:text-gray-300 space-y-1">
-                      {getLocationData(watch("location"))?.features.map((feature, index) => (
+                      {getLocationData("atmos")?.features.map((feature, index) => (
                         <li key={index}>{feature}</li>
                       ))}
                     </ul>
                     <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mt-2">
-                      Note: {getLocationData(watch("location"))?.note}
+                      Note: {getLocationData("atmos")?.note}
                     </p>
                   </div>
 
@@ -1035,31 +966,31 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                       <div className="flex justify-between">
                         <span className="font-medium text-gray-700 dark:text-gray-300">Monday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.monday}</span>
+                        <span className="text-gray-600 dark:text-gray-400">{getLocationData("atmos")?.hours.monday}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="font-medium text-gray-700 dark:text-gray-300">Tuesday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.tuesday}</span>
+                        <span className="text-gray-600 dark:text-gray-400">{getLocationData("atmos")?.hours.tuesday}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="font-medium text-gray-700 dark:text-gray-300">Wednesday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.wednesday}</span>
+                        <span className="text-gray-600 dark:text-gray-400">{getLocationData("atmos")?.hours.wednesday}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="font-medium text-gray-700 dark:text-gray-300">Thursday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.thursday}</span>
+                        <span className="text-gray-600 dark:text-gray-400">{getLocationData("atmos")?.hours.thursday}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="font-medium text-gray-700 dark:text-gray-300">Friday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.friday}</span>
+                        <span className="text-gray-600 dark:text-gray-400">{getLocationData("atmos")?.hours.friday}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="font-medium text-gray-700 dark:text-gray-300">Saturday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.saturday}</span>
+                        <span className="text-gray-600 dark:text-gray-400">{getLocationData("atmos")?.hours.saturday}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="font-medium text-gray-700 dark:text-gray-300">Sunday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.sunday}</span>
+                        <span className="text-gray-600 dark:text-gray-400">{getLocationData("atmos")?.hours.sunday}</span>
                       </div>
                     </div>
                   </div>
@@ -1067,8 +998,8 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                   {/* Add an image of the location */}
                   <div className="mt-4 rounded-lg overflow-hidden">
                     <img 
-                      src={getLocationData(watch("location"))?.imageUrl}
-                      alt={`${getLocationData(watch("location"))?.name} facility`}
+                      src={getLocationData("atmos")?.imageUrl}
+                      alt={`${getLocationData("atmos")?.name} facility`}
                       className="w-full h-48 object-cover rounded-lg"
                     />
                   </div>
@@ -1121,8 +1052,8 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-medium text-blue-800 dark:text-blue-200">Selected Location: {getLocationData(watch("location"))?.name}</h3>
-                  <p className="text-sm text-blue-700 dark:text-blue-300">{getLocationData(watch("location"))?.address}</p>
+                  <h3 className="font-medium text-blue-800 dark:text-blue-200">Selected Location: {getLocationData("atmos")?.name}</h3>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">{getLocationData("atmos")?.address}</p>
                 </div>
               </div>
             </div>
@@ -1424,8 +1355,8 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-medium text-blue-800 dark:text-blue-200">Selected Location: {getLocationData(watch("location"))?.name}</h3>
-                  <p className="text-sm text-blue-700 dark:text-blue-300">{getLocationData(watch("location"))?.address}</p>
+                  <h3 className="font-medium text-blue-800 dark:text-blue-200">Selected Location: {getLocationData("atmos")?.name}</h3>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">{getLocationData("atmos")?.address}</p>
                 </div>
               </div>
             </div>
@@ -1461,7 +1392,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               <div className="p-6">
                 <div className="mb-4">
                   <p className="text-base text-gray-700 dark:text-gray-300 mb-4">
-                    Select the number of people who will attend the session together.
+                    Select the number of clients who will attend the session together.
                   </p>
                 </div>
 
@@ -1493,7 +1424,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                         {size}
                       </span>
                       <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {size === "1" ? "Person" : "People"}
+                        {size === "1" ? "Client" : "Clients"}
                       </span>
                       {size !== "1" && (
                         <span className="mt-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full dark:bg-green-900/30 dark:text-green-400">
@@ -1510,10 +1441,10 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zm-1 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
                     </svg>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      You've selected <span className="font-bold">{watch("groupSize")}</span> {parseInt(watch("groupSize")) === 1 ? 'person' : 'people'}.
+                      You've selected <span className="font-bold">{watch("groupSize")}</span> {parseInt(watch("groupSize")) === 1 ? 'client' : 'clients'}.
                       {watch("groupSize") === "4" && (
                         <span className="ml-1 font-medium">
-                          You qualify for our maximum 20% discount per person!
+                          You qualify for our maximum 20% discount per client!
                         </span>
                       )}
                     </p>
@@ -1536,7 +1467,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               <div className="p-6">
                 <div className="mb-4">
                   <p className="text-base text-gray-700 dark:text-gray-300 mb-4">
-                    Choose specific seats in the hyperbaric chamber for each person in your group.
+                    Choose specific seats in the hyperbaric chamber for each client in your group.
                   </p>
                 </div>
                 
@@ -1560,179 +1491,13 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                   Back to Booking Details
                 </Button>
                 <Button 
-                  type="button" 
-                  onClick={nextStep}
-                  isLoading={isStepLoading}
+                  type="submit"
+                  isLoading={isSubmitting}
                   className="w-full sm:w-auto ml-auto"
                 >
-                  Continue to Payment
+                  Complete Booking
                 </Button>
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Payment Step */}
-        {isPaymentStep && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-6 animate-scale-in">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Booking Summary</h3>
-              {selectedDate && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Date</p>
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      {format(selectedDate, "MMMM d, yyyy")}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Time</p>
-                    <p className="font-medium text-gray-900 dark:text-white">{watch("time")}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Duration</p>
-                    <p className="font-medium text-gray-900 dark:text-white">{watch("duration")} minutes</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Location</p>
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      {getLocationData(watch("location"))?.name}
-                    </p>
-                  </div>
-                  <div className="md:col-span-2">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Address</p>
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      {getLocationData(watch("location"))?.address}
-                    </p>
-                  </div>
-                  {watch("bookingReason") && (
-                    <div className="md:col-span-2">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Purpose</p>
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {watch("bookingReason") === "recovery" ? "Recovery from injury/surgery" :
-                         watch("bookingReason") === "wellness" ? "General wellness" :
-                         watch("bookingReason") === "performance" ? "Athletic performance" :
-                         watch("bookingReason") === "chronic_condition" ? "Chronic condition management" :
-                         watch("bookingReason") === "preventative" ? "Preventative health" :
-                         watch("bookingReason") === "other" ? "Other" : ""}
-                      </p>
-                    </div>
-                  )}
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Group Size</p>
-                    <p className="font-medium text-gray-900 dark:text-white">
-                      {watch("groupSize")} {parseInt(watch("groupSize")) > 1 ? "people" : "person"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Total</p>
-                    <p className="font-bold text-xl text-gray-900 dark:text-white">{formatCurrency(calculateTotal())}</p>
-                  </div>
-                  
-                  {/* Add seat information if any seats are selected */}
-                  {selectedSeats.some(seat => seat.selected) && (
-                    <div className="md:col-span-2">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Selected Seats</p>
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        {selectedSeats
-                          .filter(seat => seat.selected)
-                          .map(seat => (
-                            <span key={seat.id} className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded dark:bg-blue-900 dark:text-blue-300">
-                              Seat {seat.id}{seat.name ? `: ${seat.name}` : ''}
-                            </span>
-                          ))
-                        }
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Show uploaded files if any */}
-                  {uploadedFiles.length > 0 && (
-                    <div className="md:col-span-2">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Uploaded Documents</p>
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {uploadedFiles.length} file{uploadedFiles.length !== 1 ? 's' : ''} uploaded
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-6 animate-slide-in-up animate-delay-200">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Payment Details</h3>
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Card Number
-                  </label>
-                  <input
-                    type="text"
-                    id="cardNumber"
-                    placeholder="1234 5678 9012 3456"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="expDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Expiration Date
-                    </label>
-                    <input
-                      type="text"
-                      id="expDate"
-                      placeholder="MM/YY"
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="cvv" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      CVV
-                    </label>
-                    <input
-                      type="text"
-                      id="cvv"
-                      placeholder="123"
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="nameOnCard" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Name on Card
-                  </label>
-                  <input
-                    type="text"
-                    id="nameOnCard"
-                    placeholder="John Doe"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-4 flex flex-col sm:flex-row justify-between gap-4">
-              <Button 
-                type="button" 
-                onClick={prevStep}
-                variant="outline"
-                isLoading={isStepLoading}
-                className="w-full sm:w-auto order-2 sm:order-1"
-              >
-                Back
-              </Button>
-              <Button 
-                type="submit"
-                isLoading={isSubmitting || isStepLoading}
-                size="lg"
-                className="w-full sm:w-auto order-1 sm:order-2"
-                disabled={isSubmitting || isStepLoading}
-              >
-                <span className="hidden sm:inline">{`Complete Booking • ${formatCurrency(calculateTotal())}`}</span>
-                <span className="sm:hidden">{`Book • ${formatCurrency(calculateTotal())}`}</span>
-              </Button>
             </div>
           </div>
         )}

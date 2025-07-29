@@ -37,19 +37,19 @@ export function delay(ms: number): Promise<void> {
  * Location data for the hyperbaric chamber centers
  */
 export const locationData = {
-  midtown: {
-    name: "Midtown Biohack",
-    address: "575 Madison Ave, 20th floor, New York, NY",
+  atmos: {
+    name: "ATMOS Hyperbaric",
+    address: "166 laurel rd, east north NY, 11731",
     phone: "+1 (646) 262-8794",
-    email: "billydduc@gmail.com",
-    owner: "Billy Duc",
+    email: "info@atmoshyperbaric.com",
+    owner: "ATMOS Hyperbaric",
     features: [
-      "Free parking validation available",
-      "Private changing rooms with showers",
+      "Free parking available",
+      "Private changing rooms",
       "Complimentary refreshments",
       "WiFi and entertainment options during sessions"
     ],
-    description: "Our Manhattan location features state-of-the-art hyperbaric chambers with premium amenities.",
+    description: "Our state-of-the-art hyperbaric oxygen therapy center features premium amenities in a comfortable environment.",
     note: "Please arrive 15 minutes before your scheduled appointment.",
     hours: {
       monday: "9:00 AM - 6:00 PM",
@@ -61,38 +61,13 @@ export const locationData = {
       sunday: "Closed"
     },
     imageUrl: "/HBOT.jpg"
-  },
-  conyers: {
-    name: "Platinum Wellness Spa",
-    address: "1900 Parker Rd SE, Conyers, GA 30094",
-    phone: "+1 (646) 262-8794",
-    email: "billydduc@gmail.com",
-    owner: "Billy Duc",
-    features: [
-      "Ample free parking",
-      "Luxury spa amenities",
-      "Additional wellness services available for booking",
-      "Relaxation area with herbal teas"
-    ],
-    description: "Our Conyers location offers a serene spa environment with comprehensive wellness services.",
-    note: "Ask about our package deals when combining with other spa services.",
-    hours: {
-      monday: "9:00 AM - 6:00 PM",
-      tuesday: "9:00 AM - 6:00 PM",
-      wednesday: "9:00 AM - 6:00 PM",
-      thursday: "9:00 AM - 6:00 PM",
-      friday: "9:00 AM - 6:00 PM",
-      saturday: "10:00 AM - 4:00 PM",
-      sunday: "Closed"
-    },
-    imageUrl: "/People_HBOT.jpg"
   }
 };
 
 /**
  * Get location data by location ID
  */
-export function getLocationData(locationId: 'midtown' | 'conyers' | null) {
+export function getLocationData(locationId: 'atmos' | null) {
   if (!locationId) return null;
   return locationData[locationId];
 }

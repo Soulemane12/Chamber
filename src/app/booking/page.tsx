@@ -26,19 +26,11 @@ const getGoogleMapsUrl = (address: string) => {
 
 // Function to get location contact data
 const getLocationData = (location: string) => {
-  if (location === "midtown") {
-    return {
-      owner: "Billy Duc",
-      phone: "+1 (646) 262-8794",
-      email: "billydduc@gmail.com"
-    };
-  } else {
-    return {
-      owner: "Billy Duc",
-      phone: "+1 (646) 262-8794",
-      email: "billydduc@gmail.com"
-    };
-  }
+  return {
+    owner: "ATMOS Hyperbaric",
+    phone: "+1 (646) 262-8794",
+    email: "info@atmoshyperbaric.com"
+  };
 };
 
 export default function BookingPage() {
@@ -70,6 +62,19 @@ export default function BookingPage() {
     window.scrollTo(0, 0);
   };
 
+  // Create a function to get location information for confirmation
+  const getBookingLocation = () => {
+    return {
+      name: "ATMOS Hyperbaric",
+      address: "166 laurel rd, east north NY, 11731",
+      contact: {
+        owner: "ATMOS Hyperbaric",
+        phone: "+1 (646) 262-8794",
+        email: "info@atmoshyperbaric.com"
+      }
+    };
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
@@ -94,7 +99,7 @@ export default function BookingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
       <Head>
-        <title>WellNex02 - Book a Session</title>
+        <title>ATMOS Hyperbaric - Book a Session</title>
       </Head>
       <Header currentPage="booking" />
 
@@ -146,7 +151,7 @@ export default function BookingPage() {
             <div className="flex justify-center mb-6 animate-fade-in animate-delay-200">
               <div className="relative w-full max-w-md h-48 md:h-64 overflow-hidden rounded-lg">
                 <Image
-                  src={bookingDetails?.location === "midtown" ? "/HBOT.jpg" : "/People_HBOT.jpg"}
+                  src="/HBOT.jpg"
                   alt="Hyperbaric Chamber"
                   fill
                   className="object-cover"
@@ -182,27 +187,21 @@ export default function BookingPage() {
                   <div className="animate-slide-in-left animate-delay-400">
                     <p className="text-sm text-gray-500 dark:text-gray-400">{t('location')}</p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {bookingDetails.location === "midtown" ? "Midtown Biohack" : "Platinum Wellness Spa"}
+                      ATMOS Hyperbaric
                     </p>
                   </div>
                   <div className="animate-slide-in-right animate-delay-500 md:col-span-2">
                     <p className="text-sm text-gray-500 dark:text-gray-400">{t('address')}</p>
                     <div className="flex flex-col">
                       <p className="font-medium text-gray-900 dark:text-white break-words">
-                        {bookingDetails.location === "midtown" 
-                          ? "575 Madison Ave, 20th floor, New York, NY" 
-                          : "1900 Parker Rd SE, Conyers, GA 30094"}
+                        166 laurel rd, east north NY, 11731
                       </p>
                       {bookingDetails.location && (
                         <div className="flex flex-col gap-2 mt-1">
                           <p className="text-xs text-gray-500 dark:text-gray-400">{t('rideShare')}:</p>
                           <div className="flex flex-wrap gap-2">
                           <a 
-                            href={getGoogleMapsUrl(
-                              bookingDetails.location === "midtown" 
-                                ? "575 Madison Ave, 20th floor, New York, NY" 
-                                : "1900 Parker Rd SE, Conyers, GA 30094"
-                            )}
+                            href={getGoogleMapsUrl("166 laurel rd, east north NY, 11731")}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-600 dark:text-blue-400 text-sm hover:underline flex items-center"
@@ -215,11 +214,7 @@ export default function BookingPage() {
                           </a>
                           
                           <a 
-                            href={`https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=${encodeURIComponent(
-                              bookingDetails.location === "midtown" 
-                                ? "575 Madison Ave, 20th floor, New York, NY" 
-                                : "1900 Parker Rd SE, Conyers, GA 30094"
-                            )}`}
+                            href={`https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=${encodeURIComponent("166 laurel rd, east north NY, 11731")}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-black dark:text-white text-sm hover:underline flex items-center bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-md"
@@ -231,11 +226,7 @@ export default function BookingPage() {
                           </a>
                           
                           <a 
-                            href={`https://ride.lyft.com/ridetype?q=${encodeURIComponent(
-                              bookingDetails.location === "midtown" 
-                                ? "575 Madison Ave, 20th floor, New York, NY" 
-                                : "1900 Parker Rd SE, Conyers, GA 30094"
-                            )}`}
+                            href={`https://ride.lyft.com/ridetype?q=${encodeURIComponent("166 laurel rd, east north NY, 11731")}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-[#FF00BF] dark:text-[#FF00BF] text-sm hover:underline flex items-center bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-md"
@@ -256,42 +247,57 @@ export default function BookingPage() {
                       {formatCurrency(pricingOptions[bookingDetails.duration as keyof typeof pricingOptions])}
                     </p>
                   </div>
+
+                  {/* Add seat information */}
+                  {bookingDetails.selectedSeats && bookingDetails.selectedSeats.some(seat => seat.selected) && (
+                    <div className="md:col-span-2 animate-slide-in-up animate-delay-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Selected Seats</p>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {bookingDetails.selectedSeats
+                          .filter(seat => seat.selected)
+                          .map(seat => (
+                            <span key={seat.id} className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded dark:bg-blue-900 dark:text-blue-300">
+                              Seat {seat.id}{seat.name ? `: ${seat.name}` : ''}
+                            </span>
+                          ))
+                        }
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
-                          <div className="mt-8 flex flex-col items-center space-y-4 animate-fade-in animate-delay-500">
-              {bookingDetails?.location && (
-                <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg w-full max-w-md mx-auto animate-fade-in">
-                  <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-2">
-                    {bookingDetails.location === "midtown" ? "Midtown Biohack Contact" : "Platinum Wellness Spa Contact"}
-                  </h4>
-                  <div className="flex items-center mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    <span className="text-gray-700 dark:text-gray-300 font-medium">
-                      {t('owner')}: {getLocationData(bookingDetails.location)?.owner}
-                    </span>
-                  </div>
-                  <div className="flex items-center mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                    <span className="text-gray-700 dark:text-gray-300">
-                      {getLocationData(bookingDetails.location)?.phone}
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    <span className="text-gray-700 dark:text-gray-300">
-                      {getLocationData(bookingDetails.location)?.email}
-                    </span>
-                  </div>
+            <div className="mt-8 flex flex-col items-center space-y-4 animate-fade-in animate-delay-500">
+              <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg w-full max-w-md mx-auto animate-fade-in">
+                <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-2">
+                  ATMOS Hyperbaric Contact
+                </h4>
+                <div className="flex items-center mb-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">
+                    {t('owner')}: {getBookingLocation().contact.owner}
+                  </span>
                 </div>
-              )}
+                <div className="flex items-center mb-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                  <span className="text-gray-700 dark:text-gray-300">
+                    {getBookingLocation().contact.phone}
+                  </span>
+                </div>
+                <div className="flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <span className="text-gray-700 dark:text-gray-300">
+                    {getBookingLocation().contact.email}
+                  </span>
+                </div>
+              </div>
               <div className="flex justify-center w-full">
                 <Link
                   href="/"
