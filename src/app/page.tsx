@@ -22,7 +22,7 @@ export default function Home() {
           {/* ATMOS Logo Image */}
           <div className="relative w-full max-w-md h-48 mx-auto mb-6 animate-fade-in bg-white rounded-lg p-4">
             <Image 
-              src="/atmos_screenshot.png" 
+              src="/atmos_logo.jpg" 
               alt="ATMOS Hyperbaric" 
               width={400}
               height={200}
