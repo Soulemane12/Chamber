@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { useLanguage } from "@/lib/LanguageContext";
 import { Footer } from "@/components/Footer";
+import Image from "next/image";
 
 export default function Home() {
   const { t } = useLanguage();
@@ -20,10 +21,17 @@ export default function Home() {
 
           {/* ATMOS Logo Image */}
           <div className="relative w-full max-w-md h-48 mx-auto mb-6 animate-fade-in bg-white rounded-lg p-4">
-            <img 
+            <Image 
               src="/atmos_screenshot.png" 
               alt="ATMOS Hyperbaric" 
-              className="object-contain w-full h-full"
+              width={400}
+              height={200}
+              style={{
+                objectFit: "contain",
+                width: "100%",
+                height: "100%"
+              }}
+              priority
             />
           </div>
 

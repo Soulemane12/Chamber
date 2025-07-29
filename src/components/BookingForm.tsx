@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { formatCurrency, getLocationData } from "@/lib/utils";
 import { supabase } from "@/lib/supabaseClient";
 import { SeatSelector, SeatInfo } from "@/components/ui/SeatSelector";
+import Image from "next/image";
 
 // Define the form schema with zod validation
 const bookingSchema = z.object({
@@ -952,10 +953,20 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
 
                   {/* Add an image of the location */}
                   <div className="mt-4 rounded-lg overflow-hidden">
-                    <img 
+                    <Image 
                       src="/atmos_screenshot.png"
                       alt="ATMOS Hyperbaric facility"
-                      className="w-full h-48 object-contain bg-white p-2 rounded-lg"
+                      width={600}
+                      height={300}
+                      style={{
+                        objectFit: "contain",
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "white",
+                        padding: "8px",
+                        borderRadius: "0.5rem"
+                      }}
+                      priority
                     />
                   </div>
                 </div>
