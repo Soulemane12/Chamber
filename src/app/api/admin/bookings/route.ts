@@ -416,4 +416,24 @@ export async function POST(request: Request) {
       message: 'Failed to process analytics request'
     }, { status: 500 });
   }
+}
+
+// Bulk delete bookings
+export async function DELETE(request: Request) {
+  try {
+    const body = await request.json();
+    const ids: string[] = body.ids;
+    if (!ids || ids.length === 0) {
+      return NextResponse.json({ error: 'No ids provided' }, { status: 400 });
+    }
+    const { error } = await supabase.from('bookings').delete().in('id', ids);
+    if (error) {
+      console.error('Delete error', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: 'Unexpected error' }, { status: 500 });
+  }
 } 

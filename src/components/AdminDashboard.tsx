@@ -243,6 +243,7 @@ export default function AdminDashboard() {
 
   // Full list of bookings (used in "Bookings" tab)
   const [allBookings, setAllBookings] = useState<Booking[]>([]);
+  const [selectedBookingIds, setSelectedBookingIds] = useState<string[]>([]);
   const [bookingsPage, setBookingsPage] = useState<number>(1);
   const [bookingsPageSize, setBookingsPageSize] = useState<number>(10);
   const [totalBookingsPages, setTotalBookingsPages] = useState<number>(1);
@@ -727,6 +728,37 @@ export default function AdminDashboard() {
     setSelectedBooking(booking as unknown as GuestBookingInfo);
     setIsBookingModalOpen(true);
   };
+
+  // Selection helpers
+  const toggleBookingSelection = (id: string) => {
+    setSelectedBookingIds(prev => prev.includes(id) ? prev.filter(b => b !== id) : [...prev, id]);
+  };
+  const toggleSelectAllBookings = () => {
+    if (selectedBookingIds.length === allBookings.length) {
+      setSelectedBookingIds([]);
+    } else {
+      setSelectedBookingIds(allBookings.map(b => b.id));
+    }
+  };
+
+  const deleteSelectedBookings = async () => {
+    if (selectedBookingIds.length === 0) return;
+    if (!confirm(`Delete ${selectedBookingIds.length} selected bookings?`)) return;
+    try {
+      const res = await fetch('/api/admin/bookings', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selectedBookingIds })
+      });
+      if (!res.ok) throw new Error('Delete failed');
+      // Refresh list
+      setAllBookings(prev => prev.filter(b => !selectedBookingIds.includes(b.id)));
+      setSelectedBookingIds([]);
+    } catch (err) {
+      alert('Failed to delete bookings');
+      console.error(err);
+    }
+  };
   
   return (
     <div className="space-y-8">
@@ -1145,12 +1177,20 @@ export default function AdminDashboard() {
                 <div className="text-sm text-gray-600 dark:text-gray-400">
                   Showing {allBookings.length} of {totalBookingsCount} bookings
                 </div>
+                {selectedBookingIds.length > 0 && (
+                  <button onClick={deleteSelectedBookings} className="ml-4 inline-flex items-center px-3 py-1.5 bg-red-600 text-white text-sm rounded hover:bg-red-700">
+                    Delete Selected ({selectedBookingIds.length})
+                  </button>
+                )}
               </div>
               
               <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                   <thead className="bg-gray-50 dark:bg-gray-700">
                     <tr>
+                      <th className="px-6 py-3">
+                        <input type="checkbox" onChange={toggleSelectAllBookings} checked={selectedBookingIds.length === allBookings.length && allBookings.length>0} />
+                      </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date & Time</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Customer</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Contact</th>
@@ -1167,6 +1207,9 @@ export default function AdminDashboard() {
                         className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
                         onClick={() => handleBookingClick(booking)}
                       >
+                        <td className="px-6 py-4">
+                          <input type="checkbox" checked={selectedBookingIds.includes(booking.id)} onChange={() => toggleBookingSelection(booking.id)} onClick={(e)=>e.stopPropagation()} />
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900 dark:text-white">
                             {new Date(booking.date).toLocaleDateString()}
@@ -1376,7 +1419,7 @@ export default function AdminDashboard() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right space-x-2">
                           <button 
                             onClick={() => handleEditUser(p)}
-                            className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                            className="text-blue-600 hover:text-blue-900 dark:text-blue-400"
                           >
                             Edit
                           </button>
