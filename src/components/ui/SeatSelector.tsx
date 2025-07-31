@@ -222,7 +222,7 @@ export function SeatSelector({
                           type="text"
                           value={seat.name}
                           onChange={(e) => updateSeatName(seat.id, e.target.value)}
-                          placeholder="Enter passenger name"
+                          placeholder="Enter client name"
                           className={cn(
                             "w-full p-3 text-sm rounded-lg border shadow-sm transition-all bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm focus:ring-2 focus:outline-none text-gray-900 dark:text-white",
                             seat.error
@@ -240,7 +240,7 @@ export function SeatSelector({
                       </div>
                       {seat.error && (
                         <p className="mt-1 text-sm text-rose-600 dark:text-rose-400">
-                          Please enter passenger name
+                          Please enter client name
                         </p>
                       )}
                     </div>
