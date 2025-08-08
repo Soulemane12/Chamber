@@ -418,6 +418,69 @@ export async function POST(request: Request) {
   }
 }
 
+// Update booking status and chamber assignment
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json();
+    const { id, status, chamber_id, session_notes, cancelled_reason, ...updateData } = body;
+    
+    if (!id) {
+      return NextResponse.json({ error: 'Missing booking ID' }, { status: 400 });
+    }
+    
+    // Prepare update data with timestamps for status changes
+    const finalUpdateData: any = { ...updateData };
+    
+    if (status !== undefined) {
+      finalUpdateData.status = status;
+      
+      // Add timestamps for status changes
+      if (status === 'completed') {
+        finalUpdateData.completed_at = new Date().toISOString();
+      } else if (status === 'cancelled') {
+        finalUpdateData.cancelled_at = new Date().toISOString();
+        if (cancelled_reason) {
+          finalUpdateData.cancelled_reason = cancelled_reason;
+        }
+      }
+    }
+    
+    if (chamber_id !== undefined) {
+      finalUpdateData.chamber_id = chamber_id;
+    }
+    
+    if (session_notes !== undefined) {
+      finalUpdateData.session_notes = session_notes;
+    }
+    
+    const { data, error } = await supabase
+      .from('bookings')
+      .update(finalUpdateData)
+      .eq('id', id)
+      .select(`
+        *,
+        chambers (
+          id,
+          name,
+          description,
+          status,
+          location,
+          capacity
+        )
+      `)
+      .single();
+    
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    
+    return NextResponse.json({ data });
+  } catch (error) {
+    console.error('Error updating booking:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
 // Bulk delete bookings
 export async function DELETE(request: Request) {
   try {

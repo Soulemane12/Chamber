@@ -5,7 +5,7 @@ import { formatCurrency } from "@/lib/utils";
 import UserEditModal, { UserProfile } from "./ui/UserEditModal";
 import AdminChatbot from './AdminChatbot';
 import BookingDetailsModal, { GuestBookingInfo } from "./ui/BookingDetailsModal";
-import CalendarView from "./ui/CalendarView";
+import Calendar from "./ui/Calendar";
 import ChamberManagement from "./ui/ChamberManagement";
 
 // Simple chart component using div heights
@@ -165,7 +165,6 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'analytics' | 'users' | 'bookings' | 'calendar' | 'chambers'>('analytics');
-  const [calendarView, setCalendarView] = useState<'daily' | 'weekly' | 'monthly'>('daily');
 
   const [dataRefreshInterval] = useState<number>(60000); // 1 minute refresh
   const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
@@ -199,25 +198,9 @@ export default function AdminDashboard() {
         setLoading(false);
       }
     };
-
-    const loadChambers = async () => {
-      try {
-        const response = await fetch("/api/admin/chambers");
-        if (response.ok) {
-          const data = await response.json();
-          setChambers(data.data || []);
-        } else {
-          console.error("Failed to fetch chambers:", response.status);
-        }
-      } catch (error) {
-        console.error("Error fetching chambers:", error);
-      }
-    };
-
     loadProfiles();
-    loadChambers();
   }, []);
-  
+
   // State for booking data
   const [bookingsByTime, setBookingsByTime] = useState<Record<string, number>>({});
   const [bookingsByDemographic, setBookingsByDemographic] = useState<Record<string, number>>({});
@@ -251,12 +234,6 @@ export default function AdminDashboard() {
     profession?: string;
     age?: string | number;
     seat_data?: string | null;
-    status?: string;
-    chamber_id?: string;
-    session_notes?: string;
-    completed_at?: string;
-    cancelled_at?: string;
-    cancelled_reason?: string;
     user?: {
       id: string;
       first_name: string;
@@ -268,11 +245,19 @@ export default function AdminDashboard() {
 
   // Full list of bookings (used in "Bookings" tab)
   const [allBookings, setAllBookings] = useState<Booking[]>([]);
-  const [chambers, setChambers] = useState<any[]>([]);
   const [selectedBookingIds, setSelectedBookingIds] = useState<string[]>([]);
   const [bookingsPage, setBookingsPage] = useState<number>(1);
   const [bookingsPageSize, setBookingsPageSize] = useState<number>(10);
   const [totalBookingsPages, setTotalBookingsPages] = useState<number>(1);
+
+  // Calendar and Chamber Management state
+  const [calendarView, setCalendarView] = useState<'daily' | 'weekly' | 'monthly'>('weekly');
+  const [calendarStartDate, setCalendarStartDate] = useState(new Date().toISOString().split('T')[0]);
+  const [calendarEndDate, setCalendarEndDate] = useState(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+  const [calendarBookings, setCalendarBookings] = useState<Record<string, any[]>>({});
+  const [chambers, setChambers] = useState<any[]>([]);
+  const [maintenanceLogs, setMaintenanceLogs] = useState<any[]>([]);
+  const [selectedChamberId, setSelectedChamberId] = useState<string | null>(null);
   const [totalBookingsCount, setTotalBookingsCount] = useState<number>(0);
   const [bookingsSearchQuery, setBookingsSearchQuery] = useState<string>('');
   const [bookingsDateRange, setBookingsDateRange] = useState<{startDate: string, endDate: string}>({
@@ -282,6 +267,13 @@ export default function AdminDashboard() {
   const [bookingsLocation, setBookingsLocation] = useState<string>('');
   const [bookingsSortBy, setBookingsSortBy] = useState<string>('date');
   const [bookingsSortOrder, setBookingsSortOrder] = useState<'asc' | 'desc'>('desc');
+
+  // Load calendar and chamber data
+  useEffect(() => {
+    fetchCalendarData();
+    fetchChambersData();
+    fetchMaintenanceLogs();
+  }, [calendarView, calendarStartDate, calendarEndDate, selectedChamberId]);
 
   // Summary statistics displayed in top cards
   const [summaryStats, setSummaryStats] = useState({
@@ -345,6 +337,118 @@ export default function AdminDashboard() {
   });
   
   // Update fetchAllBookingData to handle pagination and filtering
+  const fetchCalendarData = async () => {
+    try {
+      const response = await fetch(`/api/admin/calendar?view=${calendarView}&startDate=${calendarStartDate}&endDate=${calendarEndDate}${selectedChamberId ? `&chamberId=${selectedChamberId}` : ''}`);
+      if (response.ok) {
+        const data = await response.json();
+        setCalendarBookings(data.bookings || {});
+      } else {
+        console.error('Failed to fetch calendar data');
+      }
+    } catch (error) {
+      console.error('Error fetching calendar data:', error);
+    }
+  };
+
+  const fetchChambersData = async () => {
+    try {
+      const response = await fetch('/api/admin/chambers');
+      if (response.ok) {
+        const data = await response.json();
+        setChambers(data.chambers || []);
+      } else {
+        console.error('Failed to fetch chambers data');
+      }
+    } catch (error) {
+      console.error('Error fetching chambers data:', error);
+    }
+  };
+
+  const fetchMaintenanceLogs = async () => {
+    try {
+      const response = await fetch('/api/admin/maintenance');
+      if (response.ok) {
+        const data = await response.json();
+        setMaintenanceLogs(data.maintenanceLogs || []);
+      } else {
+        console.error('Failed to fetch maintenance logs');
+      }
+    } catch (error) {
+      console.error('Error fetching maintenance logs:', error);
+    }
+  };
+
+  const handleChamberUpdate = async (chamber: any) => {
+    try {
+      const response = await fetch('/api/admin/chambers', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(chamber)
+      });
+      if (response.ok) {
+        await fetchChambersData();
+      } else {
+        console.error('Failed to update chamber');
+      }
+    } catch (error) {
+      console.error('Error updating chamber:', error);
+    }
+  };
+
+  const handleChamberDelete = async (chamberId: string) => {
+    if (!confirm('Are you sure you want to delete this chamber?')) return;
+    
+    try {
+      const response = await fetch(`/api/admin/chambers?id=${chamberId}`, {
+        method: 'DELETE'
+      });
+      if (response.ok) {
+        await fetchChambersData();
+      } else {
+        console.error('Failed to delete chamber');
+      }
+    } catch (error) {
+      console.error('Error deleting chamber:', error);
+    }
+  };
+
+  const handleMaintenanceLog = async (log: any) => {
+    try {
+      const response = await fetch('/api/admin/maintenance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(log)
+      });
+      if (response.ok) {
+        await fetchMaintenanceLogs();
+        await fetchChambersData();
+      } else {
+        console.error('Failed to create maintenance log');
+      }
+    } catch (error) {
+      console.error('Error creating maintenance log:', error);
+    }
+  };
+
+  const handleMaintenanceUpdate = async (log: any) => {
+    try {
+      const response = await fetch('/api/admin/maintenance', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(log)
+      });
+      if (response.ok) {
+        await fetchMaintenanceLogs();
+        await fetchChambersData();
+      } else {
+        console.error('Failed to update maintenance log');
+      }
+    } catch (error) {
+      console.error('Error updating maintenance log:', error);
+    }
+  };
+
   const fetchAllBookingData = async () => {
     setBookingsLoading(true);
     try {
@@ -1242,11 +1346,8 @@ export default function AdminDashboard() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Contact</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Service</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Seats</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Chamber</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Location</th>
                       <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Amount</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -1316,84 +1417,12 @@ export default function AdminDashboard() {
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            booking.status === 'confirmed' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                            booking.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                            booking.status === 'cancelled' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
-                            booking.status === 'no_show' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
-                            'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
-                          }`}>
-                            {booking.status || 'confirmed'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {booking.chamber_id ? (
-                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                              Chamber {booking.chamber_id.slice(0, 8)}...
-                            </span>
-                          ) : (
-                            <span className="text-xs text-gray-500 dark:text-gray-400">Not assigned</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200`}>
                             ATMOS Hyperbaric
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900 dark:text-white">
                           {formatCurrency(booking.amount)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                          <div className="flex space-x-1">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleBookingClick(booking);
-                              }}
-                              className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800"
-                              title="View Details"
-                            >
-                              👁
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // Quick status update
-                                fetch('/api/admin/bookings', {
-                                  method: 'PUT',
-                                  headers: { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify({ id: booking.id, status: 'completed' })
-                                }).then(() => {
-                                  setAllBookings(prev => prev.map(b => 
-                                    b.id === booking.id ? { ...b, status: 'completed' } : b
-                                  ));
-                                });
-                              }}
-                              className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 dark:bg-green-900 dark:text-green-200 dark:hover:bg-green-800"
-                              title="Mark Completed"
-                            >
-                              ✓
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // Quick status update
-                                fetch('/api/admin/bookings', {
-                                  method: 'PUT',
-                                  headers: { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify({ id: booking.id, status: 'cancelled' })
-                                }).then(() => {
-                                  setAllBookings(prev => prev.map(b => 
-                                    b.id === booking.id ? { ...b, status: 'cancelled' } : b
-                                  ));
-                                });
-                              }}
-                              className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 dark:bg-red-900 dark:text-red-200 dark:hover:bg-red-800"
-                              title="Cancel Booking"
-                            >
-                              ✕
-                            </button>
-                          </div>
                         </td>
                       </tr>
                     ))}
@@ -1425,88 +1454,6 @@ export default function AdminDashboard() {
               </div>
             </>
           )}
-        </div>
-      ) : activeTab === 'calendar' ? (
-        /* Calendar View Tab */
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
-          <div className="mb-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Calendar View</h2>
-            <p className="text-gray-600 dark:text-gray-400">View and manage bookings in calendar format</p>
-          </div>
-          
-          {/* Calendar View Controls */}
-          <div className="mb-6">
-            <div className="flex space-x-2">
-              <button
-                className={`px-4 py-2 rounded-lg ${
-                  calendarView === 'daily'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
-                onClick={() => setCalendarView('daily')}
-              >
-                Daily
-              </button>
-              <button
-                className={`px-4 py-2 rounded-lg ${
-                  calendarView === 'weekly'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
-                onClick={() => setCalendarView('weekly')}
-              >
-                Weekly
-              </button>
-              <button
-                className={`px-4 py-2 rounded-lg ${
-                  calendarView === 'monthly'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
-                onClick={() => setCalendarView('monthly')}
-              >
-                Monthly
-              </button>
-            </div>
-          </div>
-          
-          <CalendarView 
-            view={calendarView}
-            bookings={allBookings}
-            chambers={chambers}
-            onBookingClick={(booking) => {
-              setSelectedBooking(booking as unknown as GuestBookingInfo);
-              setIsBookingModalOpen(true);
-            }}
-            onStatusChange={(bookingId, status) => {
-              // Refresh all booking data when status changes
-              console.log('Booking status changed:', bookingId, status);
-              fetchAllBookingData();
-            }}
-            onChamberAssign={(bookingId, chamberId) => {
-              // Refresh all booking data when chamber is assigned
-              console.log('Chamber assigned:', bookingId, chamberId);
-              fetchAllBookingData();
-            }}
-            onRefresh={fetchAllBookingData}
-          />
-        </div>
-      ) : activeTab === 'chambers' ? (
-        /* Chamber Management Tab */
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
-          <div className="mb-6">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Chamber Management</h2>
-            <p className="text-gray-600 dark:text-gray-400">Manage hyperbaric chambers and sessions</p>
-          </div>
-          
-        <ChamberManagement 
-            onChamberUpdate={(chamberId, status) => {
-              console.log('Chamber updated:', chamberId, status);
-            }}
-            onSessionUpdate={(sessionId, status) => {
-              console.log('Session updated:', sessionId, status);
-            }}
-          />
         </div>
       ) : (
         /* User Management Tab */
@@ -1652,6 +1599,88 @@ export default function AdminDashboard() {
             </div>
           </div>
         </div>
+      ) : activeTab === 'calendar' ? (
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Calendar View</h2>
+              <div className="flex items-center space-x-4">
+                <select
+                  value={calendarView}
+                  onChange={(e) => setCalendarView(e.target.value as 'daily' | 'weekly' | 'monthly')}
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                </select>
+                
+                <select
+                  value={selectedChamberId || ''}
+                  onChange={(e) => setSelectedChamberId(e.target.value || null)}
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="">All Chambers</option>
+                  {chambers.map((chamber) => (
+                    <option key={chamber.id} value={chamber.id}>
+                      {chamber.name} - {chamber.location}
+                    </option>
+                  ))}
+                </select>
+                
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="date"
+                    value={calendarStartDate}
+                    onChange={(e) => setCalendarStartDate(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  />
+                  <span className="text-gray-500">to</span>
+                  <input
+                    type="date"
+                    value={calendarEndDate}
+                    onChange={(e) => setCalendarEndDate(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <Calendar
+              bookings={calendarBookings}
+              chambers={chambers}
+              onBookingClick={handleBookingClick}
+              onDateClick={(date) => {
+                setCalendarStartDate(date);
+                setCalendarEndDate(date);
+                setCalendarView('daily');
+              }}
+              view={calendarView}
+              startDate={calendarStartDate}
+              endDate={calendarEndDate}
+            />
+          </div>
+        </div>
+      ) : activeTab === 'chambers' ? (
+        <div className="space-y-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Chamber Management</h2>
+              <button className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors">
+                Add New Chamber
+              </button>
+            </div>
+            
+            <ChamberManagement
+              chambers={chambers}
+              maintenanceLogs={maintenanceLogs}
+              onChamberUpdate={handleChamberUpdate}
+              onChamberDelete={handleChamberDelete}
+              onMaintenanceLog={handleMaintenanceLog}
+              onMaintenanceUpdate={handleMaintenanceUpdate}
+            />
+          </div>
+        </div>
       )}
       
       {/* User Edit Modal */}
@@ -1672,16 +1701,6 @@ export default function AdminDashboard() {
         onClose={() => {
           setIsBookingModalOpen(false);
           setSelectedBooking(null);
-        }}
-        onUpdate={(bookingId, updates) => {
-          // Update the booking in the local state
-          setAllBookings(prev => prev.map(booking => 
-            booking.id === bookingId 
-              ? { ...booking, ...updates }
-              : booking
-          ));
-          // Refresh all booking data to ensure calendar is updated
-          fetchAllBookingData();
         }}
       />
       
