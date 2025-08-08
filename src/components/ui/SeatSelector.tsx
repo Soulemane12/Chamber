@@ -150,8 +150,10 @@ export function SeatSelector({
           
           {/* Seats container with perspective effect */}
           <div className="relative bg-gray-200/50 dark:bg-gray-800/30 rounded-xl p-6 transform-gpu perspective-800">
+            {/* Vertical divider between seats 2 and 3 */}
+            <div className="pointer-events-none absolute inset-y-0 left-1/2 w-px bg-gray-300 dark:bg-gray-600 z-0" />
             {/* Seats grid layout with 3D-like effect - display seats in a single row 1 2 3 4 */}
-            <div className="grid grid-cols-4 gap-6 mb-4 transform-gpu rotateX-5">
+            <div className="relative z-10 grid grid-cols-4 gap-6 mb-4 transform-gpu rotateX-5">
               {seats.map((seat) => {
                 const isSelected = seat.selected;
                 const hasError = seat.error;
