@@ -231,7 +231,6 @@ export default function AdminDashboard() {
     education?: string;
     profession?: string;
     age?: string | number;
-    seat_data?: string | null;
     user?: {
       id: string;
       first_name: string;
@@ -1165,7 +1164,7 @@ export default function AdminDashboard() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Customer</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Contact</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Service</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Seats</th>
+                      
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Location</th>
                       <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Amount</th>
                     </tr>
@@ -1217,22 +1216,7 @@ export default function AdminDashboard() {
                             Group size: {booking.group_size}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {booking.seat_data ? (
-                            <div className="flex flex-wrap gap-1">
-                              {(typeof booking.seat_data === 'string' 
-                                ? JSON.parse(booking.seat_data) 
-                                : booking.seat_data
-                              ).map((seat: {seatId: number, name: string}) => (
-                                <span key={seat.seatId} className="inline-flex items-center px-1.5 py-0.5 bg-blue-100 text-blue-800 text-xs rounded dark:bg-blue-900 dark:text-blue-300">
-                                  {seat.seatId}{seat.name ? `: ${seat.name}` : ''}
-                                </span>
-                              ))}
-                            </div>
-                          ) : (
-                            <span className="text-xs text-gray-500 dark:text-gray-400">No seat data</span>
-                          )}
-                        </td>
+                        
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             booking.location === 'midtown' 

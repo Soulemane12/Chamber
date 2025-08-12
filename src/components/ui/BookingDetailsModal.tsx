@@ -19,7 +19,6 @@ export interface GuestBookingInfo {
   education?: string;
   profession?: string;
   age?: string | number;
-  seat_data?: string | null;
   user_id?: string | null;
   created_at?: string;
 }
@@ -35,10 +34,7 @@ export default function BookingDetailsModal({ booking, isOpen, onClose }: Bookin
     return null;
   }
 
-  // Parse seat data if available
-  const seatData = booking.seat_data 
-    ? (typeof booking.seat_data === 'string' ? JSON.parse(booking.seat_data) : booking.seat_data)
-    : [];
+  // Seat data has been removed from the application
 
   // Format date for display
   const formatDate = (dateStr: string) => {
@@ -225,34 +221,7 @@ export default function BookingDetailsModal({ booking, isOpen, onClose }: Bookin
             </div>
           </div>
 
-          {/* Seat Information */}
-          {seatData.length > 0 && (
-            <div className="mb-8">
-              <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-4 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-600 dark:text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
-                </svg>
-                Seat Information
-              </h4>
-              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {seatData.map((seat: {seatId: number, name: string}, index: number) => (
-                    <div key={index} className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm">
-                      <div className="flex justify-between items-center">
-                        <div className="font-medium text-blue-600 dark:text-blue-400">Seat #{seat.seatId}</div>
-                      </div>
-                      <div className="mt-2">
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Assigned to:</p>
-                        <p className="font-medium text-gray-900 dark:text-white">
-                          {seat.name || 'Not specified'}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Seat information removed */}
 
           {/* Additional Notes */}
           {booking.notes && (

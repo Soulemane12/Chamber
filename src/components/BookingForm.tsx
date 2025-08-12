@@ -371,35 +371,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         });
 
         // Check if it's a specific column not found error
-        if (err instanceof Error && 
-            err.message.includes('column') && 
-            err.message.includes('not found')) {
-          // Try running the migration and retry
-          try {
-            // Try to run the migration first
-            const migrationResponse = await fetch('/api/admin/migrate-seat-selection');
-            if (migrationResponse.ok) {
-              console.log('Migration completed, retrying booking submission');
-              // Retry the booking submission
-              const retryResponse = await supabase
-                .from('bookings')
-                .insert([bookingData])
-                .select();
-                
-              result = retryResponse.data;
-              error = retryResponse.error;
-              
-              if (error) throw error;
-            } else {
-              throw new Error('Migration failed');
-            }
-          } catch (migrationErr) {
-            console.error('Migration attempt failed:', migrationErr);
-            throw new Error('Failed to save your booking. Please try again later.');
-          }
-        } else {
-          throw new Error(errorMessage || 'Failed to save your booking');
-        }
+        throw new Error(errorMessage || 'Failed to save your booking');
       }
       
       console.log('Booking saved successfully:', result);
