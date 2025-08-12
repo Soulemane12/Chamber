@@ -17,17 +17,6 @@ function LoginForm() {
   const [message, setMessage] = useState<string | null>(null);
   const redirectPath = searchParams.get('redirect') || '/';
 
-  // If already authenticated, redirect away from login immediately
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        router.replace(redirectPath);
-      }
-    };
-    checkSession();
-  }, [router, redirectPath]);
-
   useEffect(() => {
     // Check for access token in URL (from email confirmation)
     const handleEmailConfirmation = async () => {
@@ -65,6 +54,21 @@ function LoginForm() {
     handleEmailConfirmation();
   }, [searchParams]);
 
+  // If already authenticated, redirect away from login immediately
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          router.replace(redirectPath);
+        }
+      } catch (err) {
+        // noop
+      }
+    };
+    checkSession();
+  }, [router, redirectPath]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -82,7 +86,7 @@ function LoginForm() {
         return;
       }
       
-      // Redirect to the specified redirect path or home, replacing login in history
+      // Redirect to the specified redirect path or home (replace to avoid going back to login)
       router.replace(redirectPath);
     } catch (err) {
       console.error("Login error:", err);
