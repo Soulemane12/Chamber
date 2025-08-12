@@ -17,6 +17,17 @@ function LoginForm() {
   const [message, setMessage] = useState<string | null>(null);
   const redirectPath = searchParams.get('redirect') || '/';
 
+  // If already authenticated, redirect away from login immediately
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        router.replace(redirectPath);
+      }
+    };
+    checkSession();
+  }, [router, redirectPath]);
+
   useEffect(() => {
     // Check for access token in URL (from email confirmation)
     const handleEmailConfirmation = async () => {
@@ -71,8 +82,8 @@ function LoginForm() {
         return;
       }
       
-      // Redirect to the specified redirect path or home
-      router.push(redirectPath);
+      // Redirect to the specified redirect path or home, replacing login in history
+      router.replace(redirectPath);
     } catch (err) {
       console.error("Login error:", err);
       setError("An error occurred during login");
