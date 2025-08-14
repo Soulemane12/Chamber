@@ -9,7 +9,7 @@ export const translations = {
     contact: "Contact",
     
     // Homepage
-    heroTitle: "Experience the Benefits of Hyperbaric Oxygen Therapy (HBOT)",
+    heroTitle: "Experience the Benefits of Hyperbaric Oxygen Therapy (HBOT) ",
     heroSubtitle: "Enhance your recovery, boost performance, and improve overall wellness with ATMOS's state-of-the-art hyperbaric chambers.",
     bookYourSession: "Book Your Session",
     
