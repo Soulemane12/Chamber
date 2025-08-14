@@ -71,7 +71,7 @@ export const locationData = {
     features: [
       "Ample free parking",
       "Luxury spa amenities",
-      "Additional wellness services available for booking",
+      "Additional wellness services available",
       "Relaxation area with herbal teas"
     ],
     description: "Our Conyers location offers a serene spa environment with comprehensive wellness services.",

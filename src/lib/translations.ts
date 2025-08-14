@@ -55,8 +55,6 @@ export const translations = {
     email: "Email",
     phone: "Phone",
     name: "Name",
-    name: "Name",
-    email: "Email",
     dateAndTime: "Date & Time",
     totalAmount: "Total Amount",
     contactInfo: "Contact",

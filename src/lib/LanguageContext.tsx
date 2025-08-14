@@ -47,8 +47,9 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
 
   // Translation function
   const t = (key: keyof typeof translations.en): string => {
-    const translation = translations[language][key];
-    return translation || translations.en[key] || key as string;
+    const languageMap = translations[language] as Partial<typeof translations.en>;
+    const translation = languageMap[key];
+    return translation || translations.en[key] || (key as string);
   };
 
   return (
