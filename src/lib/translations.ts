@@ -5,13 +5,13 @@ export const translations = {
     // Navigation
     home: "Home",
     about: "About",
-    bookNow: "Book Now",
+    products: "Products",
     contact: "Contact",
     
     // Homepage
-    heroTitle: "Experience the Benefits of Hyperbaric Oxygen Therapy (HBOT)",
-    heroSubtitle: "Enhance your recovery, boost performance, and improve overall wellness with Billy Duc's state-of-the-art hyperbaric chambers.",
-    bookYourSession: "Book Your Session",
+    heroTitle: "Premium Hyperbaric Chambers for Home and Clinic",
+    heroSubtitle: "Explore our selection of high-quality hyperbaric chambers designed for wellness, recovery, and performance.",
+    bookYourSession: "Shop Now",
     
     // Benefits
     efficientRecovery: "Efficient Recovery",
@@ -20,12 +20,12 @@ export const translations = {
     enhancedPerformanceDesc: "Improve athletic performance, increase energy levels, and enhance cognitive function through optimal oxygenation.",
     wellnessBoost: "Wellness Boost",
     wellnessBoostDesc: "Support your overall health with sessions that help detoxify your body, strengthen your immune system, and improve sleep quality.",
-    readyToExperience: "Ready to Experience the Benefits?",
-    bookYourSessionNow: "Book Your Session Now",
+    readyToExperience: "Ready to Own a Hyperbaric Chamber?",
+    bookYourSessionNow: "Browse Products",
     
-    // Booking Form
-    bookingTitle: "Book Your Hyperbaric Chamber Session",
-    bookingSubtitle: "Fill out the form below to schedule your hyperbaric oxygen therapy session at one of Billy Duc's premium wellness centers.",
+    // Product Page
+    productLineTitle: "Our Hyperbaric Chambers",
+    productLineSubtitle: "Compare specs, sizes, and features to find the right chamber for you.",
     personalDetails: "Personal Details",
     details: "Details",
     dateTime: "Date & Time",
@@ -47,26 +47,14 @@ export const translations = {
     premiumSession: "Premium session",
     notes: "Special Requests or Notes (Optional)",
     
-    // Payment
-    bookingSummary: "Booking Summary",
-    date: "Date",
-    time: "Time",
-    duration: "Duration",
-    address: "Address",
+    // CTA
     total: "Total",
-    paymentDetails: "Payment Details",
-    cardNumber: "Card Number",
-    expirationDate: "Expiration Date",
-    cvv: "CVV",
-    nameOnCard: "Name on Card",
-    completeBooking: "Complete Booking",
-    book: "Book",
     
-    // Confirmation
-    bookingConfirmed: "Booking Confirmed!",
-    thankYou: "Thank you for booking your hyperbaric chamber session.",
-    emailConfirmation: "A confirmation email has been sent to:",
-    bookingDetails: "Booking Details",
+    // Contact
+    contactUs: "Contact Us",
+    email: "Email",
+    phone: "Phone",
+    name: "Name",
     name: "Name",
     email: "Email",
     dateAndTime: "Date & Time",

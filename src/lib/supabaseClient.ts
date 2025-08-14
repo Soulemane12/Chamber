@@ -1,16 +1,2 @@
-import { createClient } from '@supabase/supabase-js';
-
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string,
-  {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true,
-    },
-    global: {
-      fetch: fetch.bind(globalThis)
-    },
-  }
-); 
+// Supabase not required for product brochure site; file kept to avoid import errors if any remain.
+export const supabase = undefined as unknown as never;

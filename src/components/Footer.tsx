@@ -16,7 +16,7 @@ export function Footer({ showSocials = true, className = "" }: FooterProps) {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
         <div className="mb-4 md:mb-0">
           <p className="text-gray-600 dark:text-gray-400">
-            <Link href="/admin" className="hover:text-gray-600 dark:hover:text-gray-400 focus:outline-none">©</Link> {new Date().getFullYear()} WellNex02{t('allRightsReserved')}<Link href="/admin" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors ml-0.5">.</Link>
+            <span className="select-none">©</span> {new Date().getFullYear()} WellNex02{t('allRightsReserved')}
           </p>
         </div>
         
@@ -44,14 +44,7 @@ export function Footer({ showSocials = true, className = "" }: FooterProps) {
         )}
       </div>
       
-      {/* Add an extra hidden admin link that's even more discreet */}
-      <div className="text-center mt-4">
-        <span className="text-gray-400 dark:text-gray-600 text-xs">
-          <Link href="/admin" className="hover:text-gray-400 focus:outline-none" aria-label="Admin Access">
-            <span className="select-none cursor-default">·</span>
-          </Link>
-        </span>
-      </div>
+      {/* No admin links */}
     </footer>
   );
 } 

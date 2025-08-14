@@ -44,7 +44,7 @@ body {
   font-family: var(--font-sans);
 }
 
-/* Calendar styling */
+/* Calendar styling (no longer used, kept minimal to avoid removal churn) */
 .booking-calendar .react-datepicker {
   font-family: var(--font-sans);
   border-radius: 0.5rem;
@@ -250,27 +250,7 @@ body {
 
 /* Responsive design improvements */
 @media (max-width: 640px) {
-  .booking-calendar .react-datepicker__month-container {
-    width: 100%;
-  }
-  
-  .booking-calendar .react-datepicker__day,
-  .booking-calendar .react-datepicker__day-name {
-    width: 2rem;
-    height: 2rem;
-    line-height: 2rem;
-    margin: 0.1rem;
-  }
-  
-  .booking-calendar .react-datepicker__header {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-  }
-  
-  .booking-calendar .react-datepicker__current-month {
-    font-size: 0.9rem;
-  }
-  
+  /* booking-calendar rules no longer needed */
   /* Improve touch targets for mobile */
   .hover-scale:active {
     transform: scale(1.02);

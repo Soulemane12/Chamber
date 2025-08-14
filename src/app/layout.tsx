@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "WellNex02 | Book Your Hyperbaric Session",
-  description: "Book and pay for your hyperbaric chamber session with our easy-to-use booking system.",
+  title: "WellNex02 | Hyperbaric Chambers for Sale",
+  description: "Shop premium hyperbaric chambers. Detailed specs, images, and easy contact to purchase.",
 };
 
 export default function RootLayout({
