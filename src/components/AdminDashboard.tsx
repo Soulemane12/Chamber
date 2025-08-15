@@ -7,6 +7,7 @@ import AdminChatbot from './AdminChatbot';
 import BookingDetailsModal, { GuestBookingInfo } from "./ui/BookingDetailsModal";
 import CalendarView from "./ui/CalendarView";
 import ChamberManagement from "./ui/ChamberManagement";
+import { AdminAssessmentDashboard } from "./AdminAssessmentDashboard";
 
 // Simple chart component using div heights
 function BarChart({ data, title, maxHeight = 200 }: { data: Record<string, number>, title: string, maxHeight?: number }) {
@@ -164,7 +165,7 @@ export default function AdminDashboard() {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'analytics' | 'users' | 'bookings' | 'calendar' | 'chambers'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'users' | 'bookings' | 'calendar' | 'chambers' | 'assessments'>('analytics');
   const [calendarView, setCalendarView] = useState<'daily' | 'weekly' | 'monthly'>('daily');
 
   const [dataRefreshInterval] = useState<number>(60000); // 1 minute refresh
@@ -865,6 +866,16 @@ export default function AdminDashboard() {
           >
             Chambers
           </button>
+          <button
+            className={`py-2 px-4 ${
+              activeTab === 'assessments'
+                ? 'border-b-2 border-blue-600 font-medium text-blue-600'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+            }`}
+            onClick={() => setActiveTab('assessments')}
+          >
+            Assessments
+          </button>
         </div>
         
         {/* Data refresh controls */}
@@ -1507,6 +1518,16 @@ export default function AdminDashboard() {
               console.log('Session updated:', sessionId, status);
             }}
           />
+        </div>
+      ) : activeTab === 'assessments' ? (
+        /* Assessments Tab */
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Assessment Management</h2>
+            <p className="text-gray-600 dark:text-gray-400">View and analyze self-assessment submissions</p>
+          </div>
+          
+          <AdminAssessmentDashboard />
         </div>
       ) : (
         /* User Management Tab */

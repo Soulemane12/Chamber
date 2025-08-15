@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { BookingForm, BookingFormData } from "@/components/BookingForm";
+import { AssessmentForm, AssessmentFormData } from "@/components/AssessmentForm";
 import { supabase } from "@/lib/supabaseClient";
 import { useLanguage } from "@/lib/LanguageContext";
 import { formatCurrency } from "@/lib/utils";
@@ -37,6 +38,8 @@ export default function BookingPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
   const [bookingDetails, setBookingDetails] = useState<BookingFormData | null>(null);
+  const [showAssessment, setShowAssessment] = useState(false);
+  const [assessmentComplete, setAssessmentComplete] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { t } = useLanguage();
 
@@ -59,7 +62,13 @@ export default function BookingPage() {
   const handleBookingComplete = (data: BookingFormData) => {
     setBookingDetails(data);
     setBookingComplete(true);
+    setShowAssessment(true);
     window.scrollTo(0, 0);
+  };
+
+  const handleAssessmentComplete = (data: AssessmentFormData) => {
+    setAssessmentComplete(true);
+    setShowAssessment(false);
   };
 
   // Create a function to get location information for confirmation
@@ -299,6 +308,30 @@ export default function BookingPage() {
                   </span>
                 </div>
               </div>
+              
+              {/* Assessment Form Section */}
+              {showAssessment && !assessmentComplete && (
+                <div className="w-full max-w-4xl mx-auto mt-8">
+                  <AssessmentForm 
+                    onAssessmentComplete={handleAssessmentComplete}
+                    bookingId={bookingDetails?.id}
+                  />
+                </div>
+              )}
+              
+              {assessmentComplete && (
+                <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg w-full max-w-md mx-auto">
+                  <div className="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-green-700 dark:text-green-300 font-medium">
+                      Assessment completed! Thank you for your feedback.
+                    </span>
+                  </div>
+                </div>
+              )}
+              
               <div className="flex justify-center w-full">
                 <Link
                   href="/"
