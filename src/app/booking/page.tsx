@@ -61,7 +61,6 @@ export default function BookingPage() {
 
   const handleBookingComplete = (data: BookingFormData) => {
     setBookingDetails(data);
-    setBookingComplete(true);
     setShowAssessment(true);
     window.scrollTo(0, 0);
   };
@@ -69,6 +68,7 @@ export default function BookingPage() {
   const handleAssessmentComplete = (data: AssessmentFormData) => {
     setAssessmentComplete(true);
     setShowAssessment(false);
+    setBookingComplete(true);
   };
 
   // Create a function to get location information for confirmation
@@ -140,7 +140,30 @@ export default function BookingPage() {
           )}
         </div>
 
-        {bookingComplete ? (
+        {bookingDetails && !bookingComplete ? (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 mb-8 animate-scale-in">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white animate-fade-in animate-delay-100">Complete Your Assessment</h2>
+              <p className="text-gray-600 dark:text-gray-300 mt-2 animate-fade-in animate-delay-200">
+                Please complete a quick wellness assessment before confirming your booking
+              </p>
+            </div>
+
+            {/* Assessment Form Section */}
+            {showAssessment && !assessmentComplete && (
+              <div className="w-full max-w-4xl mx-auto">
+                <AssessmentForm 
+                  onAssessmentComplete={handleAssessmentComplete}
+                  bookingId={bookingDetails?.id}
+                  autoFillDate={bookingDetails?.date}
+                  autoFillTime={bookingDetails?.time}
+                  autoFillFirstName={bookingDetails?.firstName}
+                  autoFillLastName={bookingDetails?.lastName}
+                />
+              </div>
+            )}
+          </div>
+        ) : bookingComplete ? (
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 mb-8 animate-scale-in">
             <div className="text-center mb-6">
               <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4 animate-scale-in">
@@ -308,29 +331,6 @@ export default function BookingPage() {
                   </span>
                 </div>
               </div>
-              
-              {/* Assessment Form Section */}
-              {showAssessment && !assessmentComplete && (
-                <div className="w-full max-w-4xl mx-auto mt-8">
-                  <AssessmentForm 
-                    onAssessmentComplete={handleAssessmentComplete}
-                    bookingId={bookingDetails?.id}
-                  />
-                </div>
-              )}
-              
-              {assessmentComplete && (
-                <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg w-full max-w-md mx-auto">
-                  <div className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="text-green-700 dark:text-green-300 font-medium">
-                      Assessment completed! Thank you for your feedback.
-                    </span>
-                  </div>
-                </div>
-              )}
               
               <div className="flex justify-center w-full">
                 <Link

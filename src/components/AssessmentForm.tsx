@@ -28,11 +28,33 @@ export type AssessmentFormData = z.infer<typeof assessmentSchema>;
 interface AssessmentFormProps {
   onAssessmentComplete?: (data: AssessmentFormData) => void;
   bookingId?: string;
+  autoFillDate?: Date;
+  autoFillTime?: string;
+  autoFillFirstName?: string;
+  autoFillLastName?: string;
 }
 
-export function AssessmentForm({ onAssessmentComplete, bookingId }: AssessmentFormProps) {
+export function AssessmentForm({ onAssessmentComplete, bookingId, autoFillDate, autoFillTime, autoFillFirstName, autoFillLastName }: AssessmentFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  // Parse auto-filled time if provided
+  const parseAutoFillTime = () => {
+    if (!autoFillTime) return { hour: "12", minutes: "00", ampm: "PM" };
+    
+    // Parse time like "9:00 AM" or "2:30 PM"
+    const timeMatch = autoFillTime.match(/(\d+):(\d+)\s*(AM|PM)/i);
+    if (timeMatch) {
+      return {
+        hour: timeMatch[1].padStart(2, '0'),
+        minutes: timeMatch[2].padStart(2, '0'),
+        ampm: timeMatch[3].toUpperCase()
+      };
+    }
+    return { hour: "12", minutes: "00", ampm: "PM" };
+  };
+
+  const autoFillTimeData = parseAutoFillTime();
 
   const {
     register,
@@ -43,10 +65,12 @@ export function AssessmentForm({ onAssessmentComplete, bookingId }: AssessmentFo
   } = useForm<AssessmentFormData>({
     resolver: zodResolver(assessmentSchema),
     defaultValues: {
-      date: new Date().toISOString().split('T')[0],
-      hour: "12",
-      minutes: "00",
-      ampm: "PM",
+      date: autoFillDate ? autoFillDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+      hour: autoFillTimeData.hour,
+      minutes: autoFillTimeData.minutes,
+      ampm: autoFillTimeData.ampm,
+      firstName: autoFillFirstName || '',
+      lastName: autoFillLastName || '',
       painLevel: 5,
       stressLevel: 5,
       focusLevel: 5,
@@ -134,69 +158,67 @@ export function AssessmentForm({ onAssessmentComplete, bookingId }: AssessmentFo
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Date and Time Section */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {/* Date and Time Section - Auto-filled from booking */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Date*
+              Assessment Date
             </label>
             <input
               type="date"
               {...register("date")}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+              disabled
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 cursor-not-allowed"
             />
-            {errors.date && (
-              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.date.message}</p>
-            )}
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Auto-filled from your booking date
+            </p>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Hour
+              Assessment Time
             </label>
-            <select
-              {...register("hour")}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            >
-              {Array.from({ length: 12 }, (_, i) => i + 1).map((hour) => (
-                <option key={hour} value={hour.toString().padStart(2, '0')}>
-                  {hour}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Minutes
-            </label>
-            <select
-              {...register("minutes")}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            >
-              {Array.from({ length: 60 }, (_, i) => i).map((minute) => (
-                <option key={minute} value={minute.toString().padStart(2, '0')}>
-                  {minute.toString().padStart(2, '0')}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              AM/PM
-            </label>
-            <select
-              {...register("ampm")}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            >
-              <option value="AM">AM</option>
-              <option value="PM">PM</option>
-            </select>
+            <div className="flex space-x-2">
+              <select
+                {...register("hour")}
+                disabled
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 cursor-not-allowed"
+              >
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((hour) => (
+                  <option key={hour} value={hour.toString().padStart(2, '0')}>
+                    {hour}
+                  </option>
+                ))}
+              </select>
+              <span className="text-gray-500 dark:text-gray-400 self-center">:</span>
+              <select
+                {...register("minutes")}
+                disabled
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 cursor-not-allowed"
+              >
+                {Array.from({ length: 60 }, (_, i) => i).map((minute) => (
+                  <option key={minute} value={minute.toString().padStart(2, '0')}>
+                    {minute.toString().padStart(2, '0')}
+                  </option>
+                ))}
+              </select>
+              <select
+                {...register("ampm")}
+                disabled
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 cursor-not-allowed"
+              >
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+              </select>
+            </div>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Auto-filled from your booking time
+            </p>
           </div>
         </div>
 
-        {/* Name Section */}
+        {/* Name Section - Auto-filled from booking */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
