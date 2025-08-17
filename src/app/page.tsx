@@ -71,6 +71,47 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Why Choose Wellnex02 Section */}
+        <div className="mb-16 animate-fade-in">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
+              {t('whyChooseTitle')}
+            </h2>
+          </div>
+          
+          <div className="max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                  {t('scienceDrivenWellness')}
+                </p>
+              </div>
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                  {t('durableUserFriendly')}
+                </p>
+              </div>
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
+                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                  {t('inspiredByTradition')}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Recovery Series Section */}
+        <div className="mb-16 animate-fade-in">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
+              {t('recoverySeriesTitle')}
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+              {t('recoverySeriesDescription')}
+            </p>
+          </div>
+        </div>
+
         {/* Products Section */}
         <div className="mb-16 animate-fade-in">
           <div className="text-center mb-10">
@@ -114,30 +155,44 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Mission Section */}
+        {/* Experience Future Section */}
         <div className="mb-16 animate-fade-in">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
-              {t('missionTitle')}
+              {t('experienceFutureTitle')}
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              {t('missionSubtitle')}
+              {t('experienceFutureDescription')}
             </p>
           </div>
           
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-8 text-center text-white">
             <h3 className="text-2xl font-bold mb-4">
-              Hyperbaric O2 Recovery
+              Wellnex02
             </h3>
             <p className="text-xl mb-6">
-              {t('healthRevolution')}
+              Join the movement toward better health and vitality
             </p>
-            <Link 
-              href="/contact" 
-              className="bg-white text-blue-600 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block"
-            >
-              {t('leaseOptions')}
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link 
+                href="/contact" 
+                className="bg-white text-blue-600 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block"
+              >
+                📩 Contact Us
+              </Link>
+              <Link 
+                href="/about" 
+                className="bg-white text-blue-600 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block"
+              >
+                📘 Learn More
+              </Link>
+              <Link 
+                href="/products" 
+                className="bg-white text-blue-600 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block"
+              >
+                🛒 Shop Now
+              </Link>
+            </div>
           </div>
         </div>
       </main>

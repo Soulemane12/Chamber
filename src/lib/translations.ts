@@ -11,13 +11,13 @@ export const translations = {
     contact: "Contact",
     
     // Homepage
-    heroTitle: "Explore Advanced Hyperbaric Oxygen Therapy.",
-    heroSubtitle: "Experience Safe and Effective Healing with HBOT in Our Innovative Hyperbaric Chambers.",
+    heroTitle: "Welcome to Wellnex02",
+    heroSubtitle: "Innovative Hyperbaric Oxygen Therapy Rooted in Japanese Wellness",
     getStarted: "Get started",
-    welcomeTitle: "Welcome to Hyperbaric O2 Recovery Inc.",
-    welcomeSubtitle: "Where innovation blends with tradition to elevate health and wellness.",
-    welcomeDescription: "As a pioneer in creating high-quality hyperbaric oxygen therapy chambers, we are committed to enhancing the quality of life for individuals and communities. Our products reflect the deep traditions of Japanese wellness, emphasizing longevity, vitality, and overall well-being. With over 25 years of experience and recognition as the leading oxygen chamber manufacturer in Asia, we are thrilled to launch our innovative O2 Recovery series in the U.S. market. Our cutting-edge solutions provide durable, user-friendly, and effective oxygen therapy, aimed at enhancing both personal health and community wellness.",
-    discoverText: "Discover our advanced oxygen therapy products and embark on a journey to improved health and vitality. See how Hyperbaric O2 Recovery Inc. can support you in achieving optimal wellness.",
+    welcomeTitle: "Welcome to Wellnex02",
+    welcomeSubtitle: "Innovative Hyperbaric Oxygen Therapy Rooted in Japanese Wellness",
+    welcomeDescription: "Wellnex02, in collaboration with a leading Japan-based manufacturer, brings over 25 years of excellence in hyperbaric oxygen therapy to the U.S. market. As Asia's top producer of oxygen chambers, our legacy is built on the timeless principles of Japanese wellness—focusing on longevity, vitality, and holistic health.",
+    discoverText: "Join the movement toward better health and vitality. Discover how Wellnex02 can support your journey to optimal wellness—one breath at a time.",
     readMore: "Read More",
     
     // Products
@@ -32,6 +32,20 @@ export const translations = {
     operationalItemsDesc: "Optional accessories for your capsule",
     learnMore: "Learn More",
     
+    // Why Choose Wellnex02
+    whyChooseTitle: "Why Choose Wellnex02?",
+    scienceDrivenWellness: "🧠 Science-Driven Wellness: Our chambers are engineered for optimal oxygen delivery, supporting recovery, mental clarity, and overall vitality.",
+    durableUserFriendly: "🛠️ Durable & User-Friendly Design: Built to last, easy to operate, and suitable for both personal and professional use.",
+    inspiredByTradition: "🌿 Inspired by Tradition, Powered by Innovation: Merging ancient wellness philosophies with modern technology.",
+    
+    // Recovery Series
+    recoverySeriesTitle: "Introducing the Wellnex02 Recovery Series",
+    recoverySeriesDescription: "Our latest line of hyperbaric oxygen chambers is designed to meet the evolving needs of athletes, wellness centers, and healthcare providers. Whether you're enhancing performance, accelerating recovery, or promoting long-term health, Wellnex02 offers a trusted solution.",
+    
+    // Experience Future
+    experienceFutureTitle: "Experience the Future of Wellness",
+    experienceFutureDescription: "Join the movement toward better health and vitality. Discover how Wellnex02 can support your journey to optimal wellness—one breath at a time.",
+    
     // Mission
     missionTitle: "Immerse yourself in the process",
     missionSubtitle: "Our mission is to enable people to access the benefits of hyperbaric oxygen therapy at an affordable price.",
@@ -41,12 +55,12 @@ export const translations = {
     // Footer
     subscribeTitle: "Subscribe to Our Mailing List",
     subscribe: "Subscribe",
-    email: "sales@hyperbarico2recovery.com",
-    companyDescription: "Hyperberic O2 Recovery Inc. Stands at the forefront of innovation in designing and manufacturing premium hyperbaric oxygen chambers. Founded with a mission to elevate health, wellness, and longevity through cutting-edge oxygen therapy, we are proud to be Asia's leading oxygen chamber manufacturer.",
+    email: "sales@wellnex02.com",
+    companyDescription: "Wellnex02, in collaboration with a leading Japan-based manufacturer, brings over 25 years of excellence in hyperbaric oxygen therapy to the U.S. market. As Asia's top producer of oxygen chambers, our legacy is built on the timeless principles of Japanese wellness—focusing on longevity, vitality, and holistic health.",
     quickLinks: "Quick Links.",
     contactUs: "Contact Us",
     phone: "631-954-5440",
-    copyright: "COPYRIGHT © 2024 Hyperbaric O2 Recovery – ALL RIGHTS RESERVED.",
+    copyright: "COPYRIGHT © 2024 Wellnex02 – ALL RIGHTS RESERVED.",
     
     // About Page
     aboutUs: "About Us",

@@ -88,14 +88,14 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
         </nav>
         <div className="hidden sm:flex items-center ml-6 space-x-4">
           <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text">
-            Hyperbaric O2 Recovery
+            Wellnex02
           </div>
           <LanguageSelector />
         </div>
       </div>
       <div className="sm:hidden w-full mt-2 flex flex-col items-center">
         <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text mb-2">
-          Hyperbaric O2 Recovery
+          Wellnex02
         </div>
         <MobileLanguageSelector />
       </div>

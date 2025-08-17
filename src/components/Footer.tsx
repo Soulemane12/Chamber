@@ -19,7 +19,7 @@ export function Footer({ showSocials = true, className = "" }: FooterProps) {
           {/* Company Info */}
           <div className="lg:col-span-2">
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-              Hyperbaric O2 Recovery
+              Wellnex02
             </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               {t('companyDescription')}
