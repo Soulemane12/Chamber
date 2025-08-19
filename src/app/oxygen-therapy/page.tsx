@@ -62,15 +62,19 @@ export default function OxygenTherapy() {
           </div>
         </div>
 
-        {/* Video Player Placeholder */}
+        {/* Video Player */}
         <div className="mb-16 animate-fade-in">
-          <div className="bg-gray-200 dark:bg-gray-700 rounded-lg h-64 flex items-center justify-center">
-            <div className="text-center">
-              <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <p className="text-gray-500 dark:text-gray-400">Video Player</p>
-            </div>
+          <div className="max-w-4xl mx-auto">
+            <video 
+              className="w-full rounded-lg shadow-lg" 
+              controls 
+              preload="metadata"
+              poster="/logo.png"
+            >
+              <source src="/Wellnex_vid.MOV" type="video/quicktime" />
+              <source src="/Wellnex_vid.MOV" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
           </div>
         </div>
 

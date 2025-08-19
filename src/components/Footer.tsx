@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useLanguage } from "@/lib/LanguageContext";
 
 interface FooterProps {
@@ -18,9 +19,18 @@ export function Footer({ showSocials = true, className = "" }: FooterProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
           {/* Company Info */}
           <div className="lg:col-span-2">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-              Wellnex02
-            </h3>
+            <div className="flex items-center mb-4">
+              <Image 
+                src="/logo.png" 
+                alt="Wellnex02 Logo" 
+                width={32} 
+                height={32} 
+                className="h-8 w-8 mr-3"
+              />
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                Wellnex02
+              </h3>
+            </div>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               {t('companyDescription')}
             </p>
