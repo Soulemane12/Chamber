@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Header } from "@/components/Header";
 import { useLanguage } from "@/lib/LanguageContext";
 import { Footer } from "@/components/Footer";
@@ -14,6 +15,16 @@ export default function Home() {
 
       <main className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center mb-16 animate-fade-in">
+          <div className="flex justify-center mb-8 animate-slide-in-up">
+            <Image 
+              src="/logo.png" 
+              alt="WellNex02 Logo" 
+              width={120} 
+              height={120} 
+              className="h-24 w-auto"
+              priority
+            />
+          </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6 animate-slide-in-up">
             {t('heroTitle')}
           </h1>
