@@ -62,7 +62,7 @@ export default function Products() {
               </div>
               
               <div className="text-center">
-                <Link href="/contact" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block">
+                <Link href="/products/o2-box-t2r" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block">
                   {t('learnMore')}
                 </Link>
               </div>
@@ -104,7 +104,7 @@ export default function Products() {
               </div>
               
               <div className="text-center">
-                <Link href="/contact" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block">
+                <Link href="/products/o2-box-t68r" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block">
                   {t('learnMore')}
                 </Link>
               </div>
@@ -146,7 +146,7 @@ export default function Products() {
               </div>
               
               <div className="text-center">
-                <Link href="/contact" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block">
+                <Link href="/products/o2-box-t810r-w2000" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block">
                   {t('learnMore')}
                 </Link>
               </div>
@@ -213,7 +213,7 @@ export default function Products() {
           </div>
           
           <div className="text-center mt-8">
-            <Link href="/contact" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block">
+            <Link href="/products/operational-items" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block">
               {t('learnMore')}
             </Link>
           </div>
