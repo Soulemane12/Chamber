@@ -29,16 +29,7 @@ export default function Home() {
               {t('bookYourSession')}
             </Link>
           </div>
-          <div className="flex justify-center mt-8 animate-slide-in-up animate-delay-400">
-            <Image 
-              src="/logo.png" 
-              alt="WellNex02 Logo" 
-              width={160} 
-              height={160} 
-              className="h-32 w-auto"
-              priority
-            />
-          </div>
+
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
