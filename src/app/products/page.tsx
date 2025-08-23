@@ -28,7 +28,7 @@ export default function Products() {
         <div className="mb-16 animate-fade-in">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* O2 BOX T2-R */}
-            <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md hover:scale-105 transition-all duration-300 cursor-pointer" onClick={() => window.location.href = '/products/o2-box-t2r'}>
               <div className="text-center mb-6">
                 <div className="mb-4">
                   <Image 
@@ -67,9 +67,9 @@ export default function Products() {
               </div>
               
               <div className="text-center">
-                <Link href="/products/o2-box-t2r" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block">
-                  {t('learnMore')}
-                </Link>
+                <div className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block">
+                  View Details & Purchase
+                </div>
               </div>
             </div>
 
