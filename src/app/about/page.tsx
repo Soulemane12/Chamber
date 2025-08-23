@@ -66,15 +66,15 @@ export default function About() {
             </p>
             <div className="space-y-4">
               <div className="flex items-start">
-                <span className="text-green-500 mr-3 mt-1">✅</span>
+                <span className="text-green-500 mr-3 mt-1">•</span>
                 <p className="text-gray-600 dark:text-gray-300">{t('madeInJapan')}</p>
               </div>
               <div className="flex items-start">
-                <span className="text-green-500 mr-3 mt-1">✅</span>
+                <span className="text-green-500 mr-3 mt-1">•</span>
                 <p className="text-gray-600 dark:text-gray-300">{t('userFriendly')}</p>
               </div>
               <div className="flex items-start">
-                <span className="text-green-500 mr-3 mt-1">✅</span>
+                <span className="text-green-500 mr-3 mt-1">•</span>
                 <p className="text-gray-600 dark:text-gray-300">{t('maintainedWithExcellence')}</p>
               </div>
             </div>

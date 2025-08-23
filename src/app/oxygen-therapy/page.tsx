@@ -91,25 +91,25 @@ export default function OxygenTherapy() {
         <div className="mb-16 animate-fade-in">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">✅{t('antiAging')}</h3>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">{t('antiAging')}</h3>
               <Link href="#anti-aging" className="text-blue-600 hover:text-blue-700 font-medium">
                 {t('learnMore')}
               </Link>
             </div>
             <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">✅{t('enhancedCognitive')}</h3>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">{t('enhancedCognitive')}</h3>
               <Link href="#cognitive" className="text-blue-600 hover:text-blue-700 font-medium">
                 {t('learnMore')}
               </Link>
             </div>
             <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">✅{t('recovery')}</h3>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">{t('recovery')}</h3>
               <Link href="#recovery" className="text-blue-600 hover:text-blue-700 font-medium">
                 {t('learnMore')}
               </Link>
             </div>
             <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">✅{t('performance')}</h3>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">{t('performance')}</h3>
               <Link href="#performance" className="text-blue-600 hover:text-blue-700 font-medium">
                 {t('learnMore')}
               </Link>

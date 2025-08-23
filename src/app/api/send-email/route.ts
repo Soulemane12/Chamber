@@ -98,7 +98,6 @@ export async function POST(request: Request) {
           <div style="margin: 20px 0; padding: 15px; background-color: #eff6ff; border-radius: 5px; border-left: 4px solid #3b82f6;">
             <h3 style="color: #1e3a8a; font-size: 16px; margin-bottom: 10px;">Contact Information</h3>
             <p><strong>Owner:</strong> Billy Duc</p>
-            <p><strong>Phone:</strong> +1 (646) 262-8794</p>
             <p><strong>Email:</strong> billydduc@gmail.com</p>
           </div>
           
