@@ -146,28 +146,16 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
         </nav>
         <div className="hidden sm:flex items-center ml-6 space-x-4">
           <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text">
-            ATMOS
+            WellNex02
           </div>
           <LanguageSelector />
         </div>
       </div>
       <div className="sm:hidden w-full mt-2 flex flex-col items-center">
         <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text mb-2">
-          ATMOS
+          WellNex02
         </div>
         <MobileLanguageSelector />
-      </div>
-      
-      {/* Large ATMOS Logo on the right */}
-      <div className="absolute top-4 right-4 sm:right-8 lg:right-12">
-        <Image 
-          src="/atmos_logo.jpg" 
-          alt="ATMOS Logo" 
-          width={120}
-          height={80}
-          className="h-20 w-auto object-contain"
-          priority
-        />
       </div>
     </header>
   );
