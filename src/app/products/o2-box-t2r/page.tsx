@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Header } from "@/components/Header";
 import { useLanguage } from "@/lib/LanguageContext";
 import { Footer } from "@/components/Footer";
@@ -26,16 +27,31 @@ export default function O2BoxT2R() {
 
         {/* Product Header */}
         <div className="mb-16 animate-fade-in">
-          <div className="text-center mb-10">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6 animate-slide-in-up">
-              O2 BOX T2-R
-            </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto animate-slide-in-up animate-delay-200">
-              Model: T2-R
-            </p>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto animate-slide-in-up animate-delay-200">
-              Designed for the comfort of 1-2 Persons
-            </p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6 animate-slide-in-up">
+                O2 BOX T2-R
+              </h1>
+              <p className="text-xl text-gray-600 dark:text-gray-300 mb-4 animate-slide-in-up animate-delay-200">
+                Model: T2-R
+              </p>
+              <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 animate-slide-in-up animate-delay-200">
+                Designed for the comfort of 1-2 Persons
+              </p>
+            </div>
+            
+            <div className="flex justify-center">
+              <div className="relative">
+                <Image 
+                  src="/O2BOXT2R.png" 
+                  alt="O2 BOX T2-R Hyperbaric Chamber" 
+                  width={600}
+                  height={400}
+                  className="rounded-lg shadow-lg object-contain"
+                  priority
+                />
+              </div>
+            </div>
           </div>
         </div>
 

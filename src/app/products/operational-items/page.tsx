@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Header } from "@/components/Header";
 import { useLanguage } from "@/lib/LanguageContext";
 import { Footer } from "@/components/Footer";
@@ -33,10 +34,28 @@ export default function OperationalItems() {
 
         {/* Control Device Section */}
         <div className="mb-16 animate-fade-in">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
-              Control Device for O2 BOX
-            </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-10">
+            <div>
+              <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
+                Control Device for O2 BOX
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-gray-300">
+                Advanced control system for managing pressure and oxygen levels in hyperbaric chambers.
+              </p>
+            </div>
+            
+            <div className="flex justify-center">
+              <div className="relative">
+                <Image 
+                  src="/Control Device for O2 BOX.png" 
+                  alt="Control Device for O2 BOX" 
+                  width={500}
+                  height={400}
+                  className="rounded-lg shadow-lg object-contain"
+                  priority
+                />
+              </div>
+            </div>
           </div>
           
           <div className="max-w-4xl mx-auto">
