@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
 import { LanguageSelector, MobileLanguageSelector } from "./LanguageSelector";
 import { useLanguage } from "@/lib/LanguageContext";
 
@@ -11,9 +12,10 @@ interface HeaderProps {
 
 export function Header({ currentPage = 'home' }: HeaderProps) {
   const { t } = useLanguage();
+  const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
 
   return (
-    <header className="py-6 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center">
+    <header className="py-6 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center relative">
       <div className="flex items-center mb-4 sm:mb-0">
         <Link href="/" className="text-2xl font-bold text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
           <span className="sr-only">Home</span>
@@ -55,15 +57,70 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
                 {t('oxygenTherapy')}
               </Link>
             </li>
-            <li className="px-3 py-2 sm:p-0">
-              <Link 
-                href="/products" 
-                className={currentPage === 'products' 
-                  ? "text-blue-600 dark:text-blue-400 font-medium" 
-                  : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"}
+            <li className="px-3 py-2 sm:p-0 relative">
+              <button
+                onClick={() => setIsProductsDropdownOpen(!isProductsDropdownOpen)}
+                onMouseEnter={() => setIsProductsDropdownOpen(true)}
+                onMouseLeave={() => setIsProductsDropdownOpen(false)}
+                className={`flex items-center space-x-1 ${
+                  currentPage === 'products' 
+                    ? "text-blue-600 dark:text-blue-400 font-medium" 
+                    : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
+                }`}
               >
-                {t('products')}
-              </Link>
+                <span>{t('products')}</span>
+                <svg 
+                  className={`w-4 h-4 transition-transform ${isProductsDropdownOpen ? 'rotate-180' : ''}`} 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              
+              {/* Dropdown Menu */}
+              <div 
+                className={`absolute top-full left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 transition-all duration-200 ${
+                  isProductsDropdownOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'
+                }`}
+                onMouseEnter={() => setIsProductsDropdownOpen(true)}
+                onMouseLeave={() => setIsProductsDropdownOpen(false)}
+              >
+                <div className="py-2">
+                  <Link 
+                    href="/products" 
+                    className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  >
+                    All Products
+                  </Link>
+                  <Link 
+                    href="/products/o2-box-t2r" 
+                    className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  >
+                    O2 BOX T2-R (1-2 Persons)
+                  </Link>
+                  <Link 
+                    href="/products/o2-box-t68r" 
+                    className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  >
+                    O2 BOX T68-R (6-8 Persons)
+                  </Link>
+                  <Link 
+                    href="/products/o2-box-t810r-w2000" 
+                    className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  >
+                    O2 BOX T810-R W2000 (8-10 Persons)
+                  </Link>
+                  <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                  <Link 
+                    href="/products/operational-items" 
+                    className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  >
+                    Operational Items
+                  </Link>
+                </div>
+              </div>
             </li>
             <li className="px-3 py-2 sm:p-0">
               <Link 
