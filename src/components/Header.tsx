@@ -6,7 +6,7 @@ import { LanguageSelector, MobileLanguageSelector } from "./LanguageSelector";
 import { useLanguage } from "@/lib/LanguageContext";
 
 interface HeaderProps {
-  currentPage?: 'home' | 'booking' | 'admin' | 'account' | 'about' | 'contact' | 'oxygenTherapy' | 'products' | 'faq';
+  currentPage?: 'home' | 'about' | 'contact' | 'oxygenTherapy' | 'products' | 'faq';
 }
 
 export function Header({ currentPage = 'home' }: HeaderProps) {
@@ -37,36 +37,66 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
             </li>
             <li className="px-3 py-2 sm:p-0">
               <Link 
-                href="/booking" 
-                className={currentPage === 'booking' 
+                href="/about" 
+                className={currentPage === 'about' 
                   ? "text-blue-600 dark:text-blue-400 font-medium" 
                   : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"}
               >
-                Book Now
+                {t('about')}
               </Link>
             </li>
             <li className="px-3 py-2 sm:p-0">
               <Link 
-                href="/account" 
-                className={currentPage === 'account' 
+                href="/oxygen-therapy" 
+                className={currentPage === 'oxygenTherapy' 
                   ? "text-blue-600 dark:text-blue-400 font-medium" 
                   : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"}
               >
-                Account
+                {t('oxygenTherapy')}
+              </Link>
+            </li>
+            <li className="px-3 py-2 sm:p-0">
+              <Link 
+                href="/products" 
+                className={currentPage === 'products' 
+                  ? "text-blue-600 dark:text-blue-400 font-medium" 
+                  : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"}
+              >
+                {t('products')}
+              </Link>
+            </li>
+            <li className="px-3 py-2 sm:p-0">
+              <Link 
+                href="/faq" 
+                className={currentPage === 'faq' 
+                  ? "text-blue-600 dark:text-blue-400 font-medium" 
+                  : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"}
+              >
+                {t('faq')}
+              </Link>
+            </li>
+            <li className="px-3 py-2 sm:p-0">
+              <Link 
+                href="/contact" 
+                className={currentPage === 'contact' 
+                  ? "text-blue-600 dark:text-blue-400 font-medium" 
+                  : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"}
+              >
+                {t('contact')}
               </Link>
             </li>
           </ul>
         </nav>
         <div className="hidden sm:flex items-center ml-6 space-x-4">
           <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text">
-            WellNex02
+            ATMOS
           </div>
           <LanguageSelector />
         </div>
       </div>
       <div className="sm:hidden w-full mt-2 flex flex-col items-center">
         <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text mb-2">
-          WellNex02
+          ATMOS
         </div>
         <MobileLanguageSelector />
       </div>

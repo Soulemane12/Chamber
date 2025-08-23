@@ -63,7 +63,7 @@ export default function Home() {
         <div className="mb-16 animate-fade-in">
           <div className="max-w-2xl mx-auto">
             <video 
-              className="w-full h-64 sm:h-80 md:h-96 rounded-lg shadow-lg object-cover" 
+              className="w-full rounded-lg shadow-lg" 
               controls 
               preload="metadata"
               poster="/logo.png"
@@ -170,7 +170,7 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-xl p-8 text-center text-white">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-8 text-center text-white">
             <h3 className="text-2xl font-bold mb-4">
               Wellnex02
             </h3>
@@ -180,21 +180,21 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link 
                 href="/contact" 
-                className="bg-white text-green-600 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block"
+                className="bg-white text-blue-600 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block"
               >
-                Contact Us
+                📩 Contact Us
               </Link>
               <Link 
                 href="/about" 
-                className="bg-white text-green-600 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block"
+                className="bg-white text-blue-600 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block"
               >
-                Learn More
+                📘 Learn More
               </Link>
               <Link 
                 href="/products" 
-                className="bg-white text-green-600 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block"
+                className="bg-white text-blue-600 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block"
               >
-                Shop Now
+                🛒 Shop Now
               </Link>
             </div>
           </div>
