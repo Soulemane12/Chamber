@@ -97,9 +97,7 @@ export function Footer({ showSocials = true, className = "" }: FooterProps) {
               <p>
                 <span className="font-medium">{t('mail')}</span> {t('email')}
               </p>
-              <p>
-                <span className="font-medium">{t('phoneLabel')}</span> {t('phone')}
-              </p>
+
             </div>
           </div>
         </div>

@@ -37,14 +37,7 @@ export default function Contact() {
                   </p>
                 </div>
                 
-                <div>
-                  <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
-                    {t('phoneLabel')}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    {t('phone')}
-                  </p>
-                </div>
+
               </div>
               
               <div className="text-center md:text-left">
@@ -87,12 +80,7 @@ export default function Contact() {
                 >
                   Send Email
                 </a>
-                <a 
-                  href={`tel:${t('phone')}`}
-                  className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block"
-                >
-                  Call Now
-                </a>
+
               </div>
             </div>
           </div>

@@ -34,9 +34,9 @@ export const translations = {
     
     // Why Choose Wellnex02
     whyChooseTitle: "Why Choose Wellnex02?",
-    scienceDrivenWellness: "🧠 Science-Driven Wellness: Our chambers are engineered for optimal oxygen delivery, supporting recovery, mental clarity, and overall vitality.",
-    durableUserFriendly: "🛠️ Durable & User-Friendly Design: Built to last, easy to operate, and suitable for both personal and professional use.",
-    inspiredByTradition: "🌿 Inspired by Tradition, Powered by Innovation: Merging ancient wellness philosophies with modern technology.",
+    scienceDrivenWellness: "Science-Driven Wellness: Our chambers are engineered for optimal oxygen delivery, supporting recovery, mental clarity, and overall vitality.",
+    durableUserFriendly: "Durable & User-Friendly Design: Built to last, easy to operate, and suitable for both personal and professional use.",
+    inspiredByTradition: "Inspired by Tradition, Powered by Innovation: Merging ancient wellness philosophies with modern technology.",
     
     // Recovery Series
     recoverySeriesTitle: "Introducing the Wellnex02 Recovery Series",
@@ -59,7 +59,7 @@ export const translations = {
     companyDescription: "Wellnex02, in collaboration with a leading Japan-based manufacturer, brings over 25 years of excellence in hyperbaric oxygen therapy to the U.S. market. As Asia's top producer of oxygen chambers, our legacy is built on the timeless principles of Japanese wellness—focusing on longevity, vitality, and holistic health.",
     quickLinks: "Quick Links.",
     contactUs: "Contact Us",
-    phone: "631-954-5440",
+
     copyright: "COPYRIGHT © 2024 Wellnex02 – ALL RIGHTS RESERVED.",
     
     // About Page
@@ -122,7 +122,7 @@ export const translations = {
     // Contact Page
     contactTitle: "Contact",
     mail: "Mail:",
-    phoneLabel: "Phone:",
+
     
     // Benefits Details
     antiAgingTitle: "Experience the revitalizing benefits of oxygen with O2ChamberBox. Our hyperbaric oxygen therapy (HBOT) is designed to help you fight the signs of aging from within.",
@@ -210,7 +210,7 @@ export const translations = {
     firstName: "Prénom",
     lastName: "Nom",
     emailAddress: "Adresse e-mail",
-    phoneNumber: "Numéro de téléphone",
+
     requiredFields: "* Champs obligatoires",
     nextStep: "Étape suivante",
     back: "Retour",
@@ -292,7 +292,7 @@ export const translations = {
     firstName: "Nombre",
     lastName: "Apellido",
     emailAddress: "Correo electrónico",
-    phoneNumber: "Número de teléfono",
+
     requiredFields: "* Campos obligatorios",
     nextStep: "Siguiente paso",
     back: "Atrás",
@@ -374,7 +374,7 @@ export const translations = {
     firstName: "名字",
     lastName: "姓氏",
     emailAddress: "电子邮件地址",
-    phoneNumber: "电话号码",
+
     requiredFields: "* 必填字段",
     nextStep: "下一步",
     back: "返回",
@@ -456,7 +456,7 @@ export const translations = {
     firstName: "名",
     lastName: "姓",
     emailAddress: "メールアドレス",
-    phoneNumber: "電話番号",
+
     requiredFields: "* 必須項目",
     nextStep: "次のステップ",
     back: "戻る",
@@ -538,7 +538,7 @@ export const translations = {
     firstName: "Nome",
     lastName: "Cognome",
     emailAddress: "Indirizzo email",
-    phoneNumber: "Numero di telefono",
+
     requiredFields: "* Campi obbligatori",
     nextStep: "Prossimo passo",
     back: "Indietro",

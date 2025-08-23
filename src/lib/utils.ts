@@ -40,7 +40,7 @@ export const locationData = {
   midtown: {
     name: "Midtown Biohack",
     address: "575 Madison Ave, 20th floor, New York, NY",
-    phone: "+1 (646) 262-8794",
+
     email: "billydduc@gmail.com",
     owner: "Billy Duc",
     features: [
@@ -65,7 +65,7 @@ export const locationData = {
   conyers: {
     name: "Platinum Wellness Spa",
     address: "1900 Parker Rd SE, Conyers, GA 30094",
-    phone: "+1 (646) 262-8794",
+
     email: "billydduc@gmail.com",
     owner: "Billy Duc",
     features: [
