@@ -29,7 +29,7 @@ export const translations = {
     personalDetails: "Personal Details",
     details: "Details",
     dateTime: "Date & Time",
-    payment: "Payment",
+
     firstName: "First Name",
     lastName: "Last Name",
     emailAddress: "Email Address",
@@ -47,18 +47,12 @@ export const translations = {
     premiumSession: "Premium session",
     notes: "Special Requests or Notes (Optional)",
     
-    // Payment
+    // Booking Summary
     bookingSummary: "Booking Summary",
     date: "Date",
     time: "Time",
     duration: "Duration",
     address: "Address",
-    total: "Total",
-    paymentDetails: "Payment Details",
-    cardNumber: "Card Number",
-    expirationDate: "Expiration Date",
-    cvv: "CVV",
-    nameOnCard: "Name on Card",
     completeBooking: "Complete Booking",
     book: "Book",
     
@@ -70,7 +64,7 @@ export const translations = {
     name: "Name",
     email: "Email",
     dateAndTime: "Date & Time",
-    totalAmount: "Total Amount",
+
     contactInfo: "Contact",
     owner: "Owner",
     viewOnGoogleMaps: "View on Google Maps",
@@ -111,7 +105,7 @@ export const translations = {
     personalDetails: "Informations personnelles",
     details: "Détails",
     dateTime: "Date et heure",
-    payment: "Paiement",
+
     firstName: "Prénom",
     lastName: "Nom",
     emailAddress: "Adresse e-mail",

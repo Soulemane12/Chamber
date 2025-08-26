@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { formatCurrency } from "@/lib/utils";
+
 import UserEditModal, { UserProfile } from "./ui/UserEditModal";
 import AdminChatbot from './AdminChatbot';
 import BookingDetailsModal, { GuestBookingInfo } from "./ui/BookingDetailsModal";
@@ -156,8 +156,7 @@ function StatCard({ title, value, subtitle }: { title: string, value: string | n
 export default function AdminDashboard() {
   const [timePeriod, setTimePeriod] = useState<'day' | 'month' | 'quarter' | 'year'>('month');
   const [demographic, setDemographic] = useState<'age' | 'gender' | 'race' | 'education' | 'profession'>('age');
-  const [revenuePeriod, setRevenuePeriod] = useState<'day' | 'week' | 'month' | 'year'>('month');
-  const [revenueLocation, setRevenueLocation] = useState<'all' | 'atmos'>('all');
+
   const [profiles, setProfiles] = useState<UserProfile[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -223,7 +222,7 @@ export default function AdminDashboard() {
   const [bookingsByTime, setBookingsByTime] = useState<Record<string, number>>({});
   const [bookingsByDemographic, setBookingsByDemographic] = useState<Record<string, number>>({});
   const [averageBookings, setAverageBookings] = useState<{atmos: number}>({atmos: 0});
-  const [revenueData, setRevenueData] = useState<Record<string, number>>({});
+
   
   // -------------------------------------------------
   // Booking-related state (declared early to prevent
@@ -287,7 +286,7 @@ export default function AdminDashboard() {
   // Summary statistics displayed in top cards
   const [summaryStats, setSummaryStats] = useState({
     totalBookings: 0,
-    totalRevenue: 0,
+
     averageBookingValue: 0,
   });
 
@@ -321,29 +320,7 @@ export default function AdminDashboard() {
     education: {},
     profession: {}
   });
-  const [allRevenueData, setAllRevenueData] = useState<{
-    day: {
-      all: Record<string, number>;
-      atmos: Record<string, number>;
-    };
-    week: {
-      all: Record<string, number>;
-      atmos: Record<string, number>;
-    };
-    month: {
-      all: Record<string, number>;
-      atmos: Record<string, number>;
-    };
-    year: {
-      all: Record<string, number>;
-      atmos: Record<string, number>;
-    };
-  }>({
-    day: { all: {}, atmos: {} },
-    week: { all: {}, atmos: {} },
-    month: { all: {}, atmos: {} },
-    year: { all: {}, atmos: {} }
-  });
+
   
   // Update fetchAllBookingData to handle pagination and filtering
   const fetchAllBookingData = async () => {
@@ -475,59 +452,7 @@ export default function AdminDashboard() {
         setAverageBookings(data);
       }
       
-      // Fetch all revenue data at once
-      const revPeriods = ['day', 'week', 'month', 'year'] as const;
-      const locations = ['all', 'atmos'] as const;
-      const revenueData: Record<string, Record<string, Record<string, number>>> = {
-        day: { all: {}, atmos: {} },
-        week: { all: {}, atmos: {} },
-        month: { all: {}, atmos: {} },
-        year: { all: {}, atmos: {} }
-      };
-      
-      for (const period of revPeriods) {
-        // Period already initialized in revenueData
-        
-        for (const loc of locations) {
-      const revenueResponse = await fetch('/api/admin/bookings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          type: 'revenue',
-              period,
-              location: loc
-        }),
-      });
-      
-      if (revenueResponse.ok) {
-        const { data } = await revenueResponse.json();
-            revenueData[period][loc] = data;
-          }
-        }
-      }
-      
-      setAllRevenueData({
-        day: {
-          all: revenueData.day?.all || {},
-          atmos: revenueData.day?.atmos || {}
-        },
-        week: {
-          all: revenueData.week?.all || {},
-          atmos: revenueData.week?.atmos || {}
-        },
-        month: {
-          all: revenueData.month?.all || {},
-          atmos: revenueData.month?.atmos || {}
-        },
-        year: {
-          all: revenueData.year?.all || {},
-          atmos: revenueData.year?.atmos || {}
-        }
-      });
-      // Set initial view
-      setRevenueData(revenueData[revenuePeriod][revenueLocation] || {});
+
       
       setLastRefreshed(new Date());
       setBookingsError(null);
@@ -595,15 +520,10 @@ export default function AdminDashboard() {
     }
   }, [demographic, allBookingsByDemographic]);
   
-  useEffect(() => {
-    if (Object.keys(allRevenueData).length > 0 && 
-        Object.keys(allRevenueData[revenuePeriod] || {}).length > 0) {
-      setRevenueData(allRevenueData[revenuePeriod][revenueLocation] || {});
-    }
-  }, [revenuePeriod, revenueLocation, allRevenueData, demographic, timePeriod]);
+
   
   // Extract summary statistics
-  const { totalBookings, totalRevenue, averageBookingValue } = summaryStats;
+  const { totalBookings, averageBookingValue } = summaryStats;
   
   // Helper function to format demographic values for display
   const formatDemographic = (value: string | undefined): string => {
@@ -796,14 +716,10 @@ export default function AdminDashboard() {
           value={totalBookings} 
           subtitle="All time"
         />
-        <StatCard 
-          title="Total Revenue" 
-          value={formatCurrency(totalRevenue)} 
-          subtitle="All time"
-        />
+
         <StatCard 
           title="Average Booking Value" 
-          value={formatCurrency(averageBookingValue)} 
+          value="Free" 
           subtitle={`Last updated: ${lastRefreshed.toLocaleTimeString()}`}
         />
         <StatCard 
@@ -1035,52 +951,7 @@ export default function AdminDashboard() {
         </div>
       </div>
       
-            {/* Revenue Analytics */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Revenue</h3>
-                <div className="flex space-x-2">
-                  <select
-                    className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
-                    value={revenuePeriod}
-                    onChange={(e) => setRevenuePeriod(e.target.value as 'day' | 'week' | 'month' | 'year')}
-                  >
-                    <option value="day">Daily</option>
-                    <option value="week">Weekly</option>
-                    <option value="month">Monthly</option>
-                    <option value="year">Yearly</option>
-                  </select>
-                  <select
-                    className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
-                    value={revenueLocation}
-                    onChange={(e) => setRevenueLocation(e.target.value as 'all' | 'atmos')}
-                  >
-                    <option value="all">All Locations</option>
-                    <option value="atmos">ATMOS Hyperbaric</option>
-                  </select>
-            </div>
-            </div>
-              <div className="relative">
-                {Object.keys(revenueData).length === 0 && !bookingsLoading ? (
-                  <p className="text-center text-gray-500 dark:text-gray-400 py-10">No revenue data available</p>
-                ) : (
-                  <div className={`transition-opacity duration-300 ${Object.keys(revenueData).length > 0 ? 'opacity-100' : 'opacity-0'}`}>
-                    <BarChart data={revenueData} title="Revenue" />
-          </div>
-                )}
-                {bookingsLoading && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-white/75 dark:bg-gray-800/75">
-                    <div className="animate-pulse flex flex-col items-center">
-                      <svg className="animate-spin h-10 w-10 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      <span className="mt-2 text-sm text-gray-500 dark:text-gray-400">Loading data...</span>
-        </div>
-        </div>
-                )}
-        </div>
-      </div>
+
           </div>
         </div>
       ) : activeTab === 'bookings' ? (
@@ -1352,7 +1223,7 @@ export default function AdminDashboard() {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900 dark:text-white">
-                          {formatCurrency(booking.amount)}
+                          Free
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right">
                           <div className="flex space-x-1">

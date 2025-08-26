@@ -1,17 +1,10 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { BookingFormData } from '@/components/BookingForm';
-import { formatCurrency } from '@/lib/utils';
+
 import { format } from 'date-fns';
 
-// Group size multipliers (discount for groups) - same as in BookingForm.tsx
-const groupSizeMultipliers = {
-  "1": 1.0,    // No discount for single person
-  "2": 1.8,    // 10% discount per person
-  "3": 2.55,   // 15% discount per person
-  "4": 3.2,    // 20% discount per person
-  "5": 3.75,   // 25% discount per person
-};
+
 
 export async function POST(request: Request) {
   try {
@@ -40,34 +33,14 @@ export async function POST(request: Request) {
       : new Date(bookingData.date);
     const formattedDate = format(dateToFormat, 'MMMM d, yyyy');
     
-    // Calculate price based on duration
-    const prices: Record<string, number> = {
-      '60': 150,
-      '90': 200,
-      '120': 250
-    };
-    const basePrice = prices[bookingData.duration] || 150;
-    
-    // Apply group size multiplier
+    // All sessions are free
     const groupSize = bookingData.groupSize || "1";
-    const multiplier = groupSizeMultipliers[groupSize as keyof typeof groupSizeMultipliers] || 1.0;
-    const totalPrice = basePrice * multiplier;
     
     // Update location details to use ATMOS location
     const locationName = 'ATMOS Hyperbaric';
     const locationAddress = '166 laurel rd, east north NY, 11731';
 
-    // Group discount info
-    let discountInfo = '';
-    if (groupSize !== "1") {
-      const discountPercentages = {
-        "2": "10%",
-        "3": "15%",
-        "4": "20%",
-        "5": "25%"
-      };
-      discountInfo = `<p><strong>Group Discount:</strong> ${discountPercentages[groupSize as "2" | "3" | "4" | "5"]} off per person</p>`;
-    }
+
 
     // Update contact information to match ATMOS
     const mailOptions = {
@@ -89,8 +62,7 @@ export async function POST(request: Request) {
             <p><strong>Location:</strong> ${locationName}</p>
             <p><strong>Address:</strong> ${locationAddress}</p>
             <p><strong>Group Size:</strong> ${groupSize} ${parseInt(groupSize) > 1 ? 'clients' : 'client'}</p>
-            ${discountInfo}
-            <p><strong>Total Amount:</strong> ${formatCurrency(totalPrice)}</p>
+            <p><strong>Total Amount:</strong> Free</p>
           </div>
           
           <div style="margin: 20px 0; padding: 15px; background-color: #eff6ff; border-radius: 5px; border-left: 4px solid #3b82f6;">

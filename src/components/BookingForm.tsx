@@ -7,7 +7,7 @@ import { z } from "zod";
 import { format, isBefore, startOfDay } from "date-fns";
 import { DatePickerField } from "@/components/ui/DatePickerField";
 import { Button } from "@/components/ui/Button";
-import { formatCurrency, getLocationData } from "@/lib/utils";
+import { getLocationData } from "@/lib/utils";
 import { supabase } from "@/lib/supabaseClient";
 import { SeatSelector, SeatInfo } from "@/components/ui/SeatSelector";
 import Image from "next/image";
@@ -63,19 +63,12 @@ const timeSlots = [
   "5:00 PM",
 ];
 
-// Pricing for different durations
-const pricingOptions = {
-  "60": 150,
-  "90": 200,
-  "120": 250,
-};
-
-// Group size multipliers (discount for groups)
+// Group size multipliers (no pricing - all sessions are free)
 const groupSizeMultipliers = {
-  "1": 1.0,    // No discount for single person
-  "2": 1.8,    // 10% discount per person
-  "3": 2.55,   // 15% discount per person
-  "4": 3.2,    // 20% discount per person
+  "1": 1.0,
+  "2": 1.8,
+  "3": 2.55,
+  "4": 3.2,
 };
 
 interface BookingFormProps {
@@ -298,9 +291,8 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
   const selectedGroupSize = watch("groupSize");
 
   const calculateTotal = () => {
-    const basePrice = pricingOptions[selectedDuration as keyof typeof pricingOptions] || 0;
-    const multiplier = groupSizeMultipliers[selectedGroupSize as keyof typeof groupSizeMultipliers] || 1.0;
-    return basePrice * multiplier;
+    // All sessions are free - no pricing
+    return 0;
   };
 
   const isDateDisabled = (date: Date) => {
@@ -327,10 +319,8 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         }
       }
       
-      // Calculate booking amount
-      const basePrice = pricingOptions[data.duration as keyof typeof pricingOptions] || 0;
-      const multiplier = groupSizeMultipliers[data.groupSize as keyof typeof groupSizeMultipliers] || 1.0;
-      const amount = basePrice * multiplier;
+      // All sessions are free - no pricing
+      const amount = 0;
       
       // Get user ID if authenticated
       const { data: { session } } = await supabase.auth.getSession();
@@ -1147,7 +1137,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       ? "text-blue-600 dark:text-blue-400"
                       : "text-gray-900 dark:text-white"
                   }`}>
-                    {formatCurrency(150)}
+                    Free
                   </div>
                 </label>
 
@@ -1182,7 +1172,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       ? "text-blue-600 dark:text-blue-400"
                       : "text-gray-900 dark:text-white"
                   }`}>
-                    {formatCurrency(200)}
+                    Free
                   </div>
                 </label>
 
@@ -1217,7 +1207,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       ? "text-blue-600 dark:text-blue-400"
                       : "text-gray-900 dark:text-white"
                   }`}>
-                    {formatCurrency(250)}
+                    Free
                   </div>
                 </label>
               </div>
@@ -1422,11 +1412,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       <span className="text-sm text-gray-600 dark:text-gray-400">
                         {size === "1" ? "Client" : "Clients"}
                       </span>
-                      {size !== "1" && (
-                        <span className="mt-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full dark:bg-green-900/30 dark:text-green-400">
-                          {size === "2" ? "10%" : size === "3" ? "15%" : "20%"} discount
-                        </span>
-                      )}
+
                     </label>
                   ))}
                 </div>
@@ -1438,11 +1424,6 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     </svg>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
                       You've selected <span className="font-bold">{watch("groupSize")}</span> {parseInt(watch("groupSize")) === 1 ? 'client' : 'clients'}.
-                      {watch("groupSize") === "4" && (
-                        <span className="ml-1 font-medium">
-                          You qualify for our maximum 20% discount per client!
-                        </span>
-                      )}
                     </p>
                   </div>
                 </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { formatCurrency } from '@/lib/utils';
+
 
 interface Booking {
   id: string;
@@ -250,7 +250,7 @@ export default function CalendarView({
                         <p>{booking.email}</p>
                         <p>{booking.phone}</p>
                         <p>{booking.duration} min • {booking.group_size} people</p>
-                        <p className="font-medium">{formatCurrency(booking.amount)}</p>
+                        <p className="font-medium">Free</p>
                       </div>
                     </div>
                     

@@ -87,7 +87,7 @@ export default function AdminChatbot({ mode = 'floating' }: AdminChatbotProps) {
       messages: [
         {
           role: 'assistant',
-          content: 'Hello! I\'m your admin assistant. Ask me anything about bookings, users, or analytics data. I can also generate PDF reports for you - just ask for a "booking report", "user report", "revenue report", or any custom document you need!',
+          content: 'Hello! I\'m your admin assistant. Ask me anything about bookings, users, or analytics data. I can also generate PDF reports for you - just ask for a "booking report", "user report", or any custom document you need!',
           timestamp: new Date(),
         },
       ],
@@ -332,9 +332,7 @@ export default function AdminChatbot({ mode = 'floating' }: AdminChatbotProps) {
       } else if (/user|customer|client/i.test(userRequest)) {
         documentType = 'user_report';
         customRequest = 'Generate a comprehensive user report';
-      } else if (/revenue|financial|money|income/i.test(userRequest)) {
-        documentType = 'revenue_report';
-        customRequest = 'Generate a comprehensive revenue report';
+      
       }
 
       const response = await fetch('/api/admin/generate-pdf', {
