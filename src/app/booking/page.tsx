@@ -274,12 +274,7 @@ export default function BookingPage() {
                       )}
                     </div>
                   </div>
-                  <div className="animate-slide-in-up animate-delay-500">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('totalAmount')}</p>
-                    <p className="font-medium text-gray-900 dark:text-white">
-      
-                    </p>
-                  </div>
+
 
                   {/* Add seat information */}
                   {bookingDetails.selectedSeats && bookingDetails.selectedSeats.some(seat => seat.selected) && (
