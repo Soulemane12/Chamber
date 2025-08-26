@@ -719,7 +719,7 @@ export default function AdminDashboard() {
 
         <StatCard 
           title="Average Booking Value" 
-          value="Free" 
+          value="N/A" 
           subtitle={`Last updated: ${lastRefreshed.toLocaleTimeString()}`}
         />
         <StatCard 
@@ -1223,7 +1223,7 @@ export default function AdminDashboard() {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900 dark:text-white">
-                          Free
+                          -
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right">
                           <div className="flex space-x-1">

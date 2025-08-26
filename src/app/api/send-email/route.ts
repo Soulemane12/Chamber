@@ -62,7 +62,7 @@ export async function POST(request: Request) {
             <p><strong>Location:</strong> ${locationName}</p>
             <p><strong>Address:</strong> ${locationAddress}</p>
             <p><strong>Group Size:</strong> ${groupSize} ${parseInt(groupSize) > 1 ? 'clients' : 'client'}</p>
-            <p><strong>Total Amount:</strong> Free</p>
+
           </div>
           
           <div style="margin: 20px 0; padding: 15px; background-color: #eff6ff; border-radius: 5px; border-left: 4px solid #3b82f6;">

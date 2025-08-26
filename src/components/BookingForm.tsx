@@ -1132,13 +1132,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Standard session</p>
                   </div>
-                  <div className={`text-lg font-bold ${
-                    watch("duration") === "60"
-                      ? "text-blue-600 dark:text-blue-400"
-                      : "text-gray-900 dark:text-white"
-                  }`}>
-                    Free
-                  </div>
+
                 </label>
 
                 <label
@@ -1167,13 +1161,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Extended session</p>
                   </div>
-                  <div className={`text-lg font-bold ${
-                    watch("duration") === "90"
-                      ? "text-blue-600 dark:text-blue-400"
-                      : "text-gray-900 dark:text-white"
-                  }`}>
-                    Free
-                  </div>
+
                 </label>
 
                 <label
@@ -1202,13 +1190,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Premium session</p>
                   </div>
-                  <div className={`text-lg font-bold ${
-                    watch("duration") === "120"
-                      ? "text-blue-600 dark:text-blue-400"
-                      : "text-gray-900 dark:text-white"
-                  }`}>
-                    Free
-                  </div>
+
                 </label>
               </div>
               {errors.duration && (
