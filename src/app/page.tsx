@@ -61,7 +61,7 @@ export default function Home() {
 
         {/* Video Player */}
         <div className="mb-16 animate-fade-in">
-          <div className="max-w-xl lg:max-w-lg xl:max-w-md mx-auto">
+          <div className="max-w-lg lg:max-w-md xl:max-w-sm mx-auto">
             <video 
               className="w-full rounded-lg shadow-lg" 
               controls 
