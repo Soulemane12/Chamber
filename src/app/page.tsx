@@ -22,9 +22,9 @@ export default function Home() {
             {t('heroSubtitle')}
           </p>
           <div className="mt-10 animate-fade-in animate-delay-300 px-4 sm:px-0">
-            <Link 
-              href="/products" 
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 hover:translate-y-[-3px] active:scale-95 inline-block w-full sm:w-auto text-center"
+            <Link
+              href="/products"
+              className="btn bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 inline-block w-full sm:w-auto text-center min-h-[44px] flex items-center justify-center"
             >
               {t('getStarted')}
             </Link>
@@ -49,9 +49,9 @@ export default function Home() {
               {t('discoverText')}
             </p>
             <div className="text-center">
-              <Link 
-                href="/about" 
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block"
+              <Link
+                href="/about"
+                className="btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block min-h-[44px] flex items-center justify-center"
               >
                 {t('readMore')}
               </Link>
@@ -178,21 +178,21 @@ export default function Home() {
               Join the movement toward better health and vitality
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link 
-                href="/contact" 
-                className="bg-white text-green-600 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block"
+              <Link
+                href="/contact"
+                className="btn bg-white text-green-600 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block min-h-[44px] flex items-center justify-center w-full sm:w-auto"
               >
                 Contact Us
               </Link>
-              <Link 
-                href="/about" 
-                className="bg-white text-green-600 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block"
+              <Link
+                href="/about"
+                className="btn bg-white text-green-600 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block min-h-[44px] flex items-center justify-center w-full sm:w-auto"
               >
                 Learn More
               </Link>
-              <Link 
-                href="/products" 
-                className="bg-white text-green-600 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block"
+              <Link
+                href="/products"
+                className="btn bg-white text-green-600 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block min-h-[44px] flex items-center justify-center w-full sm:w-auto"
               >
                 Shop Now
               </Link>
