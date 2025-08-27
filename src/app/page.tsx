@@ -63,7 +63,7 @@ export default function Home() {
         <div className="mb-16 animate-fade-in">
           <div className="max-w-lg lg:max-w-md xl:max-w-sm mx-auto">
             <video 
-              className="w-full max-w-[400px] lg:max-w-[350px] xl:max-w-[300px] mx-auto rounded-lg shadow-lg" 
+              className="w-full max-w-[280px] md:max-w-[250px] lg:max-w-[220px] xl:max-w-[200px] mx-auto rounded-lg shadow-lg" 
               controls 
               preload="metadata"
               poster="/logo.png"
