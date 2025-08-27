@@ -114,7 +114,7 @@ export default function Products() {
               
               <div className="text-center">
                 <Link href="/products/o2-box-t68r" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block">
-                  {t('learnMore')}
+                  View Details & Purchase
                 </Link>
               </div>
             </div>
@@ -160,7 +160,7 @@ export default function Products() {
               
               <div className="text-center">
                 <Link href="/products/o2-box-t810r-w2000" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block">
-                  {t('learnMore')}
+                  View Details & Purchase
                 </Link>
               </div>
             </div>
