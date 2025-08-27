@@ -53,10 +53,10 @@ export default function AdminPage() {
       </Head>
       <Header currentPage="admin" />
       
-      <main className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-300">
+      <main className="py-6 sm:py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
+          <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
             View and analyze booking statistics
           </p>
         </div>

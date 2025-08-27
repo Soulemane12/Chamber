@@ -39,64 +39,64 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
   }, []);
 
   return (
-    <header className="py-6 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center">
-      <div className="flex items-center mb-4 sm:mb-0">
+    <header className="py-4 sm:py-6 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center">
+      <div className="flex items-center mb-3 sm:mb-0">
         <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
           <span className="sr-only">Home</span>
-          <Image 
-            src="/logo.png" 
-            alt="WellNex02 Logo" 
-            width={200} 
-            height={200} 
-            className="h-48 w-48"
+          <Image
+            src="/logo.png"
+            alt="WellNex02 Logo"
+            width={200}
+            height={200}
+            className="h-24 w-24 sm:h-32 sm:w-32 lg:h-48 lg:w-48"
             priority
           />
         </Link>
       </div>
-      <div className="flex flex-col sm:flex-row items-center w-full sm:w-auto">
-        <nav className="w-full sm:w-auto mb-4 sm:mb-0">
-          <ul className="flex flex-wrap justify-center sm:space-x-8">
-            <li className="px-3 py-2 sm:p-0">
-              <Link 
-                href="/" 
-                className={currentPage === 'home' 
-                  ? "text-blue-600 dark:text-blue-400 font-medium" 
-                  : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"}
+      <div className="flex flex-col sm:flex-row items-center w-full sm:w-auto gap-3 sm:gap-0">
+        <nav className="w-full sm:w-auto">
+          <ul className="flex flex-wrap justify-center sm:space-x-8 gap-1 sm:gap-0">
+            <li className="px-2 sm:px-0 py-1 sm:py-0">
+              <Link
+                href="/"
+                className={`text-sm sm:text-base ${currentPage === 'home'
+                  ? "text-blue-600 dark:text-blue-400 font-medium"
+                  : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"}`}
               >
                 {t('home')}
               </Link>
             </li>
-            <li className="px-3 py-2 sm:p-0">
-              <Link 
-                href="/booking" 
-                className={currentPage === 'booking' 
-                  ? "text-blue-600 dark:text-blue-400 font-medium" 
-                  : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"}
+            <li className="px-2 sm:px-0 py-1 sm:py-0">
+              <Link
+                href="/booking"
+                className={`text-sm sm:text-base ${currentPage === 'booking'
+                  ? "text-blue-600 dark:text-blue-400 font-medium"
+                  : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"}`}
               >
                 {t('bookNow')}
               </Link>
             </li>
-            <li className="px-3 py-2 sm:p-0">
-              <Link 
-                href={isAuthenticated ? "/account" : "/login?redirect=/account"} 
-                className={currentPage === 'account' 
-                  ? "text-blue-600 dark:text-blue-400 font-medium" 
-                  : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"}
+            <li className="px-2 sm:px-0 py-1 sm:py-0">
+              <Link
+                href={isAuthenticated ? "/account" : "/login?redirect=/account"}
+                className={`text-sm sm:text-base ${currentPage === 'account'
+                  ? "text-blue-600 dark:text-blue-400 font-medium"
+                  : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"}`}
               >
                 Account
               </Link>
             </li>
           </ul>
         </nav>
-        <div className="hidden sm:flex items-center ml-6 space-x-4">
-          <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text">
+        <div className="hidden sm:flex items-center ml-4 lg:ml-6 space-x-4">
+          <div className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text">
             WellNex02
           </div>
           <LanguageSelector />
         </div>
       </div>
-      <div className="sm:hidden w-full mt-2 flex flex-col items-center">
-        <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text mb-2">
+      <div className="sm:hidden w-full flex flex-col items-center gap-2">
+        <div className="text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text">
           WellNex02
         </div>
         <MobileLanguageSelector />

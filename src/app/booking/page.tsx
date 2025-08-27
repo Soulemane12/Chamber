@@ -98,12 +98,12 @@ export default function BookingPage() {
       </Head>
       <Header currentPage="booking" />
 
-      <main className="py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-        <div className="mb-10">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+      <main className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+        <div className="mb-8 sm:mb-10">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
             {t('bookingTitle')}
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
             {t('bookingSubtitle')}
           </p>
           

@@ -525,61 +525,92 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         </div>
       )}
       
-      <div className="flex flex-wrap border-b border-gray-200 dark:border-gray-700">
-        <button
-          className={`flex-1 py-4 text-center transition-all-300 text-xs sm:text-sm md:text-base ${
-            currentStep === 1
-              ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
-              : "text-gray-500 dark:text-gray-400"
-          }`}
-          disabled={currentStep === 1}
-          type="button"
-        >
-          <span className="block">1. {isGuest ? "Your Information" : "Select Location"}</span>
-        </button>
-        <button
-          className={`flex-1 py-4 text-center transition-all-300 text-xs sm:text-sm md:text-base ${
-            currentStep === 2
-              ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
-              : "text-gray-500 dark:text-gray-400"
-          } ${isGuest && currentStep < 2 ? 'opacity-50 cursor-not-allowed' : ''}`}
-          disabled={isGuest && currentStep < 2}
-          type="button"
-        >
-          <span className="block">2. {isGuest ? "Select Location" : "Booking Details"}</span>
-        </button>
-        <button
-          className={`flex-1 py-4 text-center transition-all-300 text-xs sm:text-sm md:text-base ${
-            currentStep === 3
-              ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
-              : "text-gray-500 dark:text-gray-400"
-          } ${currentStep < 3 ? 'opacity-50 cursor-not-allowed' : ''}`}
-          disabled={currentStep < 3}
-          type="button"
-        >
-          <span className="block">3. {isGuest ? "Booking Details" : "Payment"}</span>
-        </button>
-        {isGuest && (
+      <div className="border-b border-gray-200 dark:border-gray-700">
+        {/* Mobile step indicator */}
+        <div className="flex sm:hidden justify-center py-3">
+          <div className="flex items-center space-x-2">
+            {[1, 2, 3, ...(isGuest ? [4] : [])].map((step) => (
+              <div key={step} className="flex items-center">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                    step === currentStep
+                      ? "bg-blue-600 text-white"
+                      : step < currentStep
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+                  }`}
+                >
+                  {step < currentStep ? "✓" : step}
+                </div>
+                {step < (isGuest ? 4 : 3) && (
+                  <div
+                    className={`w-6 h-0.5 mx-1 ${
+                      step < currentStep ? "bg-green-500" : "bg-gray-200 dark:bg-gray-700"
+                    }`}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop step navigation */}
+        <div className="hidden sm:flex flex-wrap">
           <button
-            className={`flex-1 py-4 text-center transition-all-300 text-xs sm:text-sm md:text-base ${
-              currentStep === 4
+            className={`flex-1 py-4 text-center transition-all-300 text-sm md:text-base ${
+              currentStep === 1
                 ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
                 : "text-gray-500 dark:text-gray-400"
-            } ${currentStep < 4 ? 'opacity-50 cursor-not-allowed' : ''}`}
-            disabled={currentStep < 4}
+            }`}
+            disabled={currentStep === 1}
             type="button"
           >
-            <span className="block">4. Payment</span>
+            <span className="block">1. {isGuest ? "Your Information" : "Select Location"}</span>
           </button>
-        )}
+          <button
+            className={`flex-1 py-4 text-center transition-all-300 text-sm md:text-base ${
+              currentStep === 2
+                ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
+                : "text-gray-500 dark:text-gray-400"
+            } ${isGuest && currentStep < 2 ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={isGuest && currentStep < 2}
+            type="button"
+          >
+            <span className="block">2. {isGuest ? "Select Location" : "Booking Details"}</span>
+          </button>
+          <button
+            className={`flex-1 py-4 text-center transition-all-300 text-sm md:text-base ${
+              currentStep === 3
+                ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
+                : "text-gray-500 dark:text-gray-400"
+            } ${currentStep < 3 ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={currentStep < 3}
+            type="button"
+          >
+            <span className="block">3. {isGuest ? "Booking Details" : "Payment"}</span>
+          </button>
+          {isGuest && (
+            <button
+              className={`flex-1 py-4 text-center transition-all-300 text-sm md:text-base ${
+                currentStep === 4
+                  ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
+                  : "text-gray-500 dark:text-gray-400"
+              } ${currentStep < 4 ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={currentStep < 4}
+              type="button"
+            >
+              <span className="block">4. Payment</span>
+            </button>
+          )}
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="p-6 sm:p-8">
-        <div className="mb-10">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="p-4 sm:p-6 lg:p-8">
+        <div className="mb-8 sm:mb-10">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
             Book Your Hyperbaric Chamber Session
           </h1>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
             Fill out the form below to schedule your hyperbaric oxygen therapy session at one of Billy Duc&apos;s premium wellness centers.
           </p>
           
@@ -602,11 +633,11 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
 
         {/* Personal Information Step - Only for guests */}
         {isPersonalInfoStep && (
-          <div className="space-y-6 animate-fade-in">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Your Information</h2>
-            
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4 sm:space-y-6 animate-fade-in">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">Your Information</h2>
+
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     First Name *
@@ -664,9 +695,9 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               </div>
               
               {/* Demographic Information Section - Added for guests */}
-              <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Demographic Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
+                <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white">Demographic Information</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 sm:mb-6">
                   <div>
                     <label htmlFor="gender" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Gender *
@@ -795,12 +826,12 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                 />
               </div>
               
-              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <Button 
-                  type="button" 
+              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+                <Button
+                  type="button"
                   onClick={nextStep}
                   isLoading={isStepLoading}
-                  className="w-full sm:w-auto float-right"
+                  className="w-full sm:w-auto"
                 >
                   Continue to Booking Details
                 </Button>
@@ -811,20 +842,20 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         
         {/* Location Selection Step */}
         {isLocationStep && (
-          <div className="space-y-6 animate-fade-in">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Select Location</h2>
-            
+          <div className="space-y-4 sm:space-y-6 animate-fade-in">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">Select Location</h2>
+
             {isGuest && (
               <div className="space-y-4 animate-slide-in-up">
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                  <h3 className="font-medium text-blue-800 dark:text-blue-200">Booking as: {watch('firstName')} {watch('lastName')}</h3>
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-3 sm:p-4 rounded-lg">
+                  <h3 className="font-medium text-blue-800 dark:text-blue-200 text-sm sm:text-base">Booking as: {watch('firstName')} {watch('lastName')}</h3>
                   <p className="text-sm text-blue-700 dark:text-blue-300">{watch('email')} • {watch('phone')}</p>
                 </div>
               </div>
             )}
-            
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="grid grid-cols-1 gap-4 mb-4 sm:mb-6">
                 <label
                   className={`
                     relative flex items-center p-4 border rounded-lg cursor-pointer transition-all-300
@@ -952,23 +983,23 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                 </div>
               )}
 
-              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-between">
+              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between gap-3 sm:gap-0">
                 {isGuest && (
-                  <Button 
-                    type="button" 
+                  <Button
+                    type="button"
                     onClick={prevStep}
                     variant="outline"
                     isLoading={isStepLoading}
-                    className="w-full sm:w-auto"
+                    className="w-full sm:w-auto order-2 sm:order-1"
                   >
                     Back
                   </Button>
                 )}
-                <Button 
-                  type="button" 
+                <Button
+                  type="button"
                   onClick={nextStep}
                   isLoading={isStepLoading}
-                  className={`w-full sm:w-auto ${isGuest ? 'sm:ml-auto' : ''}`}
+                  className={`w-full sm:w-auto ${isGuest ? 'sm:ml-auto order-1 sm:order-2' : ''}`}
                   disabled={!watch("location") || isStepLoading}
                 >
                   Continue to Booking Details
@@ -980,17 +1011,17 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         
         {/* Booking Details Step */}
         {isBookingDetailsStep && (
-          <div className="space-y-6 animate-fade-in">
+          <div className="space-y-4 sm:space-y-6 animate-fade-in">
             {isGuest && (
               <div className="space-y-4 animate-slide-in-up">
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                  <h3 className="font-medium text-blue-800 dark:text-blue-200">Booking as: {watch('firstName')} {watch('lastName')}</h3>
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-3 sm:p-4 rounded-lg">
+                  <h3 className="font-medium text-blue-800 dark:text-blue-200 text-sm sm:text-base">Booking as: {watch('firstName')} {watch('lastName')}</h3>
                   <p className="text-sm text-blue-700 dark:text-blue-300">{watch('email')} • {watch('phone')}</p>
                 </div>
               </div>
             )}
 
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6">
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-3 sm:p-4 rounded-lg mb-4 sm:mb-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0 mr-3">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 dark:text-blue-400" viewBox="0 0 20 20" fill="currentColor">
@@ -998,14 +1029,14 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-medium text-blue-800 dark:text-blue-200">Selected Location: {getLocationData(watch("location"))?.name}</h3>
+                  <h3 className="font-medium text-blue-800 dark:text-blue-200 text-sm sm:text-base">Selected Location: {getLocationData(watch("location"))?.name}</h3>
                   <p className="text-sm text-blue-700 dark:text-blue-300">{getLocationData(watch("location"))?.address}</p>
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col md:flex-row md:space-x-6">
-              <div className="md:w-7/12">
+            <div className="flex flex-col lg:flex-row lg:space-x-6">
+              <div className="lg:w-7/12 mb-6 lg:mb-0">
                 <DatePickerField
                   name="date"
                   label="Select Date *"
@@ -1017,9 +1048,9 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                   wrapperClassName="max-w-full animate-fade-in"
                 />
               </div>
-              
-              <div className="mt-6 md:mt-0 md:w-5/12">
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 h-full animate-slide-in-right animate-delay-200">
+
+              <div className="lg:w-5/12">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 shadow-sm border border-gray-200 dark:border-gray-700 h-full animate-slide-in-right animate-delay-200">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     Select Time *
                   </label>
@@ -1177,10 +1208,10 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
             </div>
 
             <div className="animate-slide-in-up animate-delay-300">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 Group Size *
               </label>
-              <div className="grid grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                 {["1", "2", "3", "4"].map((size) => (
                   <label
                     key={size}
@@ -1297,26 +1328,24 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               ></textarea>
             </div>
 
-            <div className="pt-4 flex justify-end">
-              <div className="flex justify-between w-full">
-                <Button 
-                  type="button" 
-                  onClick={prevStep}
-                  variant="outline"
-                  isLoading={isStepLoading}
-                  className="w-full sm:w-auto"
-                >
-                  Back to Location
-                </Button>
-                <Button 
-                  type="button" 
-                  onClick={nextStep}
-                  isLoading={isStepLoading}
-                  className="w-full sm:w-auto ml-auto"
-                >
-                  Continue to Payment
-                </Button>
-              </div>
+            <div className="pt-4 flex flex-col sm:flex-row justify-between gap-3 sm:gap-0">
+              <Button
+                type="button"
+                onClick={prevStep}
+                variant="outline"
+                isLoading={isStepLoading}
+                className="w-full sm:w-auto order-2 sm:order-1"
+              >
+                Back to Location
+              </Button>
+              <Button
+                type="button"
+                onClick={nextStep}
+                isLoading={isStepLoading}
+                className="w-full sm:w-auto sm:ml-auto order-1 sm:order-2"
+              >
+                Continue to Payment
+              </Button>
             </div>
           </div>
         )}
@@ -1445,9 +1474,9 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               </div>
             </div>
 
-            <div className="pt-4 flex flex-col sm:flex-row justify-between gap-4">
-              <Button 
-                type="button" 
+            <div className="pt-4 flex flex-col sm:flex-row justify-between gap-3 sm:gap-4">
+              <Button
+                type="button"
                 onClick={prevStep}
                 variant="outline"
                 isLoading={isStepLoading}
@@ -1455,7 +1484,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               >
                 Back
               </Button>
-              <Button 
+              <Button
                 type="submit"
                 isLoading={isSubmitting || isStepLoading}
                 size="lg"

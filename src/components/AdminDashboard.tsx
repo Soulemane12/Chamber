@@ -10,7 +10,7 @@ import BookingDetailsModal, { GuestBookingInfo } from "./ui/BookingDetailsModal"
 function BarChart({ data, title, maxHeight = 200 }: { data: Record<string, number>, title: string, maxHeight?: number }) {
   const maxValue = Math.max(...Object.values(data));
   const entries = Object.entries(data);
-  
+
   // Format labels based on key format
   const formatLabel = (key: string) => {
     // For day format (YYYY-MM-DD)
@@ -32,27 +32,27 @@ function BarChart({ data, title, maxHeight = 200 }: { data: Record<string, numbe
     // Default case
     return key;
   };
-  
+
   // Limit the number of bars to display for better visualization
-  const displayEntries = entries.length > 15 
+  const displayEntries = entries.length > 15
     ? entries.slice(-15).sort((a, b) => a[0].localeCompare(b[0]))
     : entries.sort((a, b) => a[0].localeCompare(b[0]));
-  
+
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
-      <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{title}</h3>
-      
+    <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 shadow-sm">
+      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white">{title}</h3>
+
       {displayEntries.length > 0 ? (
-        <div className="flex items-end h-64 space-x-1 overflow-x-auto pb-2">
+        <div className="flex items-end h-48 sm:h-64 space-x-1 overflow-x-auto pb-2">
           {displayEntries.map(([key, value]) => {
             const height = maxValue > 0 ? (value / maxValue) * maxHeight : 0;
             return (
-              <div key={key} className="flex flex-col items-center flex-1 min-w-[40px]">
+              <div key={key} className="flex flex-col items-center flex-1 min-w-[35px] sm:min-w-[40px]">
                 <div className="w-full text-center mb-1 text-xs text-gray-600 dark:text-gray-400 truncate" title={value.toString()}>
                   {value}
                 </div>
-                <div 
-                  className="w-full bg-blue-500 dark:bg-blue-600 rounded-t transition-all duration-500 ease-in-out hover:bg-blue-600 dark:hover:bg-blue-500" 
+                <div
+                  className="w-full bg-blue-500 dark:bg-blue-600 rounded-t transition-all duration-500 ease-in-out hover:bg-blue-600 dark:hover:bg-blue-500"
                   style={{ height: `${height}px` }}
                 ></div>
                 <div className="w-full text-center mt-2 text-xs text-gray-600 dark:text-gray-400 truncate" title={key}>
@@ -63,11 +63,11 @@ function BarChart({ data, title, maxHeight = 200 }: { data: Record<string, numbe
           })}
         </div>
       ) : (
-        <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
+        <div className="h-48 sm:h-64 flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm">
           No data available for this time period
         </div>
       )}
-      
+
       {displayEntries.length > 0 && displayEntries.length < entries.length && (
         <div className="mt-2 text-xs text-right text-gray-500 dark:text-gray-400">
           * Showing the last {displayEntries.length} periods
@@ -80,41 +80,41 @@ function BarChart({ data, title, maxHeight = 200 }: { data: Record<string, numbe
 function PieChart({ data, title }: { data: Record<string, number>, title: string }) {
   const total = Object.values(data).reduce((sum, value) => sum + value, 0);
   let currentAngle = 0;
-  
+
   // Generate colors for pie segments
   const colors = [
-    '#3b82f6', '#10b981', '#f59e0b', '#ef4444', 
+    '#3b82f6', '#10b981', '#f59e0b', '#ef4444',
     '#8b5cf6', '#ec4899', '#6366f1', '#14b8a6'
   ];
-  
+
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
-      <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{title}</h3>
-      <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-        <div className="relative w-48 h-48">
+    <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 shadow-sm">
+      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white">{title}</h3>
+      <div className="flex flex-col lg:flex-row items-center justify-center gap-4 lg:gap-6">
+        <div className="relative w-40 h-40 sm:w-48 sm:h-48">
           <svg viewBox="0 0 100 100" className="w-full h-full">
             {Object.entries(data).map(([key, value], index) => {
               const percentage = (value / total) * 100;
               const angle = (percentage / 100) * 360;
               const largeArcFlag = angle > 180 ? 1 : 0;
-              
+
               // Calculate start and end points
               const startX = 50 + 50 * Math.cos((currentAngle * Math.PI) / 180);
               const startY = 50 + 50 * Math.sin((currentAngle * Math.PI) / 180);
               const endAngle = currentAngle + angle;
               const endX = 50 + 50 * Math.cos((endAngle * Math.PI) / 180);
               const endY = 50 + 50 * Math.sin((endAngle * Math.PI) / 180);
-              
+
               // Create path
               const path = `M 50 50 L ${startX} ${startY} A 50 50 0 ${largeArcFlag} 1 ${endX} ${endY} Z`;
-              
-              // Update current angle for next segmentF
+
+              // Update current angle for next segment
               currentAngle += angle;
-              
+
               return (
-                <path 
-                  key={key} 
-                  d={path} 
+                <path
+                  key={key}
+                  d={path}
                   fill={colors[index % colors.length]}
                   className="hover:opacity-80 transition-opacity cursor-pointer"
                 />
@@ -122,13 +122,13 @@ function PieChart({ data, title }: { data: Record<string, number>, title: string
             })}
           </svg>
         </div>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full lg:w-auto">
           {Object.entries(data).map(([key, value], index) => {
             const percentage = ((value / total) * 100).toFixed(1);
             return (
               <div key={key} className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: colors[index % colors.length] }}></div>
-                <span className="text-xs text-gray-700 dark:text-gray-300">
+                <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: colors[index % colors.length] }}></div>
+                <span className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 break-words">
                   {key}: {value} ({percentage}%)
                 </span>
               </div>
@@ -142,9 +142,9 @@ function PieChart({ data, title }: { data: Record<string, number>, title: string
 
 function StatCard({ title, value, subtitle }: { title: string, value: string | number, subtitle?: string }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
-      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</h3>
-      <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">{value}</p>
+    <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 shadow-sm">
+      <h3 className="text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400">{title}</h3>
+      <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mt-1 sm:mt-2">{value}</p>
       {subtitle && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{subtitle}</p>}
     </div>
   );
@@ -763,10 +763,10 @@ export default function AdminDashboard() {
       </div>
       
       {/* Tab Navigation */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0 pb-4">
-        <div className="flex space-x-4 border-b border-gray-200 dark:border-gray-700 w-full sm:w-auto">
+      <div className="flex flex-col space-y-4 pb-4">
+        <div className="flex flex-wrap gap-1 border-b border-gray-200 dark:border-gray-700">
           <button
-            className={`py-2 px-4 ${
+            className={`py-2 px-3 text-sm sm:px-4 sm:text-base whitespace-nowrap ${
               activeTab === 'analytics'
                 ? 'border-b-2 border-blue-600 font-medium text-blue-600'
                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
@@ -776,7 +776,7 @@ export default function AdminDashboard() {
             Analytics
           </button>
           <button
-            className={`py-2 px-4 ${
+            className={`py-2 px-3 text-sm sm:px-4 sm:text-base whitespace-nowrap ${
               activeTab === 'users'
                 ? 'border-b-2 border-blue-600 font-medium text-blue-600'
                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
@@ -786,7 +786,7 @@ export default function AdminDashboard() {
             Users
           </button>
           <button
-            className={`py-2 px-4 ${
+            className={`py-2 px-3 text-sm sm:px-4 sm:text-base whitespace-nowrap ${
               activeTab === 'bookings'
                 ? 'border-b-2 border-blue-600 font-medium text-blue-600'
                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
@@ -796,16 +796,16 @@ export default function AdminDashboard() {
             Bookings
           </button>
         </div>
-        
+
         {/* Data refresh controls */}
-        <div className="flex items-center space-x-4 w-full sm:w-auto justify-end">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
           <div className="flex items-center space-x-2">
             <span className="text-sm text-gray-500 dark:text-gray-400">
               Auto-refresh
             </span>
             <label className="relative inline-flex items-center cursor-pointer">
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 className="sr-only peer"
                 checked={autoRefreshEnabled}
                 onChange={(e) => setAutoRefreshEnabled(e.target.checked)}
@@ -813,39 +813,41 @@ export default function AdminDashboard() {
               <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
             </label>
           </div>
-          
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            Updated: {lastRefreshed.toLocaleTimeString()}
+
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+            <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+              Updated: {lastRefreshed.toLocaleTimeString()}
+            </div>
+
+            <button
+              onClick={handleManualRefresh}
+              disabled={bookingsLoading}
+              className="flex items-center px-3 py-1.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors disabled:opacity-50 text-sm"
+            >
+              {bookingsLoading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-700 dark:text-blue-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Refreshing...
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Refresh
+                </>
+              )}
+            </button>
           </div>
-          
-          <button
-            onClick={handleManualRefresh}
-            disabled={bookingsLoading}
-            className="flex items-center px-3 py-1.5 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors disabled:opacity-50"
-          >
-            {bookingsLoading ? (
-              <>
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-700 dark:text-blue-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Refreshing...
-              </>
-            ) : (
-              <>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                Refresh
-              </>
-            )}
-          </button>
         </div>
       </div>
       
       {activeTab === 'analytics' ? (
-        <div className="space-y-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="space-y-6 sm:space-y-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
             {/* Time Period Analytics */}
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
               <div className="flex justify-between items-center mb-4">
@@ -1161,13 +1163,13 @@ export default function AdminDashboard() {
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                   <thead className="bg-gray-50 dark:bg-gray-700">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date & Time</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Customer</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Contact</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Service</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Seats</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Location</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Amount</th>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date & Time</th>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Customer</th>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell">Contact</th>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Service</th>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">Seats</th>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Location</th>
+                      <th className="px-3 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Amount</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -1177,7 +1179,7 @@ export default function AdminDashboard() {
                         className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
                         onClick={() => handleBookingClick(booking)}
                       >
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900 dark:text-white">
                             {new Date(booking.date).toLocaleDateString()}
                           </div>
@@ -1185,7 +1187,7 @@ export default function AdminDashboard() {
                             {booking.time}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900 dark:text-white">
                             {booking.first_name} {booking.last_name}
                           </div>
@@ -1201,7 +1203,7 @@ export default function AdminDashboard() {
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                           <div className="text-sm text-gray-900 dark:text-white">
                             {booking.email}
                           </div>
@@ -1209,7 +1211,7 @@ export default function AdminDashboard() {
                             {booking.phone}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900 dark:text-white">
                             {booking.duration} min
                           </div>
@@ -1217,11 +1219,11 @@ export default function AdminDashboard() {
                             Group size: {booking.group_size}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap hidden md:table-cell">
                           {booking.seat_data ? (
                             <div className="flex flex-wrap gap-1">
-                              {(typeof booking.seat_data === 'string' 
-                                ? JSON.parse(booking.seat_data) 
+                              {(typeof booking.seat_data === 'string'
+                                ? JSON.parse(booking.seat_data)
                                 : booking.seat_data
                               ).map((seat: {seatId: number, name: string}) => (
                                 <span key={seat.seatId} className="inline-flex items-center px-1.5 py-0.5 bg-blue-100 text-blue-800 text-xs rounded dark:bg-blue-900 dark:text-blue-300">
@@ -1233,16 +1235,16 @@ export default function AdminDashboard() {
                             <span className="text-xs text-gray-500 dark:text-gray-400">No seat data</span>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            booking.location === 'midtown' 
-                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
+                            booking.location === 'midtown'
+                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
                               : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                           }`}>
                             {booking.location === 'midtown' ? 'Midtown' : 'Conyers'}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900 dark:text-white">
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900 dark:text-white">
                           {formatCurrency(booking.amount)}
                         </td>
                       </tr>
@@ -1343,52 +1345,52 @@ export default function AdminDashboard() {
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-700">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Address</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Phone</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Age</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Gender</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Race</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Education</th>
-                      <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                    <th className="px-3 sm:px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                    <th className="px-3 sm:px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden md:table-cell">Address</th>
+                    <th className="px-3 sm:px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell">Phone</th>
+                    <th className="px-3 sm:px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Age</th>
+                    <th className="px-3 sm:px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden sm:table-cell">Gender</th>
+                    <th className="px-3 sm:px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden lg:table-cell">Race</th>
+                    <th className="px-3 sm:px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider hidden lg:table-cell">Education</th>
+                      <th className="px-3 sm:px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
                   {profiles.map((p) => (
                     <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                          <div className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
                             {p.avatar_url ? (
                               // eslint-disable-next-line @next/next/no-img-element
-                              <img src={p.avatar_url} alt="" className="h-10 w-10 rounded-full object-cover" />
+                              <img src={p.avatar_url} alt="" className="h-8 w-8 sm:h-10 sm:w-10 rounded-full object-cover" />
                             ) : (
-                              <span className="text-gray-500 dark:text-gray-400 text-sm font-medium">
+                              <span className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm font-medium">
                                 {p.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                               </span>
                             )}
                           </div>
-                          <div className="ml-4">
+                          <div className="ml-2 sm:ml-4">
                             <div className="text-sm font-medium text-gray-900 dark:text-white">{p.name}</div>
                           </div>
                         </div>
                       </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{p.address || '-'}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 hidden md:table-cell">{p.address || '-'}</td>
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 hidden sm:table-cell">
                           {p.phone ? (
                         <a href={`tel:${p.phone}`} className="hover:text-blue-600 dark:hover:text-blue-400">{p.phone}</a>
                           ) : '-'}
                       </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                           <span title={p.dob || ''}>
                             {calculateAge(p.dob) !== null ? `${calculateAge(p.dob)} years` : '-'}
                           </span>
                         </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{formatDemographic(p.gender)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{formatDemographic(p.race)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">{formatDemographic(p.education)}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right space-x-2">
-                          <button 
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 hidden sm:table-cell">{formatDemographic(p.gender)}</td>
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 hidden lg:table-cell">{formatDemographic(p.race)}</td>
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 hidden lg:table-cell">{formatDemographic(p.education)}</td>
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-right space-x-2">
+                          <button
                             onClick={() => handleEditUser(p)}
                             className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                           >
