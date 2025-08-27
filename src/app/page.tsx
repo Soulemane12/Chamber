@@ -61,9 +61,9 @@ export default function Home() {
 
         {/* Video Player */}
         <div className="mb-16 animate-fade-in">
-          <div className="w-full flex justify-center">
+          <div className="max-w-lg mx-auto">
             <video 
-              className="w-full max-w-[200px] md:max-w-[150px] lg:max-w-[120px] xl:max-w-[100px] mx-auto rounded-lg shadow-lg" 
+              className="w-full rounded-lg shadow-lg" 
               controls 
               preload="metadata"
               poster="/logo.png"
