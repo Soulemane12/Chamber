@@ -82,7 +82,7 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
               {/* Dropdown Menu */}
               <div
                 className={`dropdown-menu absolute top-full left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 transition-all duration-200 ${
-                  isProductsDropdownOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'
+                  isProductsDropdownOpen ? 'block opacity-100 visible translate-y-0' : 'hidden opacity-0 invisible -translate-y-2'
                 }`}
                 onMouseEnter={() => setIsProductsDropdownOpen(true)}
                 onMouseLeave={() => setIsProductsDropdownOpen(false)}
