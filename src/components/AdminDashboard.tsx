@@ -710,30 +710,103 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-8">
       {/* Summary Statistics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard 
-          title="Total Bookings" 
-          value={totalBookings} 
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <StatCard
+          title="Total Bookings"
+          value={totalBookings}
           subtitle="All time"
         />
 
-        <StatCard 
-          title="Average Booking Value" 
-          value="N/A" 
+        <StatCard
+          title="Average Booking Value"
+          value="N/A"
           subtitle={`Last updated: ${lastRefreshed.toLocaleTimeString()}`}
         />
-        <StatCard 
-          title="Users" 
-          value={profiles.length} 
+        <StatCard
+          title="Users"
+          value={profiles.length}
           subtitle="Total registered users"
+        />
+        <StatCard
+          title="Active Sessions"
+          value="0"
+          subtitle="Currently running"
         />
       </div>
       
-      {/* Tab Navigation */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0 pb-4">
-        <div className="flex space-x-4 border-b border-gray-200 dark:border-gray-700 w-full sm:w-auto">
+      {/* Mobile Tab Navigation */}
+      <div className="md:hidden mb-6">
+        <div className="grid grid-cols-3 gap-2">
           <button
-            className={`py-2 px-4 ${
+            className={`py-2 px-3 text-xs font-medium rounded-lg transition-colors ${
+              activeTab === 'analytics'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
+            onClick={() => setActiveTab('analytics')}
+          >
+            Analytics
+          </button>
+          <button
+            className={`py-2 px-3 text-xs font-medium rounded-lg transition-colors ${
+              activeTab === 'users'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
+            onClick={() => setActiveTab('users')}
+          >
+            Users
+          </button>
+          <button
+            className={`py-2 px-3 text-xs font-medium rounded-lg transition-colors ${
+              activeTab === 'bookings'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
+            onClick={() => setActiveTab('bookings')}
+          >
+            Bookings
+          </button>
+        </div>
+        <div className="grid grid-cols-3 gap-2 mt-2">
+          <button
+            className={`py-2 px-3 text-xs font-medium rounded-lg transition-colors ${
+              activeTab === 'calendar'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
+            onClick={() => setActiveTab('calendar')}
+          >
+            Calendar
+          </button>
+          <button
+            className={`py-2 px-3 text-xs font-medium rounded-lg transition-colors ${
+              activeTab === 'chambers'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
+            onClick={() => setActiveTab('chambers')}
+          >
+            Chambers
+          </button>
+          <button
+            className={`py-2 px-3 text-xs font-medium rounded-lg transition-colors ${
+              activeTab === 'assessments'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
+            onClick={() => setActiveTab('assessments')}
+          >
+            Assessments
+          </button>
+        </div>
+      </div>
+
+      {/* Desktop Tab Navigation */}
+      <div className="hidden md:flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0 pb-4">
+        <div className="flex space-x-4 border-b border-gray-200 dark:border-gray-700 w-full md:w-auto overflow-x-auto">
+          <button
+            className={`py-2 px-4 whitespace-nowrap ${
               activeTab === 'analytics'
                 ? 'border-b-2 border-blue-600 font-medium text-blue-600'
                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
@@ -743,7 +816,7 @@ export default function AdminDashboard() {
             Analytics
           </button>
           <button
-            className={`py-2 px-4 ${
+            className={`py-2 px-4 whitespace-nowrap ${
               activeTab === 'users'
                 ? 'border-b-2 border-blue-600 font-medium text-blue-600'
                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
@@ -753,7 +826,7 @@ export default function AdminDashboard() {
             Users
           </button>
           <button
-            className={`py-2 px-4 ${
+            className={`py-2 px-4 whitespace-nowrap ${
               activeTab === 'bookings'
                 ? 'border-b-2 border-blue-600 font-medium text-blue-600'
                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
@@ -763,7 +836,7 @@ export default function AdminDashboard() {
             Bookings
           </button>
           <button
-            className={`py-2 px-4 ${
+            className={`py-2 px-4 whitespace-nowrap ${
               activeTab === 'calendar'
                 ? 'border-b-2 border-blue-600 font-medium text-blue-600'
                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
@@ -773,7 +846,7 @@ export default function AdminDashboard() {
             Calendar
           </button>
           <button
-            className={`py-2 px-4 ${
+            className={`py-2 px-4 whitespace-nowrap ${
               activeTab === 'chambers'
                 ? 'border-b-2 border-blue-600 font-medium text-blue-600'
                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
@@ -783,7 +856,7 @@ export default function AdminDashboard() {
             Chambers
           </button>
           <button
-            className={`py-2 px-4 ${
+            className={`py-2 px-4 whitespace-nowrap ${
               activeTab === 'assessments'
                 ? 'border-b-2 border-blue-600 font-medium text-blue-600'
                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
@@ -794,15 +867,15 @@ export default function AdminDashboard() {
           </button>
         </div>
         
-        {/* Data refresh controls */}
-        <div className="flex items-center space-x-4 w-full sm:w-auto justify-end">
+        {/* Desktop Data refresh controls */}
+        <div className="hidden md:flex items-center space-x-4 w-full md:w-auto justify-end">
           <div className="flex items-center space-x-2">
             <span className="text-sm text-gray-500 dark:text-gray-400">
               Auto-refresh
             </span>
             <label className="relative inline-flex items-center cursor-pointer">
-              <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 className="sr-only peer"
                 checked={autoRefreshEnabled}
                 onChange={(e) => setAutoRefreshEnabled(e.target.checked)}
@@ -810,11 +883,11 @@ export default function AdminDashboard() {
               <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
             </label>
           </div>
-          
+
           <div className="text-sm text-gray-500 dark:text-gray-400">
             Updated: {lastRefreshed.toLocaleTimeString()}
           </div>
-          
+
           <button
             onClick={handleManualRefresh}
             disabled={bookingsLoading}
@@ -837,6 +910,51 @@ export default function AdminDashboard() {
               </>
             )}
           </button>
+        </div>
+
+        {/* Mobile Data refresh controls */}
+        <div className="md:hidden flex flex-col space-y-3 w-full">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                Auto-refresh
+              </span>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={autoRefreshEnabled}
+                  onChange={(e) => setAutoRefreshEnabled(e.target.checked)}
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+            <button
+              onClick={handleManualRefresh}
+              disabled={bookingsLoading}
+              className="flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 text-sm font-medium"
+            >
+              {bookingsLoading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Refreshing...
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Refresh
+                </>
+              )}
+            </button>
+          </div>
+          <div className="text-center text-xs text-gray-500 dark:text-gray-400">
+            Last updated: {lastRefreshed.toLocaleTimeString()}
+          </div>
         </div>
       </div>
       

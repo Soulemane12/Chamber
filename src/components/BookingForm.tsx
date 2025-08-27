@@ -601,9 +601,49 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         </div>
       )}
       
-      <div className="flex flex-wrap border-b border-gray-200 dark:border-gray-700">
+      {/* Mobile Step Indicator */}
+      <div className="md:hidden mb-6">
+        <div className="flex items-center justify-center space-x-2 mb-4">
+          {[1, 2, 3, 4].map((step) => (
+            <div key={step} className="flex items-center">
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+                  step === currentStep
+                    ? "bg-blue-600 text-white"
+                    : step < currentStep
+                    ? "bg-green-500 text-white"
+                    : "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                }`}
+              >
+                {step < currentStep ? "✓" : step}
+              </div>
+              {step < 4 && (
+                <div
+                  className={`w-8 h-0.5 mx-1 transition-colors ${
+                    step < currentStep ? "bg-green-500" : "bg-gray-200 dark:bg-gray-700"
+                  }`}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="text-center">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Step {currentStep} of 4
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            {isGuest
+              ? ["Your Information", "Select Location", "Booking Details", "Seating Options"][currentStep - 1]
+              : ["Select Location", "Booking Details", "Seating Options", "Confirmation"][currentStep - 1]
+            }
+          </p>
+        </div>
+      </div>
+
+      {/* Desktop Step Indicator */}
+      <div className="hidden md:flex flex-wrap border-b border-gray-200 dark:border-gray-700">
         <button
-          className={`flex-1 py-4 text-center transition-all-300 text-xs sm:text-sm md:text-base ${
+          className={`flex-1 py-4 px-2 text-center transition-all-300 text-sm lg:text-base ${
             currentStep === 1
               ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
               : "text-gray-500 dark:text-gray-400"
@@ -614,7 +654,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
           <span className="block">1. {isGuest ? "Your Information" : "Select Location"}</span>
         </button>
         <button
-          className={`flex-1 py-4 text-center transition-all-300 text-xs sm:text-sm md:text-base ${
+          className={`flex-1 py-4 px-2 text-center transition-all-300 text-sm lg:text-base ${
             currentStep === 2
               ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
               : "text-gray-500 dark:text-gray-400"
@@ -625,7 +665,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
           <span className="block">2. {isGuest ? "Select Location" : "Booking Details"}</span>
         </button>
         <button
-          className={`flex-1 py-4 text-center transition-all-300 text-xs sm:text-sm md:text-base ${
+          className={`flex-1 py-4 px-2 text-center transition-all-300 text-sm lg:text-base ${
             currentStep === 3
               ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
               : "text-gray-500 dark:text-gray-400"
@@ -636,7 +676,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
           <span className="block">3. {isGuest ? "Booking Details" : "Seating Options"}</span>
         </button>
         <button
-          className={`flex-1 py-4 text-center transition-all-300 text-xs sm:text-sm md:text-base ${
+          className={`flex-1 py-4 px-2 text-center transition-all-300 text-sm lg:text-base ${
             currentStep === 4
               ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
               : "text-gray-500 dark:text-gray-400"
@@ -679,57 +719,61 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
           <div className="space-y-6 animate-fade-in">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Your Information</h2>
             
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-6">
                 <div>
-                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     First Name *
                   </label>
                   <input
                     id="firstName"
                     {...register("firstName")}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-base"
+                    placeholder="Enter your first name"
                   />
                   {errors.firstName && (
                     <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.firstName.message}</p>
                   )}
                 </div>
                 <div>
-                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Last Name *
                   </label>
                   <input
                     id="lastName"
                     {...register("lastName")}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-base"
+                    placeholder="Enter your last name"
                   />
                   {errors.lastName && (
                     <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.lastName.message}</p>
                   )}
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Email *
                   </label>
                   <input
                     id="email"
                     type="email"
                     {...register("email")}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-base"
+                    placeholder="your.email@example.com"
                   />
                   {errors.email && (
                     <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>
                   )}
                 </div>
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Phone *
                   </label>
                   <input
                     id="phone"
                     type="tel"
                     {...register("phone")}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-base"
+                    placeholder="+1 (555) 123-4567"
                   />
                   {errors.phone && (
                     <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.phone.message}</p>
@@ -738,17 +782,17 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               </div>
               
               {/* Demographic Information Section - Added for guests */}
-              <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Demographic Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
+                <h3 className="text-base sm:text-lg font-semibold mb-4 text-gray-900 dark:text-white">Demographic Information</h3>
+                <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-6">
                   <div>
-                    <label htmlFor="gender" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label htmlFor="gender" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Gender *
                     </label>
                     <select
                       id="gender"
                       {...register("gender")}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-base"
                     >
                       <option value="">Select your gender</option>
                       <option value="male">Male</option>
@@ -762,13 +806,13 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     )}
                   </div>
                   <div>
-                    <label htmlFor="age" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label htmlFor="age" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Age Range *
                     </label>
                     <select
                       id="age"
                       {...register("age")}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-base"
                     >
                       <option value="">Select your age range</option>
                       <option value="18">18-24</option>
@@ -784,13 +828,13 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     )}
                   </div>
                   <div>
-                    <label htmlFor="race" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label htmlFor="race" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Race/Ethnicity *
                     </label>
                     <select
                       id="race"
                       {...register("race")}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-base"
                     >
                       <option value="">Select your race/ethnicity</option>
                       <option value="asian">Asian</option>
@@ -807,13 +851,13 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     )}
                   </div>
                   <div>
-                    <label htmlFor="education" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    <label htmlFor="education" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Education Level *
                     </label>
                     <select
                       id="education"
                       {...register("education")}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-base"
                     >
                       <option value="">Select your education level</option>
                       <option value="high_school">High School or equivalent</option>
@@ -828,14 +872,14 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.education.message}</p>
                     )}
                   </div>
-                  <div className="md:col-span-2">
-                    <label htmlFor="profession" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <div className="sm:col-span-2">
+                    <label htmlFor="profession" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Profession *
                     </label>
                     <select
                       id="profession"
                       {...register("profession")}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      className="w-full px-3 sm:px-4 py-3 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-base"
                     >
                       <option value="">Select your profession</option>
                       <option value="healthcare">Healthcare Professional</option>
@@ -861,14 +905,16 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               </div>
               
               <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <Button 
-                  type="button" 
-                  onClick={nextStep}
-                  isLoading={isStepLoading}
-                  className="w-full sm:w-auto float-right"
-                >
-                  Continue to Booking Details
-                </Button>
+                <div className="flex justify-end">
+                  <Button
+                    type="button"
+                    onClick={nextStep}
+                    isLoading={isStepLoading}
+                    className="w-full sm:w-auto px-6 py-3 text-base font-medium"
+                  >
+                    Continue to Booking Details
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -992,27 +1038,29 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                 </div>
               )}
 
-              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-between">
-                {isGuest && (
-                  <Button 
-                    type="button" 
-                    onClick={prevStep}
-                    variant="outline"
+              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex flex-col sm:flex-row gap-3 sm:justify-between">
+                  {isGuest && (
+                    <Button
+                      type="button"
+                      onClick={prevStep}
+                      variant="outline"
+                      isLoading={isStepLoading}
+                      className="w-full sm:w-auto px-6 py-3 text-base font-medium order-2 sm:order-1"
+                    >
+                      Back
+                    </Button>
+                  )}
+                  <Button
+                    type="button"
+                    onClick={nextStep}
                     isLoading={isStepLoading}
-                    className="w-full sm:w-auto"
+                    className={`w-full sm:w-auto px-6 py-3 text-base font-medium ${isGuest ? 'order-1 sm:order-2' : ''}`}
+                    disabled={!watch("location") || isStepLoading}
                   >
-                    Back
+                    Continue to Booking Details
                   </Button>
-                )}
-                <Button 
-                  type="button" 
-                  onClick={nextStep}
-                  isLoading={isStepLoading}
-                  className={`w-full sm:w-auto ${isGuest ? 'sm:ml-auto' : ''}`}
-                  disabled={!watch("location") || isStepLoading}
-                >
-                  Continue to Booking Details
-                </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -1275,22 +1323,22 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               ></textarea>
             </div>
 
-            <div className="pt-4 flex justify-end">
-              <div className="flex justify-between w-full">
-                <Button 
-                  type="button" 
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex flex-col sm:flex-row gap-3 sm:justify-between">
+                <Button
+                  type="button"
                   onClick={prevStep}
                   variant="outline"
                   isLoading={isStepLoading}
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto px-6 py-3 text-base font-medium order-2 sm:order-1"
                 >
                   Back to Location
                 </Button>
-                <Button 
-                  type="button" 
+                <Button
+                  type="button"
                   onClick={nextStep}
                   isLoading={isStepLoading}
-                  className="w-full sm:w-auto ml-auto"
+                  className="w-full sm:w-auto px-6 py-3 text-base font-medium order-1 sm:order-2"
                 >
                   Continue to Seating Options
                 </Button>
@@ -1438,21 +1486,21 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               </div>
             </div>
 
-            <div className="pt-4 flex justify-end">
-              <div className="flex justify-between w-full">
-                <Button 
-                  type="button" 
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex flex-col sm:flex-row gap-3 sm:justify-between">
+                <Button
+                  type="button"
                   onClick={prevStep}
                   variant="outline"
                   isLoading={isStepLoading}
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto px-6 py-3 text-base font-medium order-2 sm:order-1"
                 >
                   Back to Booking Details
                 </Button>
-                <Button 
+                <Button
                   type="submit"
                   isLoading={isSubmitting}
-                  className="w-full sm:w-auto ml-auto"
+                  className="w-full sm:w-auto px-6 py-3 text-base font-medium order-1 sm:order-2"
                 >
                   Complete Booking
                 </Button>
