@@ -62,7 +62,7 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
                 onClick={() => setIsProductsDropdownOpen(!isProductsDropdownOpen)}
                 onMouseEnter={() => setIsProductsDropdownOpen(true)}
                 onMouseLeave={() => setIsProductsDropdownOpen(false)}
-                className={`flex items-center justify-center space-x-1 ${
+                className={`flex items-center justify-center space-x-1 w-full sm:w-auto text-center ${
                   currentPage === 'products' 
                     ? "text-blue-600 dark:text-blue-400 font-medium" 
                     : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
