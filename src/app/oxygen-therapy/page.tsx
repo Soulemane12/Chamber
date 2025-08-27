@@ -64,9 +64,9 @@ export default function OxygenTherapy() {
 
         {/* Video Player */}
         <div className="mb-16 animate-fade-in">
-          <div className="max-w-lg lg:max-w-md xl:max-w-sm mx-auto">
+          <div className="w-full flex justify-center">
             <video 
-              className="w-full max-w-[280px] md:max-w-[250px] lg:max-w-[220px] xl:max-w-[200px] mx-auto rounded-lg shadow-lg" 
+              className="w-full max-w-[200px] md:max-w-[150px] lg:max-w-[120px] xl:max-w-[100px] mx-auto rounded-lg shadow-lg" 
               controls 
               preload="metadata"
               poster="/logo.png"
