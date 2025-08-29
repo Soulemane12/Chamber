@@ -64,7 +64,7 @@ export default function OxygenTherapy() {
 
         {/* Video Player */}
         <div className="mb-16 animate-fade-in">
-          <div className="max-w-sm mx-auto">
+          <div className="max-w-[320px] mx-auto">
             <video 
               className="w-full rounded-lg shadow-lg" 
               controls 
