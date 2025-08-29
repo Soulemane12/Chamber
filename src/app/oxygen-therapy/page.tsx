@@ -62,21 +62,7 @@ export default function OxygenTherapy() {
           </div>
         </div>
 
-        {/* Video Player */}
-        <div className="mb-16 animate-fade-in">
-          <div className="max-w-[320px] mx-auto">
-            <video 
-              className="w-full rounded-lg shadow-lg" 
-              controls 
-              preload="metadata"
-              poster="/logo.png"
-            >
-              <source src="/Wellnex_vid.MOV" type="video/quicktime" />
-              <source src="/Wellnex_vid.MOV" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-        </div>
+        
 
         {/* Technical Details */}
         <div className="mb-16 animate-fade-in">
