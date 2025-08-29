@@ -11,26 +11,29 @@ interface Accessory {
   id: string;
   name: string;
   price: number;
-  description: string;
+  description?: string;
 }
 
 const accessories: Accessory[] = [
-  { id: 'tv', name: 'TV & Entertainment System', price: 500, description: '32" Smart TV with mounting bracket' },
-  { id: 'couch', name: 'Comfortable Couch', price: 800, description: 'Premium leather couch for relaxation' },
-  { id: 'chairs', name: 'Ergonomic Chairs', price: 300, description: 'Set of 2 ergonomic chairs' },
-  { id: 'ac', name: 'Air Conditioning Unit', price: 1200, description: 'Built-in AC system for temperature control' },
-  { id: 'massage', name: 'Massage Table', price: 600, description: 'Professional massage table with padding' }
+  { id: 'premium_couch', name: 'Premium couch', price: 1000 },
+  { id: 'stadium_seating', name: 'Stadium seating', price: 875 },
+  { id: 'ac_unit', name: 'Air conditioner unit', price: 990 },
+  { id: 'massage_table', name: 'Massage table', price: 725 },
+  { id: 'ottoman', name: 'Ottoman', price: 589 },
+  { id: 'custom_wrap', name: 'Custom wrap', price: 1700 },
+  { id: 'custom_logo', name: 'Custom logo', price: 1380 },
 ];
 
 export default function O2BoxT2R() {
   const { t } = useLanguage();
   const [selectedAccessories, setSelectedAccessories] = useState<string[]>([]);
   const [deliveryDate, setDeliveryDate] = useState('');
+  const [deliveryTime, setDeliveryTime] = useState('');
+  const [addressOrZip, setAddressOrZip] = useState('');
   const [paymentOption, setPaymentOption] = useState<'half' | 'full' | 'financing'>('full');
   
-  // Pricing (client will provide actual prices)
-  const basePrice = 25000; // Base price for T2-R
-  const deliveryInstallPrice = 1500; // Flat rate for all 50 states
+  // Pricing
+  const basePrice = 95000; // Base price for T2-R
   
   const selectedAccessoriesTotal = selectedAccessories.reduce((total, accessoryId) => {
     const accessory = accessories.find(a => a.id === accessoryId);
@@ -38,7 +41,7 @@ export default function O2BoxT2R() {
   }, 0);
   
   const subtotal = basePrice + selectedAccessoriesTotal;
-  const total = subtotal + deliveryInstallPrice;
+  const total = subtotal; // Delivery & install included
   const upfrontPayment = paymentOption === 'half' ? total / 2 : total;
 
   const handleAccessoryToggle = (accessoryId: string) => {
@@ -153,10 +156,24 @@ export default function O2BoxT2R() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Left Column - Options */}
               <div className="space-y-8">
-                {/* Optional Accessories */}
+                {/* Included Items */}
                 <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
                   <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-                    Optional Accessories
+                    Included with Purchase
+                  </h3>
+                  <ul className="space-y-2 text-gray-700 dark:text-gray-300">
+                    <li>• Delivery & Installation</li>
+                    <li>• TV</li>
+                    <li>• Chairs</li>
+                    <li>• AC</li>
+                    <li>• 3-year warranty</li>
+                  </ul>
+                </div>
+
+                {/* Optional Add-ons */}
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                  <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                    Optional Add-ons
                   </h3>
                   <div className="space-y-3">
                     {accessories.map((accessory) => (
@@ -171,7 +188,9 @@ export default function O2BoxT2R() {
                           <div className="flex justify-between items-start">
                             <div>
                               <p className="font-medium text-gray-900 dark:text-white">{accessory.name}</p>
-                              <p className="text-sm text-gray-600 dark:text-gray-300">{accessory.description}</p>
+                              {accessory.description && (
+                                <p className="text-sm text-gray-600 dark:text-gray-300">{accessory.description}</p>
+                              )}
                             </div>
                             <p className="font-semibold text-blue-600">${accessory.price.toLocaleString()}</p>
                           </div>
@@ -181,20 +200,12 @@ export default function O2BoxT2R() {
                   </div>
                 </div>
 
-                {/* Delivery Options */}
+                {/* Delivery Scheduling */}
                 <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
                   <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-                    Delivery & Installation
+                    Delivery & Installation Scheduling
                   </h3>
                   <div className="space-y-4">
-                    <div>
-                      <p className="text-gray-600 dark:text-gray-300 mb-2">
-                        <strong>Flat Rate:</strong> ${deliveryInstallPrice.toLocaleString()} for all 50 states
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Includes delivery, installation, and setup
-                      </p>
-                    </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Preferred Delivery Date
@@ -204,6 +215,29 @@ export default function O2BoxT2R() {
                         value={deliveryDate}
                         onChange={(e) => setDeliveryDate(e.target.value)}
                         min={new Date().toISOString().split('T')[0]}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Preferred Delivery Time
+                      </label>
+                      <input
+                        type="time"
+                        value={deliveryTime}
+                        onChange={(e) => setDeliveryTime(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Address or ZIP Code
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Enter your address or ZIP code"
+                        value={addressOrZip}
+                        onChange={(e) => setAddressOrZip(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                       />
                     </div>
@@ -289,11 +323,6 @@ export default function O2BoxT2R() {
                     </div>
                   )}
                   
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-300">Delivery & Installation</span>
-                    <span className="font-medium">${deliveryInstallPrice.toLocaleString()}</span>
-                  </div>
-                  
                   <div className="border-t pt-3">
                     <div className="flex justify-between text-lg font-semibold">
                       <span className="text-gray-900 dark:text-white">Total</span>
@@ -317,7 +346,7 @@ export default function O2BoxT2R() {
 
                 <button
                   onClick={handlePurchase}
-                  disabled={!deliveryDate}
+                  disabled={!deliveryDate || !deliveryTime || !addressOrZip}
                   className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 px-6 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 disabled:cursor-not-allowed"
                 >
                   Purchase Now - ${upfrontPayment.toLocaleString()}
