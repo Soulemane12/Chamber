@@ -51,10 +51,20 @@ export default function Home() {
             <div className="text-center">
               <Link
                 href="/about"
-                className="btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block min-h-[44px] flex items-center justify-center"
+                className="btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block min-h-[44px] flex items-center justify-center mb-8"
               >
                 {t('readMore')}
               </Link>
+              <div className="mt-6">
+                <video 
+                  src="/Wellnex_vid.MOV" 
+                  controls 
+                  className="w-full max-w-md mx-auto rounded-lg shadow-lg"
+                  height="auto"
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
             </div>
           </div>
         </div>
