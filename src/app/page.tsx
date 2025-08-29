@@ -170,7 +170,7 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-xl p-8 text-center text-white">
+          <div className="bg-gradient-to-r from-green-700 to-green-800 rounded-xl p-8 text-center text-white">
             <h3 className="text-2xl font-bold mb-4">
               Wellnex02
             </h3>
@@ -180,19 +180,19 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/contact"
-                className="btn bg-white text-green-600 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block min-h-[44px] flex items-center justify-center w-full sm:w-auto"
+                className="btn bg-white text-green-700 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block min-h-[44px] flex items-center justify-center w-full sm:w-auto"
               >
                 Contact Us
               </Link>
               <Link
                 href="/about"
-                className="btn bg-white text-green-600 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block min-h-[44px] flex items-center justify-center w-full sm:w-auto"
+                className="btn bg-white text-green-700 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block min-h-[44px] flex items-center justify-center w-full sm:w-auto"
               >
                 Learn More
               </Link>
               <Link
                 href="/products"
-                className="btn bg-white text-green-600 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block min-h-[44px] flex items-center justify-center w-full sm:w-auto"
+                className="btn bg-white text-green-700 px-6 py-2 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block min-h-[44px] flex items-center justify-center w-full sm:w-auto"
               >
                 Shop Now
               </Link>

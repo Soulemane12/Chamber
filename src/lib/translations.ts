@@ -65,7 +65,7 @@ export const translations = {
     // About Page
     aboutUs: "About Us",
     aboutOurCompany: "About Our Company",
-    aboutDescription: "Hyperberic O2 Recovery Inc. stands at the forefront of innovation in designing and manufacturing premium hyperbaric oxygen chambers. Founded with a mission to elevate health, wellness, and longevity through cutting-edge oxygen therapy, we are proud to be Asia's leading oxygen chamber manufacturer. Our products are inspired by Japan's esteemed principles of longevity and anti-aging, infusing the timeless secrets of wellness and vitality cherished in Japanese culture into our advanced technology.",
+    aboutDescription: "Wellness O2 stands at the forefront of innovation in designing and manufacturing premium hyperbaric oxygen chambers. Founded with a mission to elevate health, wellness, and longevity through cutting-edge oxygen therapy, we are proud to be Asia's leading oxygen chamber manufacturer. Our products are inspired by Japan's esteemed principles of longevity and anti-aging, infusing the timeless secrets of wellness and vitality cherished in Japanese culture into our advanced technology.",
     aboutDescription2: "In response to the growing demand for holistic health solutions, we are thrilled to introduce our exceptional products to the U.S. market. With a deep-rooted heritage in wellness and a history of enhancing quality of life, we are excited to share our expertise with American consumers. Entering the U.S. market marks a pivotal step as we bring the benefits of hyperbaric oxygen therapy, inspired by Japanese traditions, to support the health and longevity of people in the United States. We're proud to share our unique approach to wellness and longevity on a global scale.",
     ourJourney: "Our Journey",
     journeyDescription: "Our company was inspired by a noticeable gap in the market. In Japan, traditional oxygen capsules are predominantly high-pressure medical devices, operating at 2.0 to 3.0 atmospheres, making them both expensive and less accessible for daily use. On the other hand, the U.S. market mainly offered 1.3 atmosphere oxygen capsules, which, though effective, often faced challenges with durability and usability due to their soft structure.",
@@ -75,7 +75,7 @@ export const translations = {
     userFriendly: "User-Friendly: Our products are fully automated, making them the first completely unmanned models in the industry.",
     maintainedWithExcellence: "Maintained with Excellence: We assure the quality and safety of our products.",
     ourTechnology: "Our Technology",
-    technologyDescription: "At Hyperberic O2 Recovery Inc., we take pride in our state-of-the-art technology and holistic approach to the hyperbaric oxygen chamber industry. We actively participate in every phase of the value chain, encompassing development, design, manufacturing, assembly, and after-service maintenance.",
+    technologyDescription: "At Wellness O2, we take pride in our state-of-the-art technology and holistic approach to the hyperbaric oxygen chamber industry. We actively participate in every phase of the value chain, encompassing development, design, manufacturing, assembly, and after-service maintenance.",
     innovationAndExcellence: "Innovation and Excellence",
     innovationDescription: "Our hyperbaric oxygen chambers are backed by over 25 years of expertise and innovation. We proudly hold the esteemed CE marking for Medical Device Class IIb (TB2-45V model) and comply with the international ISO 13485 standard for quality management systems in medical devices.",
     ourDedication: "Our Dedication",
@@ -84,7 +84,7 @@ export const translations = {
     salesKnowHow: "Sales Know-How: We leverage our extensive experience and success in the oxygen industry to assist our clients in maximizing the benefits and profitability of our products.",
     lookingAhead: "Looking Ahead",
     lookingAheadDescription: "As we expand our global presence, especially in the U.S. market, we remain steadfast in our commitment to our core values of quality, innovation, and customer satisfaction. We eagerly anticipate the opportunity to share the benefits of hyperbaric oxygen therapy with more people around the world.",
-    thankYou: "Thank you for choosing Hyperberic O2 Recovery Inc. We sincerely appreciate your trust and support.",
+    thankYou: "Thank you for choosing Wellness O2. We sincerely appreciate your trust and support.",
     
     // Oxygen Therapy Page
     oxygenTherapyTitle: "The Benefits of Oxygen Therapy",

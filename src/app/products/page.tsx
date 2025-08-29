@@ -49,19 +49,19 @@ export default function Products() {
               
               <div className="space-y-3 mb-6">
                 <div className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-green-700 mr-2">✓</span>
                   <span className="text-gray-600 dark:text-gray-300">1.3 ATA pressure</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-green-700 mr-2">✓</span>
                   <span className="text-gray-600 dark:text-gray-300">Compact design</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-green-700 mr-2">✓</span>
                   <span className="text-gray-600 dark:text-gray-300">Easy setup</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-green-700 mr-2">✓</span>
                   <span className="text-gray-600 dark:text-gray-300">Quiet operation</span>
                 </div>
               </div>
@@ -95,19 +95,19 @@ export default function Products() {
               
               <div className="space-y-3 mb-6">
                 <div className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-green-700 mr-2">✓</span>
                   <span className="text-gray-600 dark:text-gray-300">1.3 ATA pressure</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-green-700 mr-2">✓</span>
                   <span className="text-gray-600 dark:text-gray-300">Spacious interior</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-green-700 mr-2">✓</span>
                   <span className="text-gray-600 dark:text-gray-300">Group sessions</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-green-700 mr-2">✓</span>
                   <span className="text-gray-600 dark:text-gray-300">Advanced controls</span>
                 </div>
               </div>
@@ -141,19 +141,19 @@ export default function Products() {
               
               <div className="space-y-3 mb-6">
                 <div className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-green-700 mr-2">✓</span>
                   <span className="text-gray-600 dark:text-gray-300">1.3 ATA pressure</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-green-700 mr-2">✓</span>
                   <span className="text-gray-600 dark:text-gray-300">Large capacity</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-green-700 mr-2">✓</span>
                   <span className="text-gray-600 dark:text-gray-300">Commercial use</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-green-700 mr-2">✓</span>
                   <span className="text-gray-600 dark:text-gray-300">Premium features</span>
                 </div>
               </div>

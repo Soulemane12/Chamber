@@ -66,20 +66,20 @@ export default function About() {
             </p>
             <div className="space-y-4">
               <div className="flex items-start">
-                <span className="text-green-500 mr-3 mt-1">•</span>
+                <span className="text-green-600 mr-3 mt-1">•</span>
                 <p className="text-gray-600 dark:text-gray-300">{t('madeInJapan')}</p>
               </div>
               <div className="flex items-start">
-                <span className="text-green-500 mr-3 mt-1">•</span>
+                <span className="text-green-600 mr-3 mt-1">•</span>
                 <p className="text-gray-600 dark:text-gray-300">{t('userFriendly')}</p>
               </div>
               <div className="flex items-start">
-                <span className="text-green-500 mr-3 mt-1">•</span>
+                <span className="text-green-600 mr-3 mt-1">•</span>
                 <p className="text-gray-600 dark:text-gray-300">{t('maintainedWithExcellence')}</p>
               </div>
             </div>
             <p className="text-gray-600 dark:text-gray-300 mt-6 leading-relaxed">
-              By launching the Hyperberic O2 Recovery in the U.S. market, we strive to share the advantages of our innovative technology and holistic health approach, which is grounded in Japanese principles of longevity and wellness.
+              By launching Wellness O2 in the U.S. market, we strive to share the advantages of our innovative technology and holistic health approach, which is grounded in Japanese principles of longevity and wellness.
             </p>
           </div>
         </div>
