@@ -55,15 +55,15 @@ export default function Home() {
               >
                 {t('readMore')}
               </Link>
-              <div className="mt-6">
-                <div className="max-w-[240px] mx-auto">
+              <div className="mt-6 flex justify-center">
+                <div className="max-w-[400px] mx-auto">
                   <video 
                     src="/Wellnex_vid.MOV" 
                     controls 
                     className="w-full rounded-lg shadow-lg"
-                    width="240"
+                    width="400"
                     height="auto"
-                    style={{ maxWidth: '240px' }}
+                    style={{ maxWidth: '400px', margin: '0 auto' }}
                   >
                     Your browser does not support the video tag.
                   </video>
