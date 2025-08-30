@@ -56,14 +56,16 @@ export default function Home() {
                 {t('readMore')}
               </Link>
               <div className="mt-6">
-                <video 
-                  src="/Wellnex_vid.MOV" 
-                  controls 
-                  className="w-full max-w-md mx-auto rounded-lg shadow-lg"
-                  height="auto"
-                >
-                  Your browser does not support the video tag.
-                </video>
+                <div className="max-w-[320px] mx-auto">
+                  <video 
+                    src="/Wellnex_vid.MOV" 
+                    controls 
+                    className="w-full rounded-lg shadow-lg"
+                    height="auto"
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
               </div>
             </div>
           </div>
