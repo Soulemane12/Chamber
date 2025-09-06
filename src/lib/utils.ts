@@ -39,8 +39,8 @@ export function delay(ms: number): Promise<void> {
 export const locationData = {
   midtown: {
     name: "Midtown Biohack",
-    address: "575 Madison Ave, 20th floor, New York, NY",
-    phone: "+1 (646) 262-8794",
+    address: "575 Madison Ave, 23rd floor, New York, NY",
+    phone: "",
     email: "b.duc@wellnex02.com",
     owner: "Billy Duc",
     features: [

@@ -65,14 +65,14 @@ export async function POST(request: Request) {
     // Location details
     const locationName = bookingData.location === 'midtown' ? 'Midtown Biohack' : 'Platinum Wellness Spa';
     const locationAddress = bookingData.location === 'midtown' 
-      ? '575 Madison Ave, 20th floor, New York, NY' 
+      ? '575 Madison Ave, 23rd floor, New York, NY' 
       : '1900 Parker Rd SE, Conyers, GA 30094';
     
     // Contact information based on location
     const contactInfo = bookingData.location === 'midtown' 
       ? {
           owner: 'Billy Duc',
-          phone: '+1 (646) 262-8794',
+          phone: '',
           email: 'b.duc@wellnex02.com'
         }
       : {
@@ -142,7 +142,7 @@ export async function POST(request: Request) {
           <div style="margin: 20px 0; padding: 15px; background-color: #eff6ff; border-radius: 5px; border-left: 4px solid #3b82f6;">
             <h3 style="color: #1e3a8a; font-size: 16px; margin-bottom: 10px;">Contact Information</h3>
             <p><strong>Owner:</strong> ${contactInfo.owner}</p>
-            <p><strong>Phone:</strong> ${contactInfo.phone}</p>
+            ${contactInfo.phone ? `<p><strong>Phone:</strong> ${contactInfo.phone}</p>` : ''}
             <p><strong>Email:</strong> ${contactInfo.email}</p>
           </div>
           
