@@ -30,13 +30,13 @@ const getLocationData = (location: string) => {
     return {
       owner: "Billy Duc",
       phone: "+1 (646) 262-8794",
-      email: "billydduc@gmail.com"
+      email: "b.duc@wellnex02.com"
     };
   } else {
     return {
       owner: "Billy Duc",
       phone: "+1 (646) 262-8794",
-      email: "billydduc@gmail.com"
+      email: "b.duc@wellnex02.com"
     };
   }
 };

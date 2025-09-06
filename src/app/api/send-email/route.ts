@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'billydduc@gmail.com',
+        user: 'b.duc@wellnex02.com',
         pass: process.env.EMAIL_PASSWORD // This should be set in your environment variables
       }
     });
@@ -102,7 +102,7 @@ export async function POST(request: Request) {
 
     // Email content
     const mailOptions = {
-      from: 'billydduc@gmail.com',
+      from: 'b.duc@wellnex02.com',
       to: bookingData.email,
       subject: 'Your Hyperbaric Chamber Session Confirmation',
       html: `
@@ -129,7 +129,7 @@ export async function POST(request: Request) {
             <h3 style="color: #1e3a8a; font-size: 16px; margin-bottom: 10px;">Contact Information</h3>
             <p><strong>Owner:</strong> Billy Duc</p>
             <p><strong>Phone:</strong> +1 (646) 262-8794</p>
-            <p><strong>Email:</strong> billydduc@gmail.com</p>
+            <p><strong>Email:</strong> b.duc@wellnex02.com</p>
           </div>
           
           <p style="text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px;">
