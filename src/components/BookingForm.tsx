@@ -259,6 +259,24 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
     return isBefore(date, today);
   };
 
+  // Function to scroll to first error field
+  const scrollToFirstError = () => {
+    const firstErrorField = document.querySelector('[data-error="true"]');
+    if (firstErrorField) {
+      firstErrorField.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+      // Focus the field after scrolling
+      setTimeout(() => {
+        const input = firstErrorField.querySelector('input, select, textarea');
+        if (input) {
+          (input as HTMLElement).focus();
+        }
+      }, 500);
+    }
+  };
+
   const onSubmit = async (data: BookingFormData) => {
     setIsSubmitting(true);
     try {
@@ -631,7 +649,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="p-4 sm:p-6 lg:p-8">
+      <form onSubmit={handleSubmit(onSubmit, scrollToFirstError)} className="p-4 sm:p-6 lg:p-8">
         <div className="mb-8 sm:mb-10">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
             Book Your Hyperbaric Chamber Session
@@ -664,7 +682,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
 
             <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 shadow-sm border border-gray-200 dark:border-gray-700">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
+                <div data-error={errors.firstName ? "true" : "false"}>
                   <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     First Name *
                   </label>
@@ -677,7 +695,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.firstName.message}</p>
                   )}
                 </div>
-                <div>
+                <div data-error={errors.lastName ? "true" : "false"}>
                   <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Last Name *
                   </label>
@@ -690,7 +708,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.lastName.message}</p>
                   )}
                 </div>
-                <div>
+                <div data-error={errors.email ? "true" : "false"}>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Email *
                   </label>
@@ -704,7 +722,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>
                   )}
                 </div>
-                <div>
+                <div data-error={errors.phone ? "true" : "false"}>
                   <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Phone *
                   </label>
@@ -724,7 +742,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
                 <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-900 dark:text-white">Demographic Information</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 sm:mb-6">
-                  <div>
+                  <div data-error={errors.gender ? "true" : "false"}>
                     <label htmlFor="gender" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Gender *
                     </label>
@@ -744,7 +762,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.gender.message}</p>
                     )}
                   </div>
-                  <div>
+                  <div data-error={errors.age ? "true" : "false"}>
                     <label htmlFor="age" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Age Range *
                     </label>
@@ -766,7 +784,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.age.message}</p>
                     )}
                   </div>
-                  <div>
+                  <div data-error={errors.race ? "true" : "false"}>
                     <label htmlFor="race" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Race/Ethnicity *
                     </label>
@@ -789,7 +807,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.race.message}</p>
                     )}
                   </div>
-                  <div>
+                  <div data-error={errors.education ? "true" : "false"}>
                     <label htmlFor="education" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Education Level *
                     </label>
@@ -811,7 +829,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.education.message}</p>
                     )}
                   </div>
-                  <div className="md:col-span-2">
+                  <div className="md:col-span-2" data-error={errors.profession ? "true" : "false"}>
                     <label htmlFor="profession" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Profession *
                     </label>
@@ -880,7 +898,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               </div>
             )}
 
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 shadow-sm border border-gray-200 dark:border-gray-700" data-error={errors.location ? "true" : "false"}>
               <div className="grid grid-cols-1 gap-4 mb-4 sm:mb-6">
                 <label
                   className={`
@@ -1062,7 +1080,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
             </div>
 
             <div className="flex flex-col lg:flex-row lg:space-x-6">
-              <div className="lg:w-7/12 mb-6 lg:mb-0">
+              <div className="lg:w-7/12 mb-6 lg:mb-0" data-error={errors.date ? "true" : "false"}>
                 <DatePickerField
                   name="date"
                   label="Select Date *"
@@ -1076,7 +1094,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               </div>
 
               <div className="lg:w-5/12">
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 shadow-sm border border-gray-200 dark:border-gray-700 h-full animate-slide-in-right animate-delay-200">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-3 sm:p-4 shadow-sm border border-gray-200 dark:border-gray-700 h-full animate-slide-in-right animate-delay-200" data-error={errors.time ? "true" : "false"}>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                     Select Time *
                   </label>
@@ -1118,7 +1136,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               </div>
             </div>
 
-            <div className="animate-slide-in-up animate-delay-300">
+            <div className="animate-slide-in-up animate-delay-300" data-error={errors.duration ? "true" : "false"}>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Session Duration *
               </label>
