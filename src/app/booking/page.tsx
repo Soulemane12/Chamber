@@ -34,9 +34,9 @@ const getLocationData = (location: string) => {
     };
   } else {
     return {
-      owner: "Billy Duc",
-      phone: "+1 (646) 262-8794",
-      email: "b.duc@wellnex02.com"
+      owner: "Rebecca Davis & Don Davis",
+      phone: "7708007500",
+      email: "rdavis@platinumbbs.com"
     };
   }
 };

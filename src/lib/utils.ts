@@ -65,9 +65,9 @@ export const locationData = {
   conyers: {
     name: "Platinum Wellness Spa",
     address: "1900 Parker Rd SE, Conyers, GA 30094",
-    phone: "+1 (646) 262-8794",
-    email: "b.duc@wellnex02.com",
-    owner: "Billy Duc",
+    phone: "7708007500",
+    email: "rdavis@platinumbbs.com",
+    owner: "Rebecca Davis & Don Davis",
     features: [
       "Ample free parking",
       "Luxury spa amenities",

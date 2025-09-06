@@ -10,7 +10,7 @@ export const translations = {
     
     // Homepage
     heroTitle: "Experience the Benefits of Hyperbaric Oxygen Therapy (HBOT)",
-    heroSubtitle: "Enhance your recovery, boost performance, and improve overall wellness with Billy Duc's state-of-the-art hyperbaric chambers.",
+    heroSubtitle: "Enhance your recovery, boost performance, and improve overall wellness with our state-of-the-art hyperbaric chambers.",
     bookYourSession: "Book Your Session",
     
     // Benefits
@@ -25,7 +25,7 @@ export const translations = {
     
     // Booking Form
     bookingTitle: "Book Your Hyperbaric Chamber Session",
-    bookingSubtitle: "Fill out the form below to schedule your hyperbaric oxygen therapy session at one of Billy Duc's premium wellness centers.",
+    bookingSubtitle: "Fill out the form below to schedule your hyperbaric oxygen therapy session at one of our premium wellness centers.",
     personalDetails: "Personal Details",
     details: "Details",
     dateTime: "Date & Time",
@@ -92,7 +92,7 @@ export const translations = {
     
     // Homepage
     heroTitle: "Découvrez les bienfaits de l'oxygénothérapie hyperbare (HBOT)",
-    heroSubtitle: "Améliorez votre récupération, augmentez vos performances et votre bien-être avec les chambres hyperbares de pointe de Billy Duc.",
+    heroSubtitle: "Améliorez votre récupération, augmentez vos performances et votre bien-être avec nos chambres hyperbares de pointe.",
     bookYourSession: "Réserver votre séance",
     
     // Benefits
@@ -107,7 +107,7 @@ export const translations = {
     
     // Booking Form
     bookingTitle: "Réservez votre séance de chambre hyperbare",
-    bookingSubtitle: "Remplissez le formulaire ci-dessous pour planifier votre séance d'oxygénothérapie hyperbare dans l'un des centres de bien-être premium de Billy Duc.",
+    bookingSubtitle: "Remplissez le formulaire ci-dessous pour planifier votre séance d'oxygénothérapie hyperbare dans l'un de nos centres de bien-être premium.",
     personalDetails: "Informations personnelles",
     details: "Détails",
     dateTime: "Date et heure",
@@ -174,7 +174,7 @@ export const translations = {
     
     // Homepage
     heroTitle: "Experimente los beneficios de la terapia de oxígeno hiperbárico (HBOT)",
-    heroSubtitle: "Mejore su recuperación, aumente su rendimiento y bienestar general con las cámaras hiperbáricas de última generación de Billy Duc.",
+    heroSubtitle: "Mejore su recuperación, aumente su rendimiento y bienestar general con nuestras cámaras hiperbáricas de última generación.",
     bookYourSession: "Reserve su sesión",
     
     // Benefits
@@ -189,7 +189,7 @@ export const translations = {
     
     // Booking Form
     bookingTitle: "Reserve su sesión de cámara hiperbárica",
-    bookingSubtitle: "Complete el formulario a continuación para programar su sesión de terapia de oxígeno hiperbárico en uno de los centros de bienestar premium de Billy Duc.",
+    bookingSubtitle: "Complete el formulario a continuación para programar su sesión de terapia de oxígeno hiperbárico en uno de nuestros centros de bienestar premium.",
     personalDetails: "Datos personales",
     details: "Detalles",
     dateTime: "Fecha y hora",
@@ -256,7 +256,7 @@ export const translations = {
     
     // Homepage
     heroTitle: "体验高压氧疗法 (HBOT) 的益处",
-    heroSubtitle: "通过Billy Duc的先进高压氧舱，提升恢复能力，增强表现，改善整体健康。",
+    heroSubtitle: "通过我们的先进高压氧舱，提升恢复能力，增强表现，改善整体健康。",
     bookYourSession: "预约您的疗程",
     
     // Benefits
@@ -271,7 +271,7 @@ export const translations = {
     
     // Booking Form
     bookingTitle: "预约您的高压氧舱疗程",
-    bookingSubtitle: "填写下面的表格，在Billy Duc的高级健康中心之一安排您的高压氧疗疗程。",
+    bookingSubtitle: "填写下面的表格，在我们的高级健康中心之一安排您的高压氧疗疗程。",
     personalDetails: "个人信息",
     details: "详情",
     dateTime: "日期和时间",
@@ -338,7 +338,7 @@ export const translations = {
     
     // Homepage
     heroTitle: "高気圧酸素療法 (HBOT) の効果を体験しましょう",
-    heroSubtitle: "Billy Ducの最先端の高気圧酸素室で、回復力を高め、パフォーマンスを向上させ、全体的な健康状態を改善しましょう。",
+    heroSubtitle: "私たちの最先端の高気圧酸素室で、回復力を高め、パフォーマンスを向上させ、全体的な健康状態を改善しましょう。",
     bookYourSession: "セッションを予約する",
     
     // Benefits
@@ -353,7 +353,7 @@ export const translations = {
     
     // Booking Form
     bookingTitle: "高気圧酸素室セッションを予約",
-    bookingSubtitle: "以下のフォームに記入して、Billy Ducのプレミアムウェルネスセンターで高気圧酸素療法セッションを予約してください。",
+    bookingSubtitle: "以下のフォームに記入して、私たちのプレミアムウェルネスセンターで高気圧酸素療法セッションを予約してください。",
     personalDetails: "個人情報",
     details: "詳細",
     dateTime: "日付と時間",
@@ -420,7 +420,7 @@ export const translations = {
     
     // Homepage
     heroTitle: "Sperimenta i benefici della terapia iperbarica (HBOT)",
-    heroSubtitle: "Migliora il tuo recupero, aumenta le prestazioni e il benessere generale con le camere iperbariche all'avanguardia di Billy Duc.",
+    heroSubtitle: "Migliora il tuo recupero, aumenta le prestazioni e il benessere generale con le nostre camere iperbariche all'avanguardia.",
     bookYourSession: "Prenota la tua sessione",
     
     // Benefits
@@ -435,7 +435,7 @@ export const translations = {
     
     // Booking Form
     bookingTitle: "Prenota la tua sessione in camera iperbarica",
-    bookingSubtitle: "Compila il modulo sottostante per programmare la tua sessione di ossigenoterapia iperbarica in uno dei centri benessere premium di Billy Duc.",
+    bookingSubtitle: "Compila il modulo sottostante per programmare la tua sessione di ossigenoterapia iperbarica in uno dei nostri centri benessere premium.",
     personalDetails: "Dati personali",
     details: "Dettagli",
     dateTime: "Data e ora",

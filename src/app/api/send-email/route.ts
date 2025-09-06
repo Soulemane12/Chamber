@@ -67,6 +67,19 @@ export async function POST(request: Request) {
     const locationAddress = bookingData.location === 'midtown' 
       ? '575 Madison Ave, 20th floor, New York, NY' 
       : '1900 Parker Rd SE, Conyers, GA 30094';
+    
+    // Contact information based on location
+    const contactInfo = bookingData.location === 'midtown' 
+      ? {
+          owner: 'Billy Duc',
+          phone: '+1 (646) 262-8794',
+          email: 'b.duc@wellnex02.com'
+        }
+      : {
+          owner: 'Rebecca Davis & Don Davis',
+          phone: '7708007500',
+          email: 'rdavis@platinumbbs.com'
+        };
 
     // Group discount info - only show when not in promotion
     let discountInfo = '';
@@ -128,9 +141,9 @@ export async function POST(request: Request) {
           
           <div style="margin: 20px 0; padding: 15px; background-color: #eff6ff; border-radius: 5px; border-left: 4px solid #3b82f6;">
             <h3 style="color: #1e3a8a; font-size: 16px; margin-bottom: 10px;">Contact Information</h3>
-            <p><strong>Owner:</strong> Billy Duc</p>
-            <p><strong>Phone:</strong> +1 (646) 262-8794</p>
-            <p><strong>Email:</strong> b.duc@wellnex02.com</p>
+            <p><strong>Owner:</strong> ${contactInfo.owner}</p>
+            <p><strong>Phone:</strong> ${contactInfo.phone}</p>
+            <p><strong>Email:</strong> ${contactInfo.email}</p>
           </div>
           
           <p style="text-align: center; margin-top: 30px; color: #6b7280; font-size: 14px;">
