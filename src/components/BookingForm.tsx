@@ -60,8 +60,6 @@ const timeSlots = [
 
 // Pricing for different durations
 const pricingOptions = {
-  "20": 50,   // Regular price for 20 minutes
-  "45": 100,  // Regular price for 45 minutes
   "60": 150,
   "90": 200,
   "120": 250,
@@ -241,10 +239,11 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
     
     let basePrice: number;
     if (isPromoActive) {
-      // Use promotion pricing if available, otherwise fall back to regular pricing
+      // Use promotion pricing for 20, 45, 60 minutes during promotion
       const promoPrice = getPromotionPricing(selectedDuration);
       basePrice = promoPrice !== null ? promoPrice : (pricingOptions[selectedDuration as keyof typeof pricingOptions] || 0);
     } else {
+      // Regular pricing only for 60, 90, 120 minutes
       basePrice = pricingOptions[selectedDuration as keyof typeof pricingOptions] || 0;
     }
     
@@ -265,9 +264,11 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       const isPromoActive = isPromotionActive(data.location, data.date);
       let basePrice: number;
       if (isPromoActive) {
+        // Use promotion pricing for 20, 45, 60 minutes during promotion
         const promoPrice = getPromotionPricing(data.duration);
         basePrice = promoPrice !== null ? promoPrice : (pricingOptions[data.duration as keyof typeof pricingOptions] || 0);
       } else {
+        // Regular pricing only for 60, 90, 120 minutes
         basePrice = pricingOptions[data.duration as keyof typeof pricingOptions] || 0;
       }
       const multiplier = groupSizeMultipliers[data.groupSize as keyof typeof groupSizeMultipliers] || 1.0;
@@ -1247,78 +1248,6 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                 ) : (
                   <>
                     {/* Regular durations when promotion is not active */}
-                    {/* 20 Minute Session */}
-                    <label
-                      className={`
-                        relative flex items-center p-4 border rounded-lg cursor-pointer
-                        ${
-                          watch("duration") === "20"
-                            ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
-                            : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
-                        }
-                      `}
-                    >
-                      <input
-                        type="radio"
-                        value="20"
-                        {...register("duration")}
-                        className="sr-only"
-                      />
-                      <div className="flex-1">
-                        <h3 className={`font-medium ${
-                          watch("duration") === "20"
-                            ? "text-blue-600 dark:text-blue-400"
-                            : "text-gray-900 dark:text-white"
-                        }`}>
-                          20 Minute Session
-                        </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Quick session</p>
-                      </div>
-                      <div className={`text-lg font-bold ${
-                        watch("duration") === "20"
-                          ? "text-blue-600 dark:text-blue-400"
-                          : "text-gray-900 dark:text-white"
-                      }`}>
-                        {formatCurrency(pricingOptions["20"])}
-                      </div>
-                    </label>
-
-                    {/* 45 Minute Session */}
-                    <label
-                      className={`
-                        relative flex items-center p-4 border rounded-lg cursor-pointer
-                        ${
-                          watch("duration") === "45"
-                            ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
-                            : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
-                        }
-                      `}
-                    >
-                      <input
-                        type="radio"
-                        value="45"
-                        {...register("duration")}
-                        className="sr-only"
-                      />
-                      <div className="flex-1">
-                        <h3 className={`font-medium ${
-                          watch("duration") === "45"
-                            ? "text-blue-600 dark:text-blue-400"
-                            : "text-gray-900 dark:text-white"
-                        }`}>
-                          45 Minute Session
-                        </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Extended session</p>
-                      </div>
-                      <div className={`text-lg font-bold ${
-                        watch("duration") === "45"
-                          ? "text-blue-600 dark:text-blue-400"
-                          : "text-gray-900 dark:text-white"
-                      }`}>
-                        {formatCurrency(pricingOptions["45"])}
-                      </div>
-                    </label>
-
                     {/* 60 Minute Session */}
                     <label
                       className={`

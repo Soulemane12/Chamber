@@ -42,8 +42,6 @@ export async function POST(request: Request) {
     
     // Calculate price based on duration
     const prices: Record<string, number> = {
-      '20': 50,   // Regular price for 20 minutes
-      '45': 100,  // Regular price for 45 minutes
       '60': 150,
       '90': 200,
       '120': 250
