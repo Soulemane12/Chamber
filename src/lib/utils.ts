@@ -113,7 +113,7 @@ export const promotionConfig = {
   isActive: true,
   location: 'conyers', // Platinum Wellness Spa
   startDate: new Date('2025-09-15'),
-  endDate: new Date('2025-10-15'),
+  endDate: new Date('2025-10-31'),
   pricing: {
     '20': 0,    // FREE 20-Minute HBOT Session
     '45': 75,   // $75 for 45 Minutes
