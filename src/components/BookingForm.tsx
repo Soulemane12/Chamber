@@ -1368,52 +1368,51 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               )}
             </div>
 
-            {/* Group Size Section - Hidden during promotion */}
-            {!(selectedDate && selectedLocation && isPromotionActive(selectedLocation, selectedDate)) && (
-              <div className="animate-slide-in-up animate-delay-300">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                  Group Size *
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-                  {["1", "2", "3", "4"].map((size) => (
-                    <label
-                      key={size}
-                      className={`
-                        relative flex flex-col items-center justify-center p-4 border rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md
-                        ${
-                          watch("groupSize") === size
-                            ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400 shadow-lg"
-                            : "bg-white border-gray-200 dark:bg-gray-700 dark:border-gray-600"
-                        }
-                      `}
-                    >
-                      <input
-                        type="radio"
-                        value={size}
-                        {...register("groupSize")}
-                        onChange={handleGroupSizeChange}
-                        className="sr-only"
-                      />
-                      <span className={`text-3xl font-bold mb-1 ${
+            {/* Group Size Section */}
+            <div className="animate-slide-in-up animate-delay-300">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                Group Size *
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                {["1", "2", "3", "4"].map((size) => (
+                  <label
+                    key={size}
+                    className={`
+                      relative flex flex-col items-center justify-center p-4 border rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md
+                      ${
                         watch("groupSize") === size
-                          ? "text-blue-600 dark:text-blue-400"
-                          : "text-gray-700 dark:text-gray-300"
-                      }`}>
-                        {size}
+                          ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400 shadow-lg"
+                          : "bg-white border-gray-200 dark:bg-gray-700 dark:border-gray-600"
+                      }
+                    `}
+                  >
+                    <input
+                      type="radio"
+                      value={size}
+                      {...register("groupSize")}
+                      onChange={handleGroupSizeChange}
+                      className="sr-only"
+                    />
+                    <span className={`text-3xl font-bold mb-1 ${
+                      watch("groupSize") === size
+                        ? "text-blue-600 dark:text-blue-400"
+                        : "text-gray-700 dark:text-gray-300"
+                    }`}>
+                      {size}
+                    </span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      {size === "1" ? "Guest" : "Guests"}
+                    </span>
+                    {/* Only show discount badges when NOT in promotion */}
+                    {size !== "1" && !(selectedDate && selectedLocation && isPromotionActive(selectedLocation, selectedDate)) && (
+                      <span className="mt-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full dark:bg-green-900/30 dark:text-green-400">
+                        {size === "2" ? "10%" : size === "3" ? "15%" : "20%"} discount
                       </span>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {size === "1" ? "Guest" : "Guests"}
-                      </span>
-                      {size !== "1" && (
-                        <span className="mt-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full dark:bg-green-900/30 dark:text-green-400">
-                          {size === "2" ? "10%" : size === "3" ? "15%" : "20%"} discount
-                        </span>
-                      )}
-                    </label>
-                  ))}
-                </div>
+                    )}
+                  </label>
+                ))}
               </div>
-            )}
+            </div>
 
             <div className="animate-slide-in-up animate-delay-500">
               <label htmlFor="bookingReason" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -1560,14 +1559,12 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       </p>
                     </div>
                   )}
-                  {!(selectedDate && selectedLocation && isPromotionActive(selectedLocation, selectedDate)) && (
-                    <div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Group Size</p>
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {watch("groupSize")} {parseInt(watch("groupSize")) > 1 ? "guests" : "guest"}
-                      </p>
-                    </div>
-                  )}
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Group Size</p>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {watch("groupSize")} {parseInt(watch("groupSize")) > 1 ? "guests" : "guest"}
+                    </p>
+                  </div>
                   <div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Total</p>
                     <p className="font-bold text-xl text-gray-900 dark:text-white">{formatCurrency(calculateTotal())}</p>
