@@ -7,7 +7,7 @@ import { z } from "zod";
 import { format, isBefore, startOfDay } from "date-fns";
 import { DatePickerField } from "@/components/ui/DatePickerField";
 import { Button } from "@/components/ui/Button";
-import { formatCurrency, getLocationData } from "@/lib/utils";
+import { formatCurrency, getLocationData, isPromotionActive, getPromotionPricing, promotionConfig } from "@/lib/utils";
 import { supabase } from "@/lib/supabaseClient";
 import { FileUpload } from "@/components/ui/FileUpload";
 
@@ -24,7 +24,7 @@ const bookingSchema = z.object({
   time: z.string({
     required_error: "Please select a time",
   }),
-  duration: z.enum(["60", "90", "120"], {
+  duration: z.enum(["20", "45", "60", "90", "120"], {
     required_error: "Please select a duration",
   }),
   location: z.enum(["midtown", "conyers"], {
@@ -60,6 +60,8 @@ const timeSlots = [
 
 // Pricing for different durations
 const pricingOptions = {
+  "20": 50,   // Regular price for 20 minutes
+  "45": 100,  // Regular price for 45 minutes
   "60": 150,
   "90": 200,
   "120": 250,
@@ -231,9 +233,21 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
   const selectedDate = watch("date");
   const selectedDuration = watch("duration");
   const selectedGroupSize = watch("groupSize");
+  const selectedLocation = watch("location");
 
   const calculateTotal = () => {
-    const basePrice = pricingOptions[selectedDuration as keyof typeof pricingOptions] || 0;
+    // Check if promotion is active for the selected location and date
+    const isPromoActive = selectedDate && selectedLocation ? isPromotionActive(selectedLocation, selectedDate) : false;
+    
+    let basePrice: number;
+    if (isPromoActive) {
+      // Use promotion pricing if available, otherwise fall back to regular pricing
+      const promoPrice = getPromotionPricing(selectedDuration);
+      basePrice = promoPrice !== null ? promoPrice : (pricingOptions[selectedDuration as keyof typeof pricingOptions] || 0);
+    } else {
+      basePrice = pricingOptions[selectedDuration as keyof typeof pricingOptions] || 0;
+    }
+    
     const multiplier = groupSizeMultipliers[selectedGroupSize as keyof typeof groupSizeMultipliers] || 1.0;
     return basePrice * multiplier;
   };
@@ -248,7 +262,14 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
     setIsSubmitting(true);
     try {
       // Calculate booking amount
-      const basePrice = pricingOptions[data.duration as keyof typeof pricingOptions] || 0;
+      const isPromoActive = isPromotionActive(data.location, data.date);
+      let basePrice: number;
+      if (isPromoActive) {
+        const promoPrice = getPromotionPricing(data.duration);
+        basePrice = promoPrice !== null ? promoPrice : (pricingOptions[data.duration as keyof typeof pricingOptions] || 0);
+      } else {
+        basePrice = pricingOptions[data.duration as keyof typeof pricingOptions] || 0;
+      }
       const multiplier = groupSizeMultipliers[data.groupSize as keyof typeof groupSizeMultipliers] || 1.0;
       const amount = basePrice * multiplier;
       
@@ -1096,7 +1117,109 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Session Duration *
               </label>
+              
+              {/* Promotion Banner */}
+              {selectedDate && selectedLocation && isPromotionActive(selectedLocation, selectedDate) && (
+                <div className="mb-4 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg">
+                  <div className="flex items-center">
+                    <span className="text-2xl mr-2">🌟</span>
+                    <div>
+                      <h4 className="font-semibold text-yellow-800 dark:text-yellow-200">Special Promotion Active!</h4>
+                      <p className="text-sm text-yellow-700 dark:text-yellow-300">{promotionConfig.description}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               <div className="space-y-3">
+                {/* 20 Minute Session */}
+                <label
+                  className={`
+                    relative flex items-center p-4 border rounded-lg cursor-pointer
+                    ${
+                      watch("duration") === "20"
+                        ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
+                        : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
+                    }
+                  `}
+                >
+                  <input
+                    type="radio"
+                    value="20"
+                    {...register("duration")}
+                    className="sr-only"
+                  />
+                  <div className="flex-1">
+                    <h3 className={`font-medium ${
+                      watch("duration") === "20"
+                        ? "text-blue-600 dark:text-blue-400"
+                        : "text-gray-900 dark:text-white"
+                    }`}>
+                      20 Minute Session
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Quick session</p>
+                  </div>
+                  <div className={`text-lg font-bold ${
+                    watch("duration") === "20"
+                      ? "text-blue-600 dark:text-blue-400"
+                      : "text-gray-900 dark:text-white"
+                  }`}>
+                    {(() => {
+                      const isPromoActive = selectedDate && selectedLocation ? isPromotionActive(selectedLocation, selectedDate) : false;
+                      const promoPrice = isPromoActive ? getPromotionPricing("20") : null;
+                      const price = promoPrice !== null ? promoPrice : pricingOptions["20"];
+                      return formatCurrency(price);
+                    })()}
+                    {(() => {
+                      const isPromoActive = selectedDate && selectedLocation ? isPromotionActive(selectedLocation, selectedDate) : false;
+                      const promoPrice = isPromoActive ? getPromotionPricing("20") : null;
+                      return promoPrice === 0 ? <span className="text-green-600 dark:text-green-400 ml-2">FREE!</span> : null;
+                    })()}
+                  </div>
+                </label>
+
+                {/* 45 Minute Session */}
+                <label
+                  className={`
+                    relative flex items-center p-4 border rounded-lg cursor-pointer
+                    ${
+                      watch("duration") === "45"
+                        ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
+                        : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
+                    }
+                  `}
+                >
+                  <input
+                    type="radio"
+                    value="45"
+                    {...register("duration")}
+                    className="sr-only"
+                  />
+                  <div className="flex-1">
+                    <h3 className={`font-medium ${
+                      watch("duration") === "45"
+                        ? "text-blue-600 dark:text-blue-400"
+                        : "text-gray-900 dark:text-white"
+                    }`}>
+                      45 Minute Session
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Extended session</p>
+                  </div>
+                  <div className={`text-lg font-bold ${
+                    watch("duration") === "45"
+                      ? "text-blue-600 dark:text-blue-400"
+                      : "text-gray-900 dark:text-white"
+                  }`}>
+                    {(() => {
+                      const isPromoActive = selectedDate && selectedLocation ? isPromotionActive(selectedLocation, selectedDate) : false;
+                      const promoPrice = isPromoActive ? getPromotionPricing("45") : null;
+                      const price = promoPrice !== null ? promoPrice : pricingOptions["45"];
+                      return formatCurrency(price);
+                    })()}
+                  </div>
+                </label>
+
+                {/* 60 Minute Session */}
                 <label
                   className={`
                     relative flex items-center p-4 border rounded-lg cursor-pointer
@@ -1128,7 +1251,12 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       ? "text-blue-600 dark:text-blue-400"
                       : "text-gray-900 dark:text-white"
                   }`}>
-                    {formatCurrency(150)}
+                    {(() => {
+                      const isPromoActive = selectedDate && selectedLocation ? isPromotionActive(selectedLocation, selectedDate) : false;
+                      const promoPrice = isPromoActive ? getPromotionPricing("60") : null;
+                      const price = promoPrice !== null ? promoPrice : pricingOptions["60"];
+                      return formatCurrency(price);
+                    })()}
                   </div>
                 </label>
 
@@ -1163,7 +1291,12 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       ? "text-blue-600 dark:text-blue-400"
                       : "text-gray-900 dark:text-white"
                   }`}>
-                    {formatCurrency(200)}
+                    {(() => {
+                      const isPromoActive = selectedDate && selectedLocation ? isPromotionActive(selectedLocation, selectedDate) : false;
+                      const promoPrice = isPromoActive ? getPromotionPricing("90") : null;
+                      const price = promoPrice !== null ? promoPrice : pricingOptions["90"];
+                      return formatCurrency(price);
+                    })()}
                   </div>
                 </label>
 
@@ -1198,7 +1331,12 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       ? "text-blue-600 dark:text-blue-400"
                       : "text-gray-900 dark:text-white"
                   }`}>
-                    {formatCurrency(250)}
+                    {(() => {
+                      const isPromoActive = selectedDate && selectedLocation ? isPromotionActive(selectedLocation, selectedDate) : false;
+                      const promoPrice = isPromoActive ? getPromotionPricing("120") : null;
+                      const price = promoPrice !== null ? promoPrice : pricingOptions["120"];
+                      return formatCurrency(price);
+                    })()}
                   </div>
                 </label>
               </div>

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { BookingFormData } from '@/components/BookingForm';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, isPromotionActive, getPromotionPricing } from '@/lib/utils';
 import { format } from 'date-fns';
 
 // Group size multipliers (discount for groups) - same as in BookingForm.tsx
@@ -42,11 +42,22 @@ export async function POST(request: Request) {
     
     // Calculate price based on duration
     const prices: Record<string, number> = {
+      '20': 50,   // Regular price for 20 minutes
+      '45': 100,  // Regular price for 45 minutes
       '60': 150,
       '90': 200,
       '120': 250
     };
-    const basePrice = prices[bookingData.duration] || 150;
+    
+    // Check if promotion is active
+    const isPromoActive = isPromotionActive(bookingData.location, bookingData.date);
+    let basePrice: number;
+    if (isPromoActive) {
+      const promoPrice = getPromotionPricing(bookingData.duration);
+      basePrice = promoPrice !== null ? promoPrice : (prices[bookingData.duration] || 150);
+    } else {
+      basePrice = prices[bookingData.duration] || 150;
+    }
     
     // Apply group size multiplier
     const groupSize = bookingData.groupSize || "1";
@@ -70,6 +81,26 @@ export async function POST(request: Request) {
       };
       discountInfo = `<p><strong>Group Discount:</strong> ${discountPercentages[groupSize as "2" | "3" | "4" | "5"]} off per person</p>`;
     }
+    
+    // Promotion info
+    let promotionInfo = '';
+    if (isPromoActive) {
+      const promoPrice = getPromotionPricing(bookingData.duration);
+      if (promoPrice !== null) {
+        const regularPrice = prices[bookingData.duration] || 150;
+        if (promoPrice < regularPrice) {
+          const savings = regularPrice - promoPrice;
+          promotionInfo = `
+            <div style="margin: 15px 0; padding: 15px; background-color: #fef3c7; border-radius: 5px; border-left: 4px solid #f59e0b;">
+              <h4 style="color: #92400e; font-size: 16px; margin-bottom: 10px;">🌟 Special Promotion Applied!</h4>
+              <p style="color: #92400e; margin: 5px 0;"><strong>Regular Price:</strong> ${formatCurrency(regularPrice)}</p>
+              <p style="color: #92400e; margin: 5px 0;"><strong>Promotion Price:</strong> ${formatCurrency(promoPrice)}</p>
+              <p style="color: #92400e; margin: 5px 0;"><strong>You Saved:</strong> ${formatCurrency(savings)}</p>
+            </div>
+          `;
+        }
+      }
+    }
 
     // Email content
     const mailOptions = {
@@ -92,6 +123,7 @@ export async function POST(request: Request) {
             <p><strong>Address:</strong> ${locationAddress}</p>
             <p><strong>Group Size:</strong> ${groupSize} ${parseInt(groupSize) > 1 ? 'people' : 'person'}</p>
             ${discountInfo}
+            ${promotionInfo}
             <p><strong>Total Amount:</strong> ${formatCurrency(totalPrice)}</p>
           </div>
           

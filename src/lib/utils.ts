@@ -104,4 +104,40 @@ export function getGoogleMapsUrl(address: string): string {
   // Encode the address for use in a URL
   const encodedAddress = encodeURIComponent(address);
   return `https://www.google.com/maps?q=${encodedAddress}`;
+}
+
+/**
+ * Promotion configuration for Platinum Wellness Spa
+ */
+export const promotionConfig = {
+  isActive: true,
+  location: 'conyers', // Platinum Wellness Spa
+  startDate: new Date('2025-09-15'),
+  endDate: new Date('2025-10-15'),
+  pricing: {
+    '20': 0,    // FREE 20-Minute HBOT Session
+    '45': 75,   // $75 for 45 Minutes
+    '60': 90,   // $90 for 60 Minutes
+  },
+  description: "🌟 Special Promotion: FREE 20-Minute HBOT Session, $75 for 45 Minutes, $90 for 60 Minutes"
+};
+
+/**
+ * Check if a promotion is active for a given location and date
+ */
+export function isPromotionActive(location: string, date: Date): boolean {
+  if (!promotionConfig.isActive || location !== promotionConfig.location) {
+    return false;
+  }
+  
+  const checkDate = new Date(date);
+  return checkDate >= promotionConfig.startDate && checkDate <= promotionConfig.endDate;
+}
+
+/**
+ * Get promotion pricing for a given duration
+ */
+export function getPromotionPricing(duration: string): number | null {
+  if (!promotionConfig.isActive) return null;
+  return promotionConfig.pricing[duration as keyof typeof promotionConfig.pricing] ?? null;
 } 
