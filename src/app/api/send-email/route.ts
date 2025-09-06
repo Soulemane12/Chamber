@@ -6,11 +6,11 @@ import { format } from 'date-fns';
 
 // Group size multipliers (discount for groups) - same as in BookingForm.tsx
 const groupSizeMultipliers = {
-  "1": 1.0,    // No discount for single person
-  "2": 1.8,    // 10% discount per person
-  "3": 2.55,   // 15% discount per person
-  "4": 3.2,    // 20% discount per person
-  "5": 3.75,   // 25% discount per person
+  "1": 1.0,    // No discount for single guest
+  "2": 1.8,    // 10% discount per guest
+  "3": 2.55,   // 15% discount per guest
+  "4": 3.2,    // 20% discount per guest
+  "5": 3.75,   // 25% discount per guest
 };
 
 export async function POST(request: Request) {
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
         "4": "20%",
         "5": "25%"
       };
-      discountInfo = `<p><strong>Group Discount:</strong> ${discountPercentages[groupSize as "2" | "3" | "4" | "5"]} off per person</p>`;
+      discountInfo = `<p><strong>Group Discount:</strong> ${discountPercentages[groupSize as "2" | "3" | "4" | "5"]} off per guest</p>`;
     }
     
     // Promotion info
@@ -121,7 +121,7 @@ export async function POST(request: Request) {
             <p><strong>Duration:</strong> ${bookingData.duration} minutes</p>
             <p><strong>Location:</strong> ${locationName}</p>
             <p><strong>Address:</strong> ${locationAddress}</p>
-            <p><strong>Group Size:</strong> ${groupSize} ${parseInt(groupSize) > 1 ? 'people' : 'person'}</p>
+            <p><strong>Group Size:</strong> ${groupSize} ${parseInt(groupSize) > 1 ? 'guests' : 'guest'}</p>
             ${discountInfo}
             ${promotionInfo}
             <p><strong>Total Amount:</strong> ${formatCurrency(totalPrice)}</p>
