@@ -242,13 +242,15 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       // Use promotion pricing for 20, 45, 60 minutes during promotion
       const promoPrice = getPromotionPricing(selectedDuration);
       basePrice = promoPrice !== null ? promoPrice : (pricingOptions[selectedDuration as keyof typeof pricingOptions] || 0);
+      // No group discounts during promotion - return flat promotion price
+      return basePrice;
     } else {
       // Regular pricing only for 60, 90, 120 minutes
       basePrice = pricingOptions[selectedDuration as keyof typeof pricingOptions] || 0;
+      // Apply group discounts for regular pricing
+      const multiplier = groupSizeMultipliers[selectedGroupSize as keyof typeof groupSizeMultipliers] || 1.0;
+      return basePrice * multiplier;
     }
-    
-    const multiplier = groupSizeMultipliers[selectedGroupSize as keyof typeof groupSizeMultipliers] || 1.0;
-    return basePrice * multiplier;
   };
 
   const isDateDisabled = (date: Date) => {
@@ -262,17 +264,19 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
     try {
       // Calculate booking amount
       const isPromoActive = isPromotionActive(data.location, data.date);
-      let basePrice: number;
+      let amount: number;
       if (isPromoActive) {
         // Use promotion pricing for 20, 45, 60 minutes during promotion
         const promoPrice = getPromotionPricing(data.duration);
-        basePrice = promoPrice !== null ? promoPrice : (pricingOptions[data.duration as keyof typeof pricingOptions] || 0);
+        amount = promoPrice !== null ? promoPrice : (pricingOptions[data.duration as keyof typeof pricingOptions] || 0);
+        // No group discounts during promotion - use flat promotion price
       } else {
         // Regular pricing only for 60, 90, 120 minutes
-        basePrice = pricingOptions[data.duration as keyof typeof pricingOptions] || 0;
+        const basePrice = pricingOptions[data.duration as keyof typeof pricingOptions] || 0;
+        // Apply group discounts for regular pricing
+        const multiplier = groupSizeMultipliers[data.groupSize as keyof typeof groupSizeMultipliers] || 1.0;
+        amount = basePrice * multiplier;
       }
-      const multiplier = groupSizeMultipliers[data.groupSize as keyof typeof groupSizeMultipliers] || 1.0;
-      const amount = basePrice * multiplier;
       
       // Get user ID if authenticated
       const { data: { session } } = await supabase.auth.getSession();

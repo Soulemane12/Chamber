@@ -49,18 +49,18 @@ export async function POST(request: Request) {
     
     // Check if promotion is active
     const isPromoActive = isPromotionActive(bookingData.location, bookingData.date);
-    let basePrice: number;
+    let totalPrice: number;
     if (isPromoActive) {
+      // Use promotion pricing - no group discounts during promotion
       const promoPrice = getPromotionPricing(bookingData.duration);
-      basePrice = promoPrice !== null ? promoPrice : (prices[bookingData.duration] || 150);
+      totalPrice = promoPrice !== null ? promoPrice : (prices[bookingData.duration] || 150);
     } else {
-      basePrice = prices[bookingData.duration] || 150;
+      // Regular pricing with group discounts
+      const basePrice = prices[bookingData.duration] || 150;
+      const groupSize = bookingData.groupSize || "1";
+      const multiplier = groupSizeMultipliers[groupSize as keyof typeof groupSizeMultipliers] || 1.0;
+      totalPrice = basePrice * multiplier;
     }
-    
-    // Apply group size multiplier
-    const groupSize = bookingData.groupSize || "1";
-    const multiplier = groupSizeMultipliers[groupSize as keyof typeof groupSizeMultipliers] || 1.0;
-    const totalPrice = basePrice * multiplier;
     
     // Location details
     const locationName = bookingData.location === 'midtown' ? 'Midtown Biohack' : 'Platinum Wellness Spa';
@@ -68,9 +68,10 @@ export async function POST(request: Request) {
       ? '575 Madison Ave, 20th floor, New York, NY' 
       : '1900 Parker Rd SE, Conyers, GA 30094';
 
-    // Group discount info
+    // Group discount info - only show when not in promotion
     let discountInfo = '';
-    if (groupSize !== "1") {
+    const groupSize = bookingData.groupSize || "1";
+    if (!isPromoActive && groupSize !== "1") {
       const discountPercentages = {
         "2": "10%",
         "3": "15%",
