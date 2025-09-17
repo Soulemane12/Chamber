@@ -10,7 +10,7 @@ export const translations = {
     
     // Homepage
     heroTitle: "Experience the Benefits of Hyperbaric Oxygen Therapy (HBOT)",
-    heroSubtitle: "Wellnex02, in collaboration with 02CapsuleBox, a leading Japan-based manufacturer. Enhance your recovery, boost performance, and improve overall wellness with our state-of-the-art hyperbaric chambers.",
+    heroSubtitle: "Enhance your recovery, boost performance, and improve overall wellness with our state-of-the-art hyperbaric chambers.",
     bookYourSession: "Book Your Session",
     
     // Benefits
@@ -79,22 +79,6 @@ export const translations = {
     rideShare: "Ride Share",
     returnToHome: "Return to Home",
     
-    // Contact Form
-    contactUs: "Contact Us",
-    residential: "Residential",
-    business: "Business",
-    businessName: "Business Name",
-    message: "Message",
-    submit: "Submit",
-    submitting: "Submitting...",
-    messageSent: "Thank you! Your message has been sent successfully.",
-    messageError: "Sorry, there was an error sending your message. Please try again.",
-    
-    // Demo Sites
-    inPersonDemos: "In-Person Demo Sites",
-    midtownBiohack: "Midtown Biohack",
-    platinumWellness: "Platinum Wellness",
-    
     // Footer
     allRightsReserved: "All rights reserved.",
   },
@@ -108,7 +92,7 @@ export const translations = {
     
     // Homepage
     heroTitle: "Découvrez les bienfaits de l'oxygénothérapie hyperbare (HBOT)",
-    heroSubtitle: "Wellnex02, en collaboration avec 02CapsuleBox, un fabricant japonais de premier plan. Améliorez votre récupération, augmentez vos performances et votre bien-être avec nos chambres hyperbares de pointe.",
+    heroSubtitle: "Améliorez votre récupération, augmentez vos performances et votre bien-être avec nos chambres hyperbares de pointe.",
     bookYourSession: "Réserver votre séance",
     
     // Benefits
@@ -177,22 +161,6 @@ export const translations = {
     rideShare: "Partage de trajet",
     returnToHome: "Retour à l'accueil",
     
-    // Contact Form
-    contactUs: "Nous contacter",
-    residential: "Résidentiel",
-    business: "Entreprise",
-    businessName: "Nom de l'entreprise",
-    message: "Message",
-    submit: "Envoyer",
-    submitting: "Envoi en cours...",
-    messageSent: "Merci ! Votre message a été envoyé avec succès.",
-    messageError: "Désolé, une erreur s'est produite lors de l'envoi de votre message. Veuillez réessayer.",
-    
-    // Demo Sites
-    inPersonDemos: "Sites de démonstration en personne",
-    midtownBiohack: "Midtown Biohack",
-    platinumWellness: "Platinum Wellness",
-    
     // Footer
     allRightsReserved: "Tous droits réservés.",
   },
@@ -206,7 +174,7 @@ export const translations = {
     
     // Homepage
     heroTitle: "Experimente los beneficios de la terapia de oxígeno hiperbárico (HBOT)",
-    heroSubtitle: "Wellnex02, en colaboración con 02CapsuleBox, un fabricante líder con sede en Japón. Mejore su recuperación, aumente su rendimiento y bienestar general con nuestras cámaras hiperbáricas de última generación.",
+    heroSubtitle: "Mejore su recuperación, aumente su rendimiento y bienestar general con nuestras cámaras hiperbáricas de última generación.",
     bookYourSession: "Reserve su sesión",
     
     // Benefits
@@ -275,22 +243,6 @@ export const translations = {
     rideShare: "Compartir viaje",
     returnToHome: "Volver al inicio",
     
-    // Contact Form
-    contactUs: "Contáctanos",
-    residential: "Residencial",
-    business: "Empresa",
-    businessName: "Nombre de la empresa",
-    message: "Mensaje",
-    submit: "Enviar",
-    submitting: "Enviando...",
-    messageSent: "¡Gracias! Su mensaje ha sido enviado exitosamente.",
-    messageError: "Lo siento, hubo un error al enviar su mensaje. Por favor, inténtelo de nuevo.",
-    
-    // Demo Sites
-    inPersonDemos: "Sitios de demostración en persona",
-    midtownBiohack: "Midtown Biohack",
-    platinumWellness: "Platinum Wellness",
-    
     // Footer
     allRightsReserved: "Todos los derechos reservados.",
   },
@@ -304,7 +256,7 @@ export const translations = {
     
     // Homepage
     heroTitle: "体验高压氧疗法 (HBOT) 的益处",
-    heroSubtitle: "Wellnex02，与日本领先制造商02CapsuleBox合作。通过我们的先进高压氧舱，提升恢复能力，增强表现，改善整体健康。",
+    heroSubtitle: "通过我们的先进高压氧舱，提升恢复能力，增强表现，改善整体健康。",
     bookYourSession: "预约您的疗程",
     
     // Benefits
@@ -373,22 +325,6 @@ export const translations = {
     rideShare: "拼车",
     returnToHome: "返回首页",
     
-    // Contact Form
-    contactUs: "联系我们",
-    residential: "住宅",
-    business: "商业",
-    businessName: "企业名称",
-    message: "留言",
-    submit: "提交",
-    submitting: "提交中...",
-    messageSent: "谢谢！您的消息已成功发送。",
-    messageError: "抱歉，发送消息时出现错误。请重试。",
-    
-    // Demo Sites
-    inPersonDemos: "现场演示地点",
-    midtownBiohack: "Midtown Biohack",
-    platinumWellness: "Platinum Wellness",
-    
     // Footer
     allRightsReserved: "版权所有。",
   },
@@ -402,7 +338,7 @@ export const translations = {
     
     // Homepage
     heroTitle: "高気圧酸素療法 (HBOT) の効果を体験しましょう",
-    heroSubtitle: "Wellnex02、日本のリーディングメーカー02CapsuleBoxとのコラボレーション。私たちの最先端の高気圧酸素室で、回復力を高め、パフォーマンスを向上させ、全体的な健康状態を改善しましょう。",
+    heroSubtitle: "私たちの最先端の高気圧酸素室で、回復力を高め、パフォーマンスを向上させ、全体的な健康状態を改善しましょう。",
     bookYourSession: "セッションを予約する",
     
     // Benefits
@@ -471,22 +407,6 @@ export const translations = {
     rideShare: "配車サービス",
     returnToHome: "ホームに戻る",
     
-    // Contact Form
-    contactUs: "お問い合わせ",
-    residential: "住宅",
-    business: "ビジネス",
-    businessName: "会社名",
-    message: "メッセージ",
-    submit: "送信",
-    submitting: "送信中...",
-    messageSent: "ありがとうございます！メッセージが正常に送信されました。",
-    messageError: "申し訳ございません。メッセージの送信中にエラーが発生しました。もう一度お試しください。",
-    
-    // Demo Sites
-    inPersonDemos: "対面デモサイト",
-    midtownBiohack: "Midtown Biohack",
-    platinumWellness: "Platinum Wellness",
-    
     // Footer
     allRightsReserved: "全著作権所有。",
   },
@@ -500,7 +420,7 @@ export const translations = {
     
     // Homepage
     heroTitle: "Sperimenta i benefici della terapia iperbarica (HBOT)",
-    heroSubtitle: "Wellnex02, in collaborazione con 02CapsuleBox, un produttore leader con sede in Giappone. Migliora il tuo recupero, aumenta le prestazioni e il benessere generale con le nostre camere iperbariche all'avanguardia.",
+    heroSubtitle: "Migliora il tuo recupero, aumenta le prestazioni e il benessere generale con le nostre camere iperbariche all'avanguardia.",
     bookYourSession: "Prenota la tua sessione",
     
     // Benefits
@@ -568,22 +488,6 @@ export const translations = {
     getLyft: "Chiama Lyft",
     rideShare: "Servizi di trasporto",
     returnToHome: "Torna alla home",
-    
-    // Contact Form
-    contactUs: "Contattaci",
-    residential: "Residenziale",
-    business: "Aziendale",
-    businessName: "Nome dell'azienda",
-    message: "Messaggio",
-    submit: "Invia",
-    submitting: "Invio in corso...",
-    messageSent: "Grazie! Il tuo messaggio è stato inviato con successo.",
-    messageError: "Spiacenti, si è verificato un errore durante l'invio del messaggio. Riprova.",
-    
-    // Demo Sites
-    inPersonDemos: "Siti di dimostrazione in persona",
-    midtownBiohack: "Midtown Biohack",
-    platinumWellness: "Platinum Wellness",
     
     // Footer
     allRightsReserved: "Tutti i diritti riservati.",
