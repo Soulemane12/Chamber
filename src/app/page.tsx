@@ -56,14 +56,14 @@ export default function Home() {
                 {t('readMore')}
               </Link>
               <div className="mt-6 flex justify-center">
-                <div className="max-w-[500px] mx-auto">
+                <div className="max-w-[400px] mx-auto">
                   <video 
                     src="/Wellnex_vid.MOV" 
                     controls 
                     className="w-full rounded-lg shadow-lg"
-                    width="500"
-                    height="auto"
-                    style={{ maxWidth: '500px', margin: '0 auto' }}
+                    width="400"
+                    height="225"
+                    style={{ maxWidth: '400px', maxHeight: '225px', margin: '0 auto' }}
                   >
                     Your browser does not support the video tag.
                   </video>
@@ -156,6 +156,51 @@ export default function Home() {
                 {t('learnMore')}
               </Link>
             </div>
+          </div>
+        </div>
+
+        {/* In-Person Demo Sites Section */}
+        <div className="mb-16 animate-fade-in">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
+              Experience Our Products In-Person
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+              Visit our demo sites to experience the benefits of hyperbaric oxygen therapy firsthand
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
+              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Midtown Biohack</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                Experience our hyperbaric oxygen chambers in a professional wellness environment. 
+                Our Midtown location offers personalized sessions and expert guidance.
+              </p>
+              <div className="text-blue-600 hover:text-blue-700 font-medium">
+                <span className="text-sm">📍 New York, NY</span>
+              </div>
+            </div>
+            
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
+              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Platinum Wellness</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                Discover the transformative power of hyperbaric oxygen therapy at our Platinum Wellness center. 
+                Book a consultation to learn how it can benefit your health journey.
+              </p>
+              <div className="text-blue-600 hover:text-blue-700 font-medium">
+                <span className="text-sm">📍 Multiple Locations</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="text-center mt-8">
+            <Link
+              href="/contact"
+              className="btn bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 inline-block"
+            >
+              Schedule a Demo
+            </Link>
           </div>
         </div>
 
