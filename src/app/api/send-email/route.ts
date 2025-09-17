@@ -15,7 +15,9 @@ const groupSizeMultipliers = {
 
 export async function POST(request: Request) {
   try {
+    console.log('Email API called');
     const bookingData: BookingFormData = await request.json();
+    console.log('Booking data received:', bookingData);
     
     // Safety check for required fields
     if (!bookingData.email || !bookingData.firstName || !bookingData.date) {
@@ -25,12 +27,22 @@ export async function POST(request: Request) {
       );
     }
 
+    // Check if email password is configured
+    console.log('EMAIL_PASSWORD exists:', !!process.env.EMAIL_PASSWORD);
+    if (!process.env.EMAIL_PASSWORD) {
+      console.error('EMAIL_PASSWORD environment variable is not set');
+      return NextResponse.json(
+        { success: false, message: 'Email service not configured. Please contact support.' },
+        { status: 500 }
+      );
+    }
+
     // Create a transporter
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: 'b.duc@wellnex02.com',
-        pass: process.env.EMAIL_PASSWORD // This should be set in your environment variables
+        pass: process.env.EMAIL_PASSWORD
       }
     });
 
@@ -164,7 +176,11 @@ export async function POST(request: Request) {
     } catch (emailError) {
       console.error('Error sending email through transporter:', emailError);
       return NextResponse.json(
-        { success: false, message: 'Error sending through email service' },
+        { 
+          success: false, 
+          message: 'Error sending through email service',
+          error: emailError instanceof Error ? emailError.message : 'Unknown error'
+        },
         { status: 500 }
       );
     }

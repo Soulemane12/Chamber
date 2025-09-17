@@ -46,9 +46,9 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
           <Image
             src="/logo.png"
             alt="WellNex02 Logo"
-            width={200}
-            height={200}
-            className="h-24 w-24 sm:h-32 sm:w-32 lg:h-48 lg:w-48"
+            width={120}
+            height={120}
+            className="h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24"
             priority
           />
         </Link>

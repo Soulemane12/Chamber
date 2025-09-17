@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Header } from "@/components/Header";
 import { useLanguage } from "@/lib/LanguageContext";
 import { Footer } from "@/components/Footer";
+import { ContactForm } from "@/components/ContactForm";
 
 export default function Home() {
   const { t } = useLanguage();
@@ -163,6 +164,86 @@ export default function Home() {
                 The high-oxygen environment inhibits the growth of anaerobic bacteria and supports immune systems.
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="w-full h-px bg-gray-200 dark:bg-gray-700 my-12 sm:my-16"></div>
+
+        {/* In-Person Demo Sites Section */}
+        <div className="mb-12 sm:mb-16 animate-fade-in">
+          <div className="text-center mb-8 sm:mb-10 px-4 sm:px-0">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-gray-900 dark:text-white">
+              🏢 {t('inPersonDemos')}
+            </h2>
+            <div className="w-16 sm:w-20 h-1 bg-blue-600 mx-auto"></div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            <div className="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-xl shadow-md hover-scale transition-all-300">
+              <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">{t('midtownBiohack')}</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                Experience our hyperbaric oxygen therapy in a professional biohacking environment. 
+                Located in the heart of the city with state-of-the-art facilities.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link
+                  href="/booking"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 text-center"
+                >
+                  Book Demo
+                </Link>
+                <Link
+                  href="https://maps.google.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 text-center"
+                >
+                  View Location
+                </Link>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-xl shadow-md hover-scale transition-all-300">
+              <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">{t('platinumWellness')}</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                Premium wellness center offering comprehensive health services including HBOT. 
+                Expert staff and luxurious amenities for your comfort.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link
+                  href="/booking"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 text-center"
+                >
+                  Book Demo
+                </Link>
+                <Link
+                  href="https://maps.google.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 text-center"
+                >
+                  View Location
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="w-full h-px bg-gray-200 dark:bg-gray-700 my-12 sm:my-16"></div>
+
+        {/* Contact Form Section */}
+        <div className="mb-12 sm:mb-16 animate-fade-in">
+          <div className="text-center mb-8 sm:mb-10 px-4 sm:px-0">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-gray-900 dark:text-white">
+              📞 {t('contactUs')}
+            </h2>
+            <div className="w-16 sm:w-20 h-1 bg-blue-600 mx-auto"></div>
+          </div>
+          
+          <div className="max-w-2xl mx-auto">
+            <ContactForm />
           </div>
         </div>
 
