@@ -21,9 +21,9 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
           <Image 
             src="/logo.png" 
             alt="Wellnex02 Logo" 
-            width={40} 
-            height={40}
-            className="h-10 w-10"
+            width={60} 
+            height={60}
+            className="h-16 w-16"
           />
           <span className="text-2xl font-bold text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
             Wellnex02
@@ -151,14 +151,14 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
           </ul>
         </nav>
         <div className="hidden sm:flex items-center ml-6 space-x-4">
-          <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text">
+          <div className="text-2xl font-bold text-white dark:text-white">
             WellNex02
           </div>
           <LanguageSelector />
         </div>
       </div>
       <div className="sm:hidden w-full mt-2 flex flex-col items-center">
-        <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text mb-2">
+        <div className="text-2xl font-bold text-white dark:text-white mb-2">
           WellNex02
         </div>
         <MobileLanguageSelector />
