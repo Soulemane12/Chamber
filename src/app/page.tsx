@@ -172,12 +172,12 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="max-w-5xl mx-auto">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4">
               {/* Tab Navigation */}
-              <div className="flex flex-col sm:flex-row mb-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex flex-col sm:flex-row mb-4 border-b border-gray-200 dark:border-gray-700">
                 <button 
-                  className={`px-4 py-2 text-base font-medium border-b-2 transition-colors ${
+                  className={`px-3 py-1.5 text-sm font-medium border-b-2 transition-colors ${
                     selectedLocation === 'midtown' 
                       ? 'border-blue-600 text-blue-600 dark:text-blue-400' 
                       : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
@@ -187,7 +187,7 @@ export default function Home() {
                   Midtown Biohack
                 </button>
                 <button 
-                  className={`px-4 py-2 text-base font-medium border-b-2 transition-colors ${
+                  className={`px-3 py-1.5 text-sm font-medium border-b-2 transition-colors ${
                     selectedLocation === 'platinum' 
                       ? 'border-blue-600 text-blue-600 dark:text-blue-400' 
                       : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
@@ -199,25 +199,25 @@ export default function Home() {
               </div>
               
               {/* Tab Content */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {/* Left Column - Location Info */}
                 <div>
                   {selectedLocation === 'midtown' ? (
                     <div>
-                      <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Midtown Biohack</h3>
-                      <p className="text-gray-600 dark:text-gray-300 mb-3 text-sm">
+                      <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white">Midtown Biohack</h3>
+                      <p className="text-gray-600 dark:text-gray-300 mb-2 text-xs">
                         Experience our hyperbaric oxygen chambers in a professional wellness environment. 
                         Our Midtown location offers personalized sessions and expert guidance.
                       </p>
-                      <div className="space-y-1 text-gray-600 dark:text-gray-300 text-sm">
+                      <div className="space-y-0.5 text-gray-600 dark:text-gray-300 text-xs">
                         <p><strong>📍 Address:</strong> 575 Madison Ave, 23rd Floor, New York, NY 10022</p>
                         <p><strong>🕒 Hours:</strong> Mon-Fri 9AM-7PM, Sat 10AM-4PM</p>
                         <p><strong>📞 Phone:</strong> (555) 123-4567</p>
                       </div>
                       
                       {/* Video Section */}
-                      <div className="mt-4">
-                        <h4 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Take a Virtual Tour</h4>
+                      <div className="mt-2">
+                        <h4 className="text-xs font-semibold mb-1 text-gray-900 dark:text-white">Take a Virtual Tour</h4>
                         <video 
                           controls 
                           className="w-full rounded-lg shadow-md"
@@ -231,12 +231,12 @@ export default function Home() {
                     </div>
                   ) : (
                     <div>
-                      <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Platinum Wellness</h3>
-                      <p className="text-gray-600 dark:text-gray-300 mb-3 text-sm">
+                      <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white">Platinum Wellness</h3>
+                      <p className="text-gray-600 dark:text-gray-300 mb-2 text-xs">
                         Discover the transformative power of hyperbaric oxygen therapy at our Platinum Wellness center. 
                         Multiple locations available for your convenience.
                       </p>
-                      <div className="space-y-1 text-gray-600 dark:text-gray-300 text-sm">
+                      <div className="space-y-0.5 text-gray-600 dark:text-gray-300 text-xs">
                         <p><strong>📍 Locations:</strong> 1990 Parker Rd SE, Conyers, GA 30094</p>
                         <p><strong>🕒 Hours:</strong> Mon-Fri 8AM-8PM, Sat-Sun 9AM-6PM</p>
                         <p><strong>📞 Phone:</strong> (555) 987-6543</p>
@@ -246,9 +246,9 @@ export default function Home() {
                 </div>
                 
                 {/* Right Column - Booking Form */}
-                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                  <h4 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">Schedule Your Demo</h4>
-                  <form className="space-y-3">
+                <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
+                  <h4 className="text-base font-semibold mb-2 text-gray-900 dark:text-white">Schedule Your Demo</h4>
+                  <form className="space-y-2">
                     <div>
                       <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Your Name *
@@ -256,7 +256,7 @@ export default function Home() {
                       <input
                         type="text"
                         required
-                        className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white"
+                        className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white"
                         placeholder="Enter your full name"
                       />
                     </div>
@@ -268,7 +268,7 @@ export default function Home() {
                       <input
                         type="email"
                         required
-                        className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white"
+                        className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white"
                         placeholder="your.email@example.com"
                       />
                     </div>
@@ -279,7 +279,7 @@ export default function Home() {
                       </label>
                       <input
                         type="tel"
-                        className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white"
+                        className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white"
                         placeholder="(555) 123-4567"
                       />
                     </div>
@@ -292,7 +292,7 @@ export default function Home() {
                         type="date"
                         required
                         min={new Date().toISOString().split('T')[0]}
-                        className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white"
+                        className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white"
                       />
                     </div>
                     
@@ -302,7 +302,7 @@ export default function Home() {
                       </label>
                       <select
                         required
-                        className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white"
+                        className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white"
                       >
                         <option value="">Select a time</option>
                         <option value="09:00">9:00 AM</option>
@@ -322,15 +322,15 @@ export default function Home() {
                         Special Requests
                       </label>
                       <textarea
-                        rows={2}
-                        className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white"
+                        rows={1}
+                        className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white"
                         placeholder="Any specific questions or requirements?"
                       ></textarea>
                     </div>
                     
                     <button
                       type="submit"
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-1.5 px-3 rounded-lg text-xs font-medium shadow-lg hover:shadow-xl transition-all duration-300"
                     >
                       Book Demo Session
                     </button>
