@@ -9,13 +9,35 @@
   display: none !important;
 }
 
-/* Hide the specific "Complete Booking" button - more specific targeting */
-.payment-element-container button[class*="sm:order-2"] {
+/* Hide the specific Complete Booking button structure */
+button.inline-flex.items-center.justify-center.font-medium.transition-colors.duration-200.focus-visible\:outline-none.focus-visible\:ring-2.focus-visible\:ring-blue-500.disabled\:pointer-events-none.disabled\:opacity-50.bg-blue-600.text-white.hover\:bg-blue-700.dark\:bg-blue-600.dark\:hover\:bg-blue-700.active\:bg-blue-800.h-12.rounded-md.px-6.text-lg.w-full.sm\:w-auto.order-1.sm\:order-2[type="submit"] {
   display: none !important;
 }
 
-/* Hide buttons that contain "Complete Booking" text specifically */
-button span:contains("Complete Booking") {
+/* Alternative targeting for the button with any blue background */
+button[class*="bg-blue-600"][class*="order-1"][class*="sm:order-2"][type="submit"] {
+  display: none !important;
+}
+
+/* Target buttons that are exactly like the one described */
+button[class*="bg-blue-600"][class*="text-white"][class*="h-12"][type="submit"] {
+  display: none !important;
+}
+
+/* Hide buttons containing "Complete Booking" or "Book" text using attribute selectors */
+button[aria-label*="Complete"],
+button[aria-label*="Book"],
+button[title*="Complete"],
+button[title*="Book"] {
+  display: none !important;
+}
+
+/* More aggressive hiding of Stripe-generated buttons */
+[class*="SubmitButton"],
+[class*="submitButton"],
+button[class*="order-1"],
+button[class*="order-2"],
+button[class*="sm:order-2"] {
   display: none !important;
 }
 

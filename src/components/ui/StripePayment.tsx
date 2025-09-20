@@ -59,6 +59,41 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
     });
   }, [stripe, clientSecret]);
 
+  // Effect to hide any Stripe-generated submit buttons
+  useEffect(() => {
+    const hideStripeButtons = () => {
+      // Target buttons within the payment element container specifically
+      const paymentContainer = document.querySelector('.payment-element-container');
+      if (paymentContainer) {
+        const buttons = paymentContainer.querySelectorAll('button');
+        buttons.forEach(button => {
+          const buttonText = button.textContent || '';
+          // Only hide buttons that contain the exact text we want to remove
+          if (buttonText.includes('Complete Booking') || 
+              buttonText.includes('Book • $') ||
+              button.getAttribute('type') === 'submit') {
+            (button as HTMLElement).style.display = 'none !important';
+          }
+        });
+      }
+      
+      // Also target any buttons with the specific classes from the user's example
+      const specificButtons = document.querySelectorAll('button.inline-flex.items-center.justify-center.font-medium.transition-colors.duration-200');
+      specificButtons.forEach(button => {
+        const buttonText = button.textContent || '';
+        if (buttonText.includes('Complete Booking') || buttonText.includes('Book • $')) {
+          (button as HTMLElement).style.display = 'none !important';
+        }
+      });
+    };
+
+    // Run immediately and set up interval to catch dynamically added buttons
+    hideStripeButtons();
+    const interval = setInterval(hideStripeButtons, 200);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const handleSubmit = async (e?: React.FormEvent | React.MouseEvent) => {
     if (e) {
       e.preventDefault();
