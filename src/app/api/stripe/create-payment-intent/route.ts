@@ -23,6 +23,13 @@ const groupSizeMultipliers = {
 export async function POST(request: Request) {
   try {
     console.log('Creating payment intent...');
+    console.log('Environment check:', {
+      hasStripeSecret: !!process.env.STRIPE_SECRET_KEY,
+      hasStripePublishable: !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+      hasWebhookSecret: !!process.env.STRIPE_WEBHOOK_SECRET,
+      stripeSecretLength: process.env.STRIPE_SECRET_KEY?.length || 0,
+      stripeSecretPrefix: process.env.STRIPE_SECRET_KEY?.substring(0, 10) || 'undefined'
+    });
     
     const { 
       amount, 
