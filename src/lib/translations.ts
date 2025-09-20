@@ -92,7 +92,7 @@ export const translations = {
     // Oxygen Therapy Page
     oxygenTherapyTitle: "The Benefits of Oxygen Therapy",
     oxygenTherapySubtitle: "Experience the Benefits of Oxygen Therapy with O2ChamberBox",
-    oxygenTherapyDescription: "Oxygen is crucial for your body's regeneration and self-repair capabilities. At O2ChamberBox, we leverage this essential element to boost your natural healing processes through advanced hyperbaric oxygen therapy (HBOT).",
+    oxygenTherapyDescription: "Oxygen is crucial for your body's regeneration and self-repair capabilities. At O2ChamberBox, we leverage this essential element to boost your natural healing processes through advanced hyperbaric oxygen therapy.",
     oxygenTherapyDescription2: "Hyperbaric Oxygen Therapy entails inhaling pure oxygen in a pressurized chamber, which delivers concentrated oxygen throughout your body. This process amplifies your body's innate healing abilities, leading to quicker recovery, enhanced overall wellness, and increased vitality.",
     oxygenTherapyDescription3: "Discover the transformative benefits of HBOT with O2ChamberBox and unlock your body's full potential.",
     marvelsTitle: "The Marvels of Hyperbaric Oxygen Therapy",
@@ -108,7 +108,7 @@ export const translations = {
     // FAQ Page
     faqTitle: "FAQ",
     frequentlyAskedQuestions: "Frequently asked questions",
-    isHBOTSafe: "Is Hyperbaric Oxygen Therapy (HBOT) safe?",
+    isHBOTSafe: "Is Hyperbaric Oxygen Therapy safe?",
     isHBOTSafeAnswer: "Yes, HBOT is a safe and well-established treatment utilized in numerous medical and wellness settings around the globe. Our chambers comply with all safety standards.",
     howSoonBenefits: "How soon will I feel the benefits?",
     howOxygenMade: "How is the oxygen made for the chamber?",
@@ -128,7 +128,7 @@ export const translations = {
 
     
     // Benefits Details
-    antiAgingTitle: "Experience the revitalizing benefits of oxygen with O2ChamberBox. Our hyperbaric oxygen therapy (HBOT) is designed to help you fight the signs of aging from within.",
+    antiAgingTitle: "Experience the revitalizing benefits of oxygen with O2ChamberBox. Our hyperbaric oxygen therapy is designed to help you fight the signs of aging from within.",
     antiAgingHowItWorks: "How It Works:",
     antiAgingHowItWorksDesc: "As we age, our skin's ability to repair and regenerate diminishes. HBOT provides concentrated oxygen to your skin cells, enhancing their natural repair mechanisms and stimulating collagen production. The outcome? Firmer, more youthful-looking skin.",
     antiAgingBenefits: "Benefits:",
