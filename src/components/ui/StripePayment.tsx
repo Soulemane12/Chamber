@@ -10,7 +10,9 @@ import {
 } from '@stripe/react-stripe-js';
 import { Button } from './Button';
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+  : null;
 
 interface PaymentFormProps {
   clientSecret: string;
@@ -194,6 +196,14 @@ export function StripePayment({
     return (
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
         <p className="text-red-700">Error: {error}</p>
+      </div>
+    );
+  }
+
+  if (!stripePromise) {
+    return (
+      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+        <p className="text-red-700">Stripe is not configured. Please contact support.</p>
       </div>
     );
   }

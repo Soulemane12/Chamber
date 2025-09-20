@@ -72,27 +72,56 @@ export async function POST(request: Request) {
     const amountInCents = Math.round(calculatedAmount * 100);
     console.log('Calculated amount:', calculatedAmount, 'Amount in cents:', amountInCents);
 
+    // Validate amount
+    if (amountInCents < 50) { // Minimum $0.50
+      console.error('Amount too low:', amountInCents);
+      return NextResponse.json(
+        { error: 'Payment amount is too low. Minimum is $0.50.' },
+        { status: 400 }
+      );
+    }
+
     // Create a PaymentIntent with the order amount and currency
     console.log('Initializing Stripe...');
-    const stripe = getStripe();
-    console.log('Stripe initialized, creating payment intent...');
+    let stripe;
+    try {
+      stripe = getStripe();
+      console.log('Stripe initialized successfully');
+    } catch (stripeError) {
+      console.error('Stripe initialization failed:', stripeError);
+      return NextResponse.json(
+        { error: 'Stripe is not configured properly' },
+        { status: 503 }
+      );
+    }
     
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: amountInCents,
-      currency: currency,
-      automatic_payment_methods: {
-        enabled: true,
-      },
-      metadata: {
-        duration,
-        groupSize,
-        location,
-        date,
-        customerEmail: customerInfo?.email || '',
-        customerName: `${customerInfo?.firstName || ''} ${customerInfo?.lastName || ''}`.trim(),
-        isPromotionActive: isPromoActive.toString(),
-      },
-    });
+    console.log('Creating payment intent...');
+    let paymentIntent;
+    try {
+      paymentIntent = await stripe.paymentIntents.create({
+        amount: amountInCents,
+        currency: currency,
+        automatic_payment_methods: {
+          enabled: true,
+        },
+        metadata: {
+          duration,
+          groupSize,
+          location,
+          date,
+          customerEmail: customerInfo?.email || '',
+          customerName: `${customerInfo?.firstName || ''} ${customerInfo?.lastName || ''}`.trim(),
+          isPromotionActive: isPromoActive.toString(),
+        },
+      });
+      console.log('Payment intent created successfully:', paymentIntent.id);
+    } catch (stripeError) {
+      console.error('Stripe payment intent creation failed:', stripeError);
+      return NextResponse.json(
+        { error: 'Failed to create payment intent with Stripe' },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       clientSecret: paymentIntent.client_secret,
