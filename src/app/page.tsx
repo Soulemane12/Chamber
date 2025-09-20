@@ -224,7 +224,7 @@ export default function Home() {
                           </p>
                             <video 
                               controls 
-                              className="w-full max-w-xs h-64 rounded-lg shadow-md object-cover"
+                              className="w-full max-w-xs h-90 rounded-lg shadow-md object-cover"
                               poster="/HBOT.jpg"
                               preload="metadata"
                             >
