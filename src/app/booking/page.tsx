@@ -190,7 +190,7 @@ export default function BookingPage() {
                     <div className="flex flex-col">
                       <p className="font-medium text-gray-900 dark:text-white break-words">
                         {bookingDetails.location === "midtown" 
-                          ? "575 Madison Ave, 20th floor, New York, NY" 
+                          ? "575 Madison Ave, 23rd floor, New York, NY" 
                           : "1900 Parker Rd SE, Conyers, GA 30094"}
                       </p>
                       {bookingDetails.location && (
@@ -200,7 +200,7 @@ export default function BookingPage() {
                           <a 
                             href={getGoogleMapsUrl(
                               bookingDetails.location === "midtown" 
-                                ? "575 Madison Ave, 20th floor, New York, NY" 
+                                ? "575 Madison Ave, 23rd floor, New York, NY" 
                                 : "1900 Parker Rd SE, Conyers, GA 30094"
                             )}
                             target="_blank"
@@ -217,7 +217,7 @@ export default function BookingPage() {
                           <a 
                             href={`https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=${encodeURIComponent(
                               bookingDetails.location === "midtown" 
-                                ? "575 Madison Ave, 20th floor, New York, NY" 
+                                ? "575 Madison Ave, 23rd floor, New York, NY" 
                                 : "1900 Parker Rd SE, Conyers, GA 30094"
                             )}`}
                             target="_blank"
@@ -233,7 +233,7 @@ export default function BookingPage() {
                           <a 
                             href={`https://ride.lyft.com/ridetype?q=${encodeURIComponent(
                               bookingDetails.location === "midtown" 
-                                ? "575 Madison Ave, 20th floor, New York, NY" 
+                                ? "575 Madison Ave, 23rd floor, New York, NY" 
                                 : "1900 Parker Rd SE, Conyers, GA 30094"
                             )}`}
                             target="_blank"
