@@ -62,8 +62,18 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
   // Effect to immediately remove any Stripe-generated buttons from DOM
   useEffect(() => {
     const removeStripeButtons = () => {
-      // Remove any buttons that Stripe might generate
-      const buttonsToRemove = document.querySelectorAll([
+      // Target the EXACT button structure from the user's HTML
+      const exactButtonSelectors = [
+        // The exact button structure
+        'button.inline-flex.items-center.justify-center.font-medium.transition-colors.duration-200[type="submit"]',
+        'button.bg-blue-600.text-white.hover\\:bg-blue-700[type="submit"]',
+        'button.order-1.sm\\:order-2[type="submit"]',
+        'button.h-12.rounded-md.px-6.text-lg[type="submit"]',
+        // Any button with these class combinations
+        'button.inline-flex.items-center.justify-center[type="submit"]',
+        'button.bg-blue-600[type="submit"]',
+        'button[class*="order-1"][class*="sm:order-2"][type="submit"]',
+        // General patterns
         '.payment-element-container button[type="submit"]',
         '.payment-element-container [class*="SubmitButton"]',
         '.payment-element-container [class*="submitButton"]',
@@ -73,13 +83,17 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
         'button[class*="bg-blue-600"][type="submit"]',
         'button[class*="order-1"][type="submit"]',
         'button[class*="order-2"][type="submit"]'
-      ].join(', '));
+      ];
 
-      buttonsToRemove.forEach(button => {
-        // Remove ANY submit button within payment containers
-        if (button.getAttribute('type') === 'submit') {
-          console.log('Removing unwanted submit button:', button);
-          button.remove(); // Actually remove from DOM instead of hiding
+      exactButtonSelectors.forEach(selector => {
+        try {
+          const buttons = document.querySelectorAll(selector);
+          buttons.forEach(button => {
+            console.log('Removing exact matching button:', button, 'Selector:', selector);
+            button.remove();
+          });
+        } catch (error) {
+          console.debug('Error with selector:', selector, error);
         }
       });
     };
@@ -130,25 +144,60 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
     removeStripeButtons();
     const interval = setInterval(removeStripeButtons, 300);
 
-    // Also add a global button removal for any button with "Complete" text
+    // SUPER AGGRESSIVE: Target buttons with EXACT text content
     const globalRemoval = setInterval(() => {
       const allButtons = document.querySelectorAll('button, [role="button"]');
       allButtons.forEach(button => {
         const text = button.textContent || '';
-        if (text.includes('Complete') || text.includes('Book •') || button.getAttribute('type') === 'submit') {
+        const innerHTML = button.innerHTML || '';
+        
+        // Check for EXACT text patterns from the user's button
+        const hasCompleteBooking = text.includes('Complete Booking') || innerHTML.includes('Complete Booking');
+        const hasBookDollar = text.includes('Book • $') || innerHTML.includes('Book • $');
+        const isSubmitButton = button.getAttribute('type') === 'submit';
+        const hasBlueClasses = button.classList.contains('bg-blue-600') && button.classList.contains('text-white');
+        const hasOrderClasses = button.classList.contains('order-1') && button.classList.contains('sm:order-2');
+        
+        if (hasCompleteBooking || hasBookDollar || (isSubmitButton && hasBlueClasses) || hasOrderClasses) {
           // Only remove if it's not our custom payment button
-          if (!button.id?.includes('button-text') && !button.closest('#payment-form')) {
-            console.log('Removing global unwanted button:', button, 'Text:', text);
+          const isOurButton = button.closest('.space-y-6') && button.textContent?.includes('Pay $');
+          if (!isOurButton) {
+            console.log('Removing global unwanted button:', button, 'Text:', text, 'Classes:', button.className);
             button.remove();
           }
         }
       });
-    }, 200);
+    }, 100); // Increased frequency to 100ms
+
+    // NUCLEAR OPTION: Search by exact HTML structure
+    const nuclearRemoval = setInterval(() => {
+      // Look for the exact class combination
+      const exactButtons = document.querySelectorAll('button.inline-flex.items-center.justify-center.font-medium.bg-blue-600.text-white');
+      exactButtons.forEach(button => {
+        if (button.getAttribute('type') === 'submit') {
+          console.log('NUCLEAR: Removing button with exact class structure:', button);
+          button.remove();
+        }
+      });
+      
+      // Also look for any button containing the exact span structure
+      const buttonsWithSpans = document.querySelectorAll('button');
+      buttonsWithSpans.forEach(button => {
+        const spans = button.querySelectorAll('span');
+        spans.forEach(span => {
+          if (span.textContent?.includes('Complete Booking') || span.textContent?.includes('Book • $')) {
+            console.log('NUCLEAR: Removing button containing Complete/Book span:', button);
+            button.remove();
+          }
+        });
+      });
+    }, 50); // Super fast 50ms interval
 
     return () => {
       observer.disconnect();
       clearInterval(interval);
       clearInterval(globalRemoval);
+      clearInterval(nuclearRemoval);
     };
   }, []);
 
