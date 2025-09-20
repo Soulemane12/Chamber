@@ -22,6 +22,8 @@ const groupSizeMultipliers = {
 
 export async function POST(request: Request) {
   try {
+    console.log('Creating payment intent...');
+    
     const { 
       amount, 
       currency = 'usd', 
@@ -32,8 +34,11 @@ export async function POST(request: Request) {
       customerInfo 
     } = await request.json();
 
+    console.log('Payment intent data:', { amount, duration, groupSize, location, date });
+
     // Validate required fields
     if (!amount || !duration || !groupSize || !location || !date) {
+      console.error('Missing required fields:', { amount, duration, groupSize, location, date });
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -65,9 +70,13 @@ export async function POST(request: Request) {
 
     // Convert to cents for Stripe
     const amountInCents = Math.round(calculatedAmount * 100);
+    console.log('Calculated amount:', calculatedAmount, 'Amount in cents:', amountInCents);
 
     // Create a PaymentIntent with the order amount and currency
+    console.log('Initializing Stripe...');
     const stripe = getStripe();
+    console.log('Stripe initialized, creating payment intent...');
+    
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amountInCents,
       currency: currency,
@@ -92,9 +101,29 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error('Error creating payment intent:', error);
+    
+    // Provide more specific error messages
+    let errorMessage = 'Failed to create payment intent';
+    let statusCode = 500;
+    
+    if (error instanceof Error) {
+      if (error.message.includes('STRIPE_SECRET_KEY is not configured')) {
+        errorMessage = 'Stripe is not configured. Please contact support.';
+        statusCode = 503;
+      } else if (error.message.includes('Invalid API Key')) {
+        errorMessage = 'Invalid Stripe configuration. Please contact support.';
+        statusCode = 503;
+      } else if (error.message.includes('amount')) {
+        errorMessage = 'Invalid payment amount. Please try again.';
+        statusCode = 400;
+      } else {
+        errorMessage = `Payment error: ${error.message}`;
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to create payment intent' },
-      { status: 500 }
+      { error: errorMessage },
+      { status: statusCode }
     );
   }
 }

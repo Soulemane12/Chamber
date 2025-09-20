@@ -161,8 +161,12 @@ export function StripePayment({
         customerInfo,
       }),
     })
-      .then((res) => res.json())
+      .then((res) => {
+        console.log('Payment intent response status:', res.status);
+        return res.json();
+      })
       .then((data) => {
+        console.log('Payment intent response data:', data);
         if (data.error) {
           setError(data.error);
         } else {
@@ -171,6 +175,7 @@ export function StripePayment({
         setIsLoading(false);
       })
       .catch((err) => {
+        console.error('Payment intent fetch error:', err);
         setError('Failed to initialize payment');
         setIsLoading(false);
       });
