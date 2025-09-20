@@ -7,7 +7,7 @@ import { useLanguage } from "@/lib/LanguageContext";
 import { Footer } from "@/components/Footer";
 
 export default function Home() {
-  const { t } = useLanguage(); 
+  const { t } = useLanguage();
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
