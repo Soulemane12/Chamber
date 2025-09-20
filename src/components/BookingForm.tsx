@@ -1700,7 +1700,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               </Button>
               <div className="w-full sm:w-auto order-1 sm:order-2 text-center">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Complete payment to confirm your booking
+                  Payment will be processed automatically
                 </p>
               </div>
             </div>
