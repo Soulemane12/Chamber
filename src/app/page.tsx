@@ -218,15 +218,29 @@ export default function Home() {
                       {/* Video Section */}
                       <div className="mt-2">
                         <h4 className="text-xs font-semibold mb-1 text-gray-900 dark:text-white">Take a Virtual Tour</h4>
-                        <video 
-                          controls 
-                          className="w-full max-w-xs rounded-lg shadow-md"
-                          poster="/HBOT.jpg"
-                        >
-                          <source src="/midtown_vid.mov" type="video/quicktime" />
-                          <source src="/midtown_vid.mov" type="video/mp4" />
-                          Your browser does not support the video tag.
-                        </video>
+                        <div className="bg-gray-100 dark:bg-gray-600 p-3 rounded-lg">
+                          <p className="text-xs text-gray-600 dark:text-gray-300 mb-2">
+                            Video tour of our Midtown Biohack location
+                          </p>
+                          <video 
+                            controls 
+                            className="w-full max-w-xs rounded-lg shadow-md"
+                            poster="/HBOT.jpg"
+                            preload="metadata"
+                          >
+                            <source src="/midtown_vid.mov" type="video/quicktime" />
+                            <p className="text-xs text-gray-500 p-2">
+                              Your browser doesn't support this video format. 
+                              <br />
+                              <a href="/midtown_vid.mov" className="text-blue-600 hover:text-blue-800 underline" download>
+                                Download video to watch
+                              </a>
+                            </p>
+                          </video>
+                          <p className="text-xs text-gray-500 mt-1">
+                            If video doesn't play, try downloading it or use Safari/Firefox
+                          </p>
+                        </div>
                       </div>
                     </div>
                   ) : (
