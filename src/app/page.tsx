@@ -210,7 +210,7 @@ export default function Home() {
                         Our Midtown location offers personalized sessions and expert guidance.
                       </p>
                       <div className="space-y-2 text-gray-600 dark:text-gray-300">
-                        <p><strong>📍 Address:</strong> 1234 Madison Avenue, New York, NY 10001</p>
+                        <p><strong>📍 Address:</strong> 575 Madison Ave, 23rd Floor, New York, NY 10022</p>
                         <p><strong>🕒 Hours:</strong> Mon-Fri 9AM-7PM, Sat 10AM-4PM</p>
                         <p><strong>📞 Phone:</strong> (555) 123-4567</p>
                       </div>

@@ -39,7 +39,7 @@ export function delay(ms: number): Promise<void> {
 export const locationData = {
   midtown: {
     name: "Midtown Biohack",
-    address: "575 Madison Ave, 20th floor, New York, NY",
+    address: "575 Madison Ave, 23rd Floor, New York, NY 10022",
 
     email: "billydduc@gmail.com",
     owner: "Billy Duc",
@@ -64,7 +64,7 @@ export const locationData = {
   },
   conyers: {
     name: "Platinum Wellness Spa",
-    address: "1900 Parker Rd SE, Conyers, GA 30094",
+    address: "1990 Parker Rd SE, Conyers, GA 30094",
 
     email: "billydduc@gmail.com",
     owner: "Billy Duc",

@@ -830,7 +830,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     }`}>
                       Midtown Biohack
                     </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">575 Madison Ave, 20th floor, NY, NY</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">575 Madison Ave, 23rd Floor, New York, NY 10022</p>
                   </div>
                 </label>
 
@@ -858,7 +858,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     }`}>
                       Platinum Wellness Spa
                     </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">1900 Parker Rd SE, Conyers, GA 30094</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">1990 Parker Rd SE, Conyers, GA 30094</p>
                   </div>
                 </label>
               </div>

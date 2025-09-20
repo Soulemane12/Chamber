@@ -39,8 +39,8 @@ export async function POST(request: Request) {
     // Location details
     const locationName = bookingData.location === 'midtown' ? 'Midtown Biohack' : 'Platinum Wellness Spa';
     const locationAddress = bookingData.location === 'midtown' 
-      ? '575 Madison Ave, 20th floor, New York, NY' 
-      : '1900 Parker Rd SE, Conyers, GA 30094';
+      ? '575 Madison Ave, 23rd Floor, New York, NY 10022' 
+      : '1990 Parker Rd SE, Conyers, GA 30094';
 
     // Group discount info removed - contact us for pricing
     let discountInfo = '';
