@@ -18,35 +18,27 @@ export default function O2BoxT810RW2000() {
   interface Accessory {
     id: string;
     name: string;
-    price: number;
     description?: string;
   }
 
   const accessories: Accessory[] = [
-    { id: 'premium_couch', name: 'Premium couch', price: 1000 },
-    { id: 'stadium_seating', name: 'Stadium seating', price: 875 },
-    { id: 'ac_unit', name: 'Air conditioner unit', price: 990 },
-    { id: 'massage_table', name: 'Massage table', price: 725 },
-    { id: 'ottoman', name: 'Ottoman', price: 589 },
-    { id: 'custom_wrap', name: 'Custom wrap', price: 1700 },
-    { id: 'custom_logo', name: 'Custom logo', price: 1380 },
+    { id: 'premium_couch', name: 'Premium couch' },
+    { id: 'stadium_seating', name: 'Stadium seating' },
+    { id: 'ac_unit', name: 'Air conditioner unit' },
+    { id: 'massage_table', name: 'Massage table' },
+    { id: 'ottoman', name: 'Ottoman' },
+    { id: 'custom_wrap', name: 'Custom wrap' },
+    { id: 'custom_logo', name: 'Custom logo' },
   ];
 
-  const basePrice = 185000;
-  const selectedAccessoriesTotal = selectedAccessories.reduce((total, accessoryId) => {
-    const accessory = accessories.find(a => a.id === accessoryId);
-    return total + (accessory?.price || 0);
-  }, 0);
-  const subtotal = basePrice + selectedAccessoriesTotal;
-  const total = subtotal; // Delivery & install included
-  const upfrontPayment = paymentOption === 'half' ? total / 2 : total;
+  // Pricing removed - contact us for pricing information
 
   const handleAccessoryToggle = (accessoryId: string) => {
     setSelectedAccessories(prev => prev.includes(accessoryId) ? prev.filter(id => id !== accessoryId) : [...prev, accessoryId]);
   };
 
   const handlePurchase = () => {
-    alert(`Purchase initiated!\nTotal: $${total.toLocaleString()}\nUpfront Payment: $${upfrontPayment.toLocaleString()}\nDelivery: ${deliveryDate} ${deliveryTime}\nAddress/ZIP: ${addressOrZip}`);
+    alert(`Purchase inquiry submitted!\nPlease contact us for pricing and availability.\nDelivery: ${deliveryDate} ${deliveryTime}\nAddress/ZIP: ${addressOrZip}`);
   };
   
   return (
@@ -183,7 +175,7 @@ export default function O2BoxT810RW2000() {
                                 <p className="text-sm text-gray-600 dark:text-gray-300">{accessory.description}</p>
                               )}
                             </div>
-                            <p className="font-semibold text-blue-600">${accessory.price.toLocaleString()}</p>
+                            <p className="font-semibold text-blue-600">Contact for pricing</p>
                           </div>
                         </div>
                       </label>
@@ -287,58 +279,38 @@ export default function O2BoxT810RW2000() {
                 </div>
               </div>
 
-              {/* Right Column - Order Summary */}
+              {/* Right Column - Inquiry Form */}
               <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg h-fit">
                 <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-                  Order Summary
+                  Request Information
                 </h3>
-                <div className="space-y-3 mb-6">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-300">O2 BOX T810-R W2000 Base Price</span>
-                    <span className="font-medium">${basePrice.toLocaleString()}</span>
-                  </div>
+                <div className="space-y-4 mb-6">
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Contact us for pricing, availability, and customization options for the O2 BOX T810-R W2000.
+                  </p>
                   {selectedAccessories.length > 0 && (
                     <div className="border-t pt-3">
                       <p className="font-medium text-gray-900 dark:text-white mb-2">Selected Accessories:</p>
                       {selectedAccessories.map(accessoryId => {
                         const accessory = accessories.find(a => a.id === accessoryId);
                         return (
-                          <div key={accessoryId} className="flex justify-between text-sm">
-                            <span className="text-gray-600 dark:text-gray-300">{accessory?.name}</span>
-                            <span>${accessory?.price.toLocaleString()}</span>
+                          <div key={accessoryId} className="text-sm text-gray-600 dark:text-gray-300">
+                            • {accessory?.name}
                           </div>
                         );
                       })}
                     </div>
                   )}
-                  <div className="border-t pt-3">
-                    <div className="flex justify-between text-lg font-semibold">
-                      <span className="text-gray-900 dark:text-white">Total</span>
-                      <span className="text-blue-600">${total.toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-3 mb-6">
-                  <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                    <p className="text-sm text-blue-800 dark:text-blue-200">
-                      <strong>Upfront Payment:</strong> ${upfrontPayment.toLocaleString()}
-                    </p>
-                    {paymentOption === 'half' && (
-                      <p className="text-sm text-blue-800 dark:text-blue-200 mt-1">
-                        Remaining: ${(total - upfrontPayment).toLocaleString()} (due before delivery)
-                      </p>
-                    )}
-                  </div>
                 </div>
                 <button
                   onClick={handlePurchase}
                   disabled={!deliveryDate || !deliveryTime || !addressOrZip}
                   className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 px-6 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 disabled:cursor-not-allowed"
                 >
-                  Purchase Now - ${upfrontPayment.toLocaleString()}
+                  Request Quote
                 </button>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
-                  * Final pricing subject to confirmation. Contact us for financing details.
+                  We'll contact you within 24 hours with detailed information and pricing.
                 </p>
               </div>
             </div>

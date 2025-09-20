@@ -36,10 +36,10 @@ async function fetchDataForPDF() {
       throw new Error('Failed to fetch users data');
     }
 
-    // Calculate summary stats
+    // Calculate summary stats (pricing removed)
     const totalBookings = bookings?.length || 0;
-    const totalRevenue = bookings?.reduce((sum, booking) => sum + (Number(booking.amount) || 0), 0) || 0;
-    const averageBookingValue = totalBookings > 0 ? totalRevenue / totalBookings : 0;
+    const totalRevenue = 0; // Pricing removed
+    const averageBookingValue = 0; // Pricing removed
 
     return {
       bookings,
@@ -133,8 +133,7 @@ function generateBookingReport(data: any) {
     <h2>Summary Statistics</h2>
     <ul>
       <li><strong>Total Bookings:</strong> ${summaryStats.totalBookings}</li>
-      <li><strong>Total Revenue:</strong> $${summaryStats.totalRevenue.toFixed(2)}</li>
-      <li><strong>Average Booking Value:</strong> $${summaryStats.averageBookingValue.toFixed(2)}</li>
+      <li><strong>Pricing:</strong> Contact us for pricing information</li>
     </ul>
     
     <h2>Recent Bookings</h2>
@@ -145,7 +144,7 @@ function generateBookingReport(data: any) {
           <th>Customer</th>
           <th>Location</th>
           <th>Duration</th>
-          <th>Amount</th>
+          <th>Status</th>
         </tr>
       </thead>
       <tbody>
@@ -155,7 +154,7 @@ function generateBookingReport(data: any) {
             <td>${booking.first_name} ${booking.last_name}</td>
             <td>${booking.location}</td>
             <td>${booking.duration} min</td>
-            <td>$${booking.amount}</td>
+            <td>Confirmed</td>
           </tr>
         `).join('') || '<tr><td colspan="5">No bookings found</td></tr>'}
       </tbody>
@@ -232,42 +231,41 @@ function generateUserReport(data: any) {
 function generateRevenueReport(data: any) {
   const { bookings, summaryStats } = data;
   
-  // Calculate revenue by location
-  const revenueByLocation = bookings?.reduce((acc: any, booking: any) => {
+  // Calculate bookings by location
+  const bookingsByLocation = bookings?.reduce((acc: any, booking: any) => {
     const location = booking.location || 'Unknown';
-    acc[location] = (acc[location] || 0) + (Number(booking.amount) || 0);
+    acc[location] = (acc[location] || 0) + 1;
     return acc;
   }, {}) || {};
   
-  // Calculate revenue by month
-  const revenueByMonth = bookings?.reduce((acc: any, booking: any) => {
+  // Calculate bookings by month
+  const bookingsByMonth = bookings?.reduce((acc: any, booking: any) => {
     const month = new Date(booking.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
-    acc[month] = (acc[month] || 0) + (Number(booking.amount) || 0);
+    acc[month] = (acc[month] || 0) + 1;
     return acc;
   }, {}) || {};
 
   return `
-    <h1>Revenue Report</h1>
+    <h1>Booking Report</h1>
     <p><strong>Generated on:</strong> ${new Date().toLocaleDateString()}</p>
     
     <h2>Summary Statistics</h2>
     <ul>
-      <li><strong>Total Revenue:</strong> $${summaryStats.totalRevenue.toFixed(2)}</li>
       <li><strong>Total Bookings:</strong> ${summaryStats.totalBookings}</li>
-      <li><strong>Average Booking Value:</strong> $${summaryStats.averageBookingValue.toFixed(2)}</li>
+      <li><strong>Pricing:</strong> Contact us for pricing information</li>
     </ul>
     
-    <h2>Revenue by Location</h2>
+    <h2>Bookings by Location</h2>
     <ul>
-      ${Object.entries(revenueByLocation).map(([location, revenue]) => 
-        `<li><strong>${location}:</strong> $${Number(revenue).toFixed(2)}</li>`
+      ${Object.entries(bookingsByLocation).map(([location, count]) => 
+        `<li><strong>${location}:</strong> ${count} bookings</li>`
       ).join('')}
     </ul>
     
-    <h2>Revenue by Month</h2>
+    <h2>Bookings by Month</h2>
     <ul>
-      ${Object.entries(revenueByMonth).map(([month, revenue]) => 
-        `<li><strong>${month}:</strong> $${Number(revenue).toFixed(2)}</li>`
+      ${Object.entries(bookingsByMonth).map(([month, count]) => 
+        `<li><strong>${month}:</strong> ${count} bookings</li>`
       ).join('')}
     </ul>
   `;
@@ -278,8 +276,7 @@ async function generateCustomDocument(customRequest: string, data: any) {
 Current system data:
 - Total users: ${data.users?.length || 0}
 - Total bookings: ${data.summaryStats?.totalBookings || 0}
-- Total revenue: $${data.summaryStats?.totalRevenue.toFixed(2) || 0}
-- Average booking value: $${data.summaryStats?.averageBookingValue.toFixed(2) || 0}
+- Pricing: Contact us for pricing information
 
 User request: ${customRequest}
 

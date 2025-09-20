@@ -58,20 +58,7 @@ const timeSlots = [
   "5:00 PM",
 ];
 
-// Pricing for different durations
-const pricingOptions = {
-  "60": 150,
-  "90": 200,
-  "120": 250,
-};
-
-// Group size multipliers (discount for groups)
-const groupSizeMultipliers = {
-  "1": 1.0,    // No discount for single person
-  "2": 1.8,    // 10% discount per person
-  "3": 2.55,   // 15% discount per person
-  "4": 3.2,    // 20% discount per person
-};
+// Pricing removed - contact us for pricing information
 
 interface BookingFormProps {
   onBookingComplete: (data: BookingFormData) => void;
@@ -232,11 +219,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
   const selectedDuration = watch("duration");
   const selectedGroupSize = watch("groupSize");
 
-  const calculateTotal = () => {
-    const basePrice = pricingOptions[selectedDuration as keyof typeof pricingOptions] || 0;
-    const multiplier = groupSizeMultipliers[selectedGroupSize as keyof typeof groupSizeMultipliers] || 1.0;
-    return basePrice * multiplier;
-  };
+  // Pricing calculation removed - contact us for pricing information
 
   const isDateDisabled = (date: Date) => {
     // Disable past dates only; allow any future date
@@ -247,10 +230,8 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
   const onSubmit = async (data: BookingFormData) => {
     setIsSubmitting(true);
     try {
-      // Calculate booking amount
-      const basePrice = pricingOptions[data.duration as keyof typeof pricingOptions] || 0;
-      const multiplier = groupSizeMultipliers[data.groupSize as keyof typeof groupSizeMultipliers] || 1.0;
-      const amount = basePrice * multiplier;
+      // Pricing removed - contact us for pricing information
+      const amount = 0; // No pricing displayed
       
       // Get user ID if authenticated
       const { data: { session } } = await supabase.auth.getSession();
@@ -1374,8 +1355,8 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Total</p>
-                    <p className="font-bold text-xl text-gray-900 dark:text-white">{formatCurrency(calculateTotal())}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Contact us for pricing</p>
+                    <p className="font-bold text-xl text-gray-900 dark:text-white">Pricing on request</p>
                   </div>
 
                   {/* Show uploaded files if any */}
@@ -1462,8 +1443,8 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                 className="w-full sm:w-auto order-1 sm:order-2"
                 disabled={isSubmitting || isStepLoading}
               >
-                <span className="hidden sm:inline">{`Complete Booking • ${formatCurrency(calculateTotal())}`}</span>
-                <span className="sm:hidden">{`Book • ${formatCurrency(calculateTotal())}`}</span>
+                <span className="hidden sm:inline">Complete Booking • Contact for pricing</span>
+                <span className="sm:hidden">Book • Contact for pricing</span>
               </Button>
             </div>
           </div>

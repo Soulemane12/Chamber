@@ -2,60 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
 import { Header } from "@/components/Header";
 import { useLanguage } from "@/lib/LanguageContext";
 import { Footer } from "@/components/Footer";
 
-interface Accessory {
-  id: string;
-  name: string;
-  price: number;
-  description?: string;
-}
-
-const accessories: Accessory[] = [
-  { id: 'premium_couch', name: 'Premium couch', price: 1000 },
-  { id: 'stadium_seating', name: 'Stadium seating', price: 875 },
-  { id: 'ac_unit', name: 'Air conditioner unit', price: 990 },
-  { id: 'massage_table', name: 'Massage table', price: 725 },
-  { id: 'ottoman', name: 'Ottoman', price: 589 },
-  { id: 'custom_wrap', name: 'Custom wrap', price: 1700 },
-  { id: 'custom_logo', name: 'Custom logo', price: 1380 },
-];
-
 export default function O2BoxT2R() {
   const { t } = useLanguage();
-  const [selectedAccessories, setSelectedAccessories] = useState<string[]>([]);
-  const [deliveryDate, setDeliveryDate] = useState('');
-  const [deliveryTime, setDeliveryTime] = useState('');
-  const [addressOrZip, setAddressOrZip] = useState('');
-  const [paymentOption, setPaymentOption] = useState<'half' | 'full' | 'financing'>('full');
-  
-  // Pricing
-  const basePrice = 95000; // Base price for T2-R
-  
-  const selectedAccessoriesTotal = selectedAccessories.reduce((total, accessoryId) => {
-    const accessory = accessories.find(a => a.id === accessoryId);
-    return total + (accessory?.price || 0);
-  }, 0);
-  
-  const subtotal = basePrice + selectedAccessoriesTotal;
-  const total = subtotal; // Delivery & install included
-  const upfrontPayment = paymentOption === 'half' ? total / 2 : total;
-
-  const handleAccessoryToggle = (accessoryId: string) => {
-    setSelectedAccessories(prev => 
-      prev.includes(accessoryId) 
-        ? prev.filter(id => id !== accessoryId)
-        : [...prev, accessoryId]
-    );
-  };
-
-  const handlePurchase = () => {
-    // This would integrate with payment processing
-    alert(`Purchase initiated!\nTotal: $${total.toLocaleString()}\nUpfront Payment: $${upfrontPayment.toLocaleString()}\nDelivery Date: ${deliveryDate}`);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
@@ -151,7 +103,7 @@ export default function O2BoxT2R() {
               Inquire About O2 BOX T2-R
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-300">
-              Contact us for pricing, availability, and customization options
+              Contact us for availability and customization options
             </p>
           </div>
           
@@ -179,16 +131,41 @@ export default function O2BoxT2R() {
                     Optional Add-ons Available
                   </h3>
                   <div className="space-y-3">
-                    {accessories.map((accessory) => (
-                      <div key={accessory.id} className="flex items-start space-x-3">
-                        <div className="flex-1">
-                          <p className="font-medium text-gray-900 dark:text-white">{accessory.name}</p>
-                          {accessory.description && (
-                            <p className="text-sm text-gray-600 dark:text-gray-300">{accessory.description}</p>
-                          )}
-                        </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900 dark:text-white">Premium couch</p>
                       </div>
-                    ))}
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900 dark:text-white">Stadium seating</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900 dark:text-white">Air conditioner unit</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900 dark:text-white">Massage table</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900 dark:text-white">Ottoman</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900 dark:text-white">Custom wrap</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900 dark:text-white">Custom logo</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -267,7 +244,7 @@ export default function O2BoxT2R() {
                   </button>
                   
                   <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                    We'll contact you within 24 hours with detailed information and pricing.
+                    We'll contact you within 24 hours with detailed information.
                   </p>
                 </form>
               </div>
