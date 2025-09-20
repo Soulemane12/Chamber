@@ -59,39 +59,151 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
     });
   }, [stripe, clientSecret]);
 
-  // Effect to hide any Stripe-generated submit buttons
+  // Effect to hide any Stripe-generated submit buttons using MutationObserver
   useEffect(() => {
-    const hideStripeButtons = () => {
-      // Target buttons within the payment element container specifically
-      const paymentContainer = document.querySelector('.payment-element-container');
-      if (paymentContainer) {
-        const buttons = paymentContainer.querySelectorAll('button');
-        buttons.forEach(button => {
-          const buttonText = button.textContent || '';
-          // Only hide buttons that contain the exact text we want to remove
-          if (buttonText.includes('Complete Booking') || 
-              buttonText.includes('Book • $') ||
-              button.getAttribute('type') === 'submit') {
-            (button as HTMLElement).style.display = 'none !important';
-          }
-        });
-      }
+    const hideStripeButtons = (targetNode?: Element | Document) => {
+      // Define all possible selectors for buttons we want to hide
+      const selectors = [
+        'button[type="submit"]',
+        'button[class*="SubmitButton"]',
+        'button[class*="submitButton"]',
+        'button[class*="Submit"]',
+        'button[class*="bg-blue-600"]',
+        'button[class*="bg-blue-700"]',
+        'button[class*="order-1"]',
+        'button[class*="order-2"]',
+        'button[class*="sm:order-2"]',
+        'button.inline-flex.items-center.justify-center',
+        '[data-testid*="submit"]',
+        '[data-testid*="Submit"]',
+        '[class*="SubmitButton"]',
+        '[class*="submitButton"]'
+      ];
+
+      // Target the specific container or the entire document
+      const searchRoot = targetNode || document;
       
-      // Also target any buttons with the specific classes from the user's example
-      const specificButtons = document.querySelectorAll('button.inline-flex.items-center.justify-center.font-medium.transition-colors.duration-200');
-      specificButtons.forEach(button => {
-        const buttonText = button.textContent || '';
-        if (buttonText.includes('Complete Booking') || buttonText.includes('Book • $')) {
-          (button as HTMLElement).style.display = 'none !important';
+      selectors.forEach(selector => {
+        try {
+          const elements = searchRoot.querySelectorAll(selector);
+          elements.forEach(element => {
+            const buttonText = element.textContent || '';
+            const isSubmitButton = element.getAttribute('type') === 'submit';
+            const hasProblematicText = buttonText.includes('Complete Booking') || 
+                                      buttonText.includes('Book • $') ||
+                                      buttonText.includes('Submit payment') ||
+                                      buttonText.includes('Pay now');
+            
+            // Hide if it's a submit button or has problematic text
+            if (isSubmitButton || hasProblematicText) {
+              const htmlElement = element as HTMLElement;
+              htmlElement.style.display = 'none';
+              htmlElement.style.visibility = 'hidden';
+              htmlElement.style.opacity = '0';
+              htmlElement.style.pointerEvents = 'none';
+              htmlElement.style.position = 'absolute';
+              htmlElement.style.left = '-9999px';
+              htmlElement.style.height = '0';
+              htmlElement.style.width = '0';
+              htmlElement.style.overflow = 'hidden';
+              
+              // Also remove from tab order
+              htmlElement.setAttribute('tabindex', '-1');
+              htmlElement.setAttribute('aria-hidden', 'true');
+            }
+          });
+        } catch (error) {
+          console.debug('Error hiding button with selector:', selector, error);
         }
       });
     };
 
-    // Run immediately and set up interval to catch dynamically added buttons
+    // Run immediately
     hideStripeButtons();
-    const interval = setInterval(hideStripeButtons, 200);
 
-    return () => clearInterval(interval);
+    // Set up MutationObserver to watch for DOM changes
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              const element = node as Element;
+              // Hide buttons in the newly added node
+              hideStripeButtons(element);
+              // Also check if the node itself is a button we want to hide
+              if (element.matches && (
+                element.matches('button[type="submit"]') ||
+                element.matches('[class*="SubmitButton"]') ||
+                element.matches('[class*="submitButton"]')
+              )) {
+                hideStripeButtons(document);
+              }
+            }
+          });
+        }
+        
+        // Also check for attribute changes that might reveal hidden buttons
+        if (mutation.type === 'attributes') {
+          const target = mutation.target as Element;
+          if (target.matches && (
+            target.matches('button[type="submit"]') ||
+            target.matches('[class*="SubmitButton"]') ||
+            target.matches('[class*="submitButton"]')
+          )) {
+            hideStripeButtons();
+          }
+        }
+      });
+    });
+
+    // Start observing the document with the configured parameters
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class', 'style', 'type', 'data-testid']
+    });
+
+    // Also run periodically as a fallback (less frequent than before)
+    const fallbackInterval = setInterval(hideStripeButtons, 1000);
+
+    return () => {
+      observer.disconnect();
+      clearInterval(fallbackInterval);
+    };
+  }, []);
+
+  // Additional effect to prevent any form submission events
+  useEffect(() => {
+    const preventFormSubmission = (event: Event) => {
+      const target = event.target as HTMLElement;
+      
+      // Check if the event is coming from a submit button we want to block
+      if (target && (
+        target.matches('button[type="submit"]') ||
+        target.matches('[class*="SubmitButton"]') ||
+        target.matches('[class*="submitButton"]') ||
+        (target.textContent && (
+          target.textContent.includes('Complete Booking') ||
+          target.textContent.includes('Book • $')
+        ))
+      )) {
+        console.debug('Preventing unwanted form submission from:', target);
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        return false;
+      }
+    };
+
+    // Add event listeners to catch form submissions
+    document.addEventListener('submit', preventFormSubmission, true);
+    document.addEventListener('click', preventFormSubmission, true);
+    
+    return () => {
+      document.removeEventListener('submit', preventFormSubmission, true);
+      document.removeEventListener('click', preventFormSubmission, true);
+    };
   }, []);
 
   const handleSubmit = async (e?: React.FormEvent | React.MouseEvent) => {
@@ -139,6 +251,17 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
       applePay: 'never' as const,
       googlePay: 'never' as const,
     },
+    // Additional options to suppress button generation
+    defaultValues: {
+      billingDetails: {
+        name: `${customerInfo.firstName} ${customerInfo.lastName}`,
+        email: customerInfo.email,
+      }
+    },
+    // Prevent any form submission behavior
+    business: {
+      name: 'Chamber Booking'
+    }
   };
 
   return (
@@ -266,6 +389,25 @@ export function StripePayment({
 
   const appearance = {
     theme: 'stripe' as const,
+    // Hide any submit buttons that Stripe might generate
+    rules: {
+      '.Tab': {
+        display: 'block'
+      },
+      '.Input': {
+        display: 'block'
+      },
+      // Hide any button elements within the payment element
+      'button[type="submit"]': {
+        display: 'none !important'
+      },
+      '.SubmitButton': {
+        display: 'none !important'
+      },
+      '[class*="SubmitButton"]': {
+        display: 'none !important'
+      }
+    }
   };
 
   const options = {
@@ -274,6 +416,8 @@ export function StripePayment({
     // Configure to prevent Stripe from generating its own submit button
     loader: 'auto' as const,
     locale: 'auto' as const,
+    // Additional options to suppress functionality
+    fonts: []
   };
 
   return (
