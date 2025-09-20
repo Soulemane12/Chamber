@@ -1,5 +1,23 @@
 @import "tailwindcss";
 
+/* Hide Stripe-generated submit buttons to prevent duplicate buttons */
+.payment-element-container button[type="submit"] {
+  display: none !important;
+}
+
+.payment-element-container [data-testid*="submit"] {
+  display: none !important;
+}
+
+/* Hide the specific "Complete Booking" button */
+button[class*="sm:order-2"] span[class*="hidden sm:inline"] {
+  display: none !important;
+}
+
+button[class*="sm:order-2"] {
+  display: none !important;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

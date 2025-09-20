@@ -19,9 +19,14 @@ interface PaymentFormProps {
   onPaymentSuccess: (paymentIntentId: string) => void;
   onPaymentError: (error: string) => void;
   amount: number;
+  customerInfo: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
 }
 
-function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount }: PaymentFormProps) {
+function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, customerInfo }: PaymentFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
@@ -86,6 +91,17 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount }:
 
   const paymentElementOptions = {
     layout: "tabs" as const,
+    // Disable Stripe's built-in submit button to prevent duplicate buttons
+    fields: {
+      billingDetails: 'never' as const,
+    },
+    // Disable the submit button from PaymentElement
+    paymentMethodTypes: ['card'],
+    // Prevent PaymentElement from generating its own submit button
+    wallets: {
+      applePay: 'never' as const,
+      googlePay: 'never' as const,
+    },
   };
 
   return (
@@ -99,7 +115,9 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount }:
         </p>
       </div>
 
-      <PaymentElement id="payment-element" options={paymentElementOptions} />
+      <div className="payment-element-container">
+        <PaymentElement id="payment-element" options={paymentElementOptions} />
+      </div>
       
       <Button
         disabled={isLoading || !stripe || !elements}
@@ -215,6 +233,9 @@ export function StripePayment({
   const options = {
     clientSecret,
     appearance,
+    // Configure to prevent Stripe from generating its own submit button
+    loader: 'auto' as const,
+    locale: 'auto' as const,
   };
 
   return (
@@ -226,6 +247,7 @@ export function StripePayment({
             onPaymentSuccess={onPaymentSuccess}
             onPaymentError={onPaymentError}
             amount={amount}
+            customerInfo={customerInfo}
           />
         </Elements>
       )}
