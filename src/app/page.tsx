@@ -223,8 +223,7 @@ export default function Home() {
                         Multiple locations available for your convenience.
                       </p>
                       <div className="space-y-1 text-gray-600 dark:text-gray-300 text-sm">
-                        <p><strong>📍 Locations:</strong> 1990 Parker Rd SE
-                        Conyers, GA 30094</p>
+                        <p><strong>📍 Locations:</strong> 1990 Parker Rd SE, Conyers, GA 30094</p>
                         <p><strong>🕒 Hours:</strong> Mon-Fri 8AM-8PM, Sat-Sun 9AM-6PM</p>
                         <p><strong>📞 Phone:</strong> (555) 987-6543</p>
                       </div>
