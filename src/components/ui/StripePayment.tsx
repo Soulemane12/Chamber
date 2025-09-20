@@ -1,0 +1,219 @@
+"use client";
+
+import { useState, useEffect } from 'react';
+import { loadStripe } from '@stripe/stripe-js';
+import {
+  Elements,
+  PaymentElement,
+  useStripe,
+  useElements
+} from '@stripe/react-stripe-js';
+import { Button } from './Button';
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+
+interface PaymentFormProps {
+  clientSecret: string;
+  onPaymentSuccess: (paymentIntentId: string) => void;
+  onPaymentError: (error: string) => void;
+  amount: number;
+}
+
+function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount }: PaymentFormProps) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!stripe) {
+      return;
+    }
+
+    if (!clientSecret) {
+      return;
+    }
+
+    stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
+      switch (paymentIntent?.status) {
+        case "succeeded":
+          setMessage("Payment succeeded!");
+          break;
+        case "processing":
+          setMessage("Your payment is processing.");
+          break;
+        case "requires_payment_method":
+          setMessage("Your payment was not successful, please try again.");
+          break;
+        default:
+          setMessage("Something went wrong.");
+          break;
+      }
+    });
+  }, [stripe, clientSecret]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!stripe || !elements) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    const { error, paymentIntent } = await stripe.confirmPayment({
+      elements,
+      redirect: 'if_required',
+    });
+
+    if (error) {
+      if (error.type === "card_error" || error.type === "validation_error") {
+        setMessage(error.message || "An error occurred");
+        onPaymentError(error.message || "An error occurred");
+      } else {
+        setMessage("An unexpected error occurred.");
+        onPaymentError("An unexpected error occurred.");
+      }
+    } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+      setMessage("Payment succeeded!");
+      onPaymentSuccess(paymentIntent.id);
+    }
+
+    setIsLoading(false);
+  };
+
+  const paymentElementOptions = {
+    layout: "tabs" as const,
+  };
+
+  return (
+    <form id="payment-form" onSubmit={handleSubmit} className="space-y-6">
+      <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+        <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+          Payment Details
+        </h3>
+        <p className="text-blue-700 dark:text-blue-300">
+          Total Amount: <span className="font-bold">${amount.toFixed(2)}</span>
+        </p>
+      </div>
+
+      <PaymentElement id="payment-element" options={paymentElementOptions} />
+      
+      <Button
+        disabled={isLoading || !stripe || !elements}
+        type="submit"
+        className="w-full"
+      >
+        <span id="button-text">
+          {isLoading ? "Processing..." : `Pay $${amount.toFixed(2)}`}
+        </span>
+      </Button>
+      
+      {message && (
+        <div className={`text-sm ${message.includes('succeeded') ? 'text-green-600' : 'text-red-600'}`}>
+          {message}
+        </div>
+      )}
+    </form>
+  );
+}
+
+interface StripePaymentProps {
+  amount: number;
+  duration: string;
+  groupSize: string;
+  location: string;
+  date: Date;
+  customerInfo: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  onPaymentSuccess: (paymentIntentId: string) => void;
+  onPaymentError: (error: string) => void;
+}
+
+export function StripePayment({
+  amount,
+  duration,
+  groupSize,
+  location,
+  date,
+  customerInfo,
+  onPaymentSuccess,
+  onPaymentError,
+}: StripePaymentProps) {
+  const [clientSecret, setClientSecret] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Create PaymentIntent as soon as the page loads
+    fetch('/api/stripe/create-payment-intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount,
+        duration,
+        groupSize,
+        location,
+        date: date.toISOString(),
+        customerInfo,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          setError(data.error);
+        } else {
+          setClientSecret(data.clientSecret);
+        }
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        setError('Failed to initialize payment');
+        setIsLoading(false);
+      });
+  }, [amount, duration, groupSize, location, date, customerInfo]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+        <span className="ml-2">Initializing payment...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+        <p className="text-red-700">Error: {error}</p>
+      </div>
+    );
+  }
+
+  const appearance = {
+    theme: 'stripe' as const,
+  };
+
+  const options = {
+    clientSecret,
+    appearance,
+  };
+
+  return (
+    <div className="w-full">
+      {clientSecret && (
+        <Elements options={options} stripe={stripePromise}>
+          <PaymentForm
+            clientSecret={clientSecret}
+            onPaymentSuccess={onPaymentSuccess}
+            onPaymentError={onPaymentError}
+            amount={amount}
+          />
+        </Elements>
+      )}
+    </div>
+  );
+}

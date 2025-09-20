@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { formatCurrency, getLocationData, isPromotionActive, getPromotionPricing, promotionConfig } from "@/lib/utils";
 import { supabase } from "@/lib/supabaseClient";
 import { FileUpload } from "@/components/ui/FileUpload";
+import { StripePayment } from "@/components/ui/StripePayment";
 
 // Define the form schema with zod validation
 const bookingSchema = z.object({
@@ -100,6 +101,10 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
 
   // Add loading state for step transitions
   const [isStepLoading, setIsStepLoading] = useState(false);
+
+  // Payment state
+  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
 
   // Update step definitions - Remove seating step
   const isPersonalInfoStep = isGuest && currentStep === 1;
@@ -322,6 +327,9 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         age?: string | null;
         notes?: string | null;
         booking_reason?: string | null;
+        // Payment tracking
+        payment_status?: string;
+        stripe_payment_intent_id?: string | null;
       } = {
         user_id: userId,
         first_name: data.firstName,
@@ -344,7 +352,10 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         profession: data.profession || null,
         age: data.age || null,
         notes: data.notes || null,
-        booking_reason: data.bookingReason || null
+        booking_reason: data.bookingReason || null,
+        // Payment tracking
+        payment_status: paymentIntentId ? 'completed' : 'pending',
+        stripe_payment_intent_id: paymentIntentId
       };
       
       // Remove any undefined properties to avoid database errors
@@ -1603,56 +1614,35 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
 
             <div className="border-t border-gray-200 dark:border-gray-700 pt-6 animate-slide-in-up animate-delay-200">
               <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Payment Details</h3>
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Card Number
-                  </label>
-                  <input
-                    type="text"
-                    id="cardNumber"
-                    placeholder="1234 5678 9012 3456"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
+              
+              {paymentError && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-700 text-sm">{paymentError}</p>
                 </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="expDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Expiration Date
-                    </label>
-                    <input
-                      type="text"
-                      id="expDate"
-                      placeholder="MM/YY"
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="cvv" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      CVV
-                    </label>
-                    <input
-                      type="text"
-                      id="cvv"
-                      placeholder="123"
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="nameOnCard" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Name on Card
-                  </label>
-                  <input
-                    type="text"
-                    id="nameOnCard"
-                    placeholder="John Doe"
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  />
-                </div>
-              </div>
+              )}
+              
+              <StripePayment
+                amount={calculateTotal()}
+                duration={selectedDuration}
+                groupSize={selectedGroupSize}
+                location={selectedLocation}
+                date={selectedDate}
+                customerInfo={{
+                  firstName: watch("firstName"),
+                  lastName: watch("lastName"), 
+                  email: watch("email")
+                }}
+                onPaymentSuccess={(paymentId) => {
+                  setPaymentIntentId(paymentId);
+                  setPaymentError(null);
+                  // Auto-submit the form after successful payment
+                  handleSubmit(onSubmit)();
+                }}
+                onPaymentError={(error) => {
+                  setPaymentError(error);
+                  setPaymentIntentId(null);
+                }}
+              />
             </div>
 
             <div className="pt-4 flex flex-col sm:flex-row justify-between gap-3 sm:gap-4">
