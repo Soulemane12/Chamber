@@ -59,150 +59,86 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
     });
   }, [stripe, clientSecret]);
 
-  // Effect to hide any Stripe-generated submit buttons using MutationObserver
+  // Effect to immediately remove any Stripe-generated buttons from DOM
   useEffect(() => {
-    const hideStripeButtons = (targetNode?: Element | Document) => {
-      // Define all possible selectors for buttons we want to hide
-      const selectors = [
-        'button[type="submit"]',
-        'button[class*="SubmitButton"]',
-        'button[class*="submitButton"]',
-        'button[class*="Submit"]',
-        'button[class*="bg-blue-600"]',
-        'button[class*="bg-blue-700"]',
-        'button[class*="order-1"]',
-        'button[class*="order-2"]',
-        'button[class*="sm:order-2"]',
-        'button.inline-flex.items-center.justify-center',
-        '[data-testid*="submit"]',
-        '[data-testid*="Submit"]',
-        '[class*="SubmitButton"]',
-        '[class*="submitButton"]'
-      ];
+    const removeStripeButtons = () => {
+      // Remove any buttons that Stripe might generate
+      const buttonsToRemove = document.querySelectorAll([
+        '.payment-element-container button[type="submit"]',
+        '.payment-element-container [class*="SubmitButton"]',
+        '.payment-element-container [class*="submitButton"]',
+        '.__PrivateStripeElement button[type="submit"]',
+        '.__PrivateStripeElement [class*="SubmitButton"]',
+        '.StripeElement button[type="submit"]',
+        'button[class*="bg-blue-600"][type="submit"]',
+        'button[class*="order-1"][type="submit"]',
+        'button[class*="order-2"][type="submit"]'
+      ].join(', '));
 
-      // Target the specific container or the entire document
-      const searchRoot = targetNode || document;
-      
-      selectors.forEach(selector => {
-        try {
-          const elements = searchRoot.querySelectorAll(selector);
-          elements.forEach(element => {
-            const buttonText = element.textContent || '';
-            const isSubmitButton = element.getAttribute('type') === 'submit';
-            const hasProblematicText = buttonText.includes('Complete Booking') || 
-                                      buttonText.includes('Book • $') ||
-                                      buttonText.includes('Submit payment') ||
-                                      buttonText.includes('Pay now');
-            
-            // Hide if it's a submit button or has problematic text
-            if (isSubmitButton || hasProblematicText) {
-              const htmlElement = element as HTMLElement;
-              htmlElement.style.display = 'none';
-              htmlElement.style.visibility = 'hidden';
-              htmlElement.style.opacity = '0';
-              htmlElement.style.pointerEvents = 'none';
-              htmlElement.style.position = 'absolute';
-              htmlElement.style.left = '-9999px';
-              htmlElement.style.height = '0';
-              htmlElement.style.width = '0';
-              htmlElement.style.overflow = 'hidden';
-              
-              // Also remove from tab order
-              htmlElement.setAttribute('tabindex', '-1');
-              htmlElement.setAttribute('aria-hidden', 'true');
-            }
-          });
-        } catch (error) {
-          console.debug('Error hiding button with selector:', selector, error);
+      buttonsToRemove.forEach(button => {
+        const buttonText = button.textContent || '';
+        if (buttonText.includes('Complete Booking') || 
+            buttonText.includes('Book • $') ||
+            button.getAttribute('type') === 'submit') {
+          console.log('Removing unwanted button:', button);
+          button.remove(); // Actually remove from DOM instead of hiding
         }
       });
     };
 
-    // Run immediately
-    hideStripeButtons();
-
-    // Set up MutationObserver to watch for DOM changes
+    // Set up MutationObserver to remove buttons as they're added
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.type === 'childList') {
           mutation.addedNodes.forEach((node) => {
             if (node.nodeType === Node.ELEMENT_NODE) {
               const element = node as Element;
-              // Hide buttons in the newly added node
-              hideStripeButtons(element);
-              // Also check if the node itself is a button we want to hide
+              
+              // Check if the added node is a button we want to remove
               if (element.matches && (
                 element.matches('button[type="submit"]') ||
                 element.matches('[class*="SubmitButton"]') ||
                 element.matches('[class*="submitButton"]')
               )) {
-                hideStripeButtons(document);
+                const buttonText = element.textContent || '';
+                if (buttonText.includes('Complete Booking') || 
+                    buttonText.includes('Book • $') ||
+                    element.getAttribute('type') === 'submit') {
+                  console.log('Removing newly added unwanted button:', element);
+                  element.remove();
+                }
               }
+              
+              // Also check for buttons within the added node
+              const nestedButtons = element.querySelectorAll('button[type="submit"], [class*="SubmitButton"], [class*="submitButton"]');
+              nestedButtons.forEach(button => {
+                const buttonText = button.textContent || '';
+                if (buttonText.includes('Complete Booking') || 
+                    buttonText.includes('Book • $') ||
+                    button.getAttribute('type') === 'submit') {
+                  console.log('Removing nested unwanted button:', button);
+                  button.remove();
+                }
+              });
             }
           });
-        }
-        
-        // Also check for attribute changes that might reveal hidden buttons
-        if (mutation.type === 'attributes') {
-          const target = mutation.target as Element;
-          if (target.matches && (
-            target.matches('button[type="submit"]') ||
-            target.matches('[class*="SubmitButton"]') ||
-            target.matches('[class*="submitButton"]')
-          )) {
-            hideStripeButtons();
-          }
         }
       });
     });
 
-    // Start observing the document with the configured parameters
+    // Start observing
     observer.observe(document.body, {
       childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['class', 'style', 'type', 'data-testid']
+      subtree: true
     });
 
-    // Also run periodically as a fallback (less frequent than before)
-    const fallbackInterval = setInterval(hideStripeButtons, 1000);
+    // Run immediately and periodically
+    removeStripeButtons();
+    const interval = setInterval(removeStripeButtons, 500);
 
     return () => {
       observer.disconnect();
-      clearInterval(fallbackInterval);
-    };
-  }, []);
-
-  // Additional effect to prevent any form submission events
-  useEffect(() => {
-    const preventFormSubmission = (event: Event) => {
-      const target = event.target as HTMLElement;
-      
-      // Check if the event is coming from a submit button we want to block
-      if (target && (
-        target.matches('button[type="submit"]') ||
-        target.matches('[class*="SubmitButton"]') ||
-        target.matches('[class*="submitButton"]') ||
-        (target.textContent && (
-          target.textContent.includes('Complete Booking') ||
-          target.textContent.includes('Book • $')
-        ))
-      )) {
-        console.debug('Preventing unwanted form submission from:', target);
-        event.preventDefault();
-        event.stopPropagation();
-        event.stopImmediatePropagation();
-        return false;
-      }
-    };
-
-    // Add event listeners to catch form submissions
-    document.addEventListener('submit', preventFormSubmission, true);
-    document.addEventListener('click', preventFormSubmission, true);
-    
-    return () => {
-      document.removeEventListener('submit', preventFormSubmission, true);
-      document.removeEventListener('click', preventFormSubmission, true);
+      clearInterval(interval);
     };
   }, []);
 
@@ -239,33 +175,35 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
   };
 
   const paymentElementOptions = {
-    layout: "tabs" as const,
-    // Disable Stripe's built-in submit button to prevent duplicate buttons
+    layout: "accordion" as const, // Changed from tabs to accordion
+    // Completely disable billing details collection
     fields: {
       billingDetails: 'never' as const,
     },
-    // Disable the submit button from PaymentElement
+    // Only allow card payments
     paymentMethodTypes: ['card'],
-    // Prevent PaymentElement from generating its own submit button
+    // Disable all wallet options
     wallets: {
       applePay: 'never' as const,
       googlePay: 'never' as const,
     },
-    // Additional options to suppress button generation
+    // Provide default values to minimize form fields
     defaultValues: {
       billingDetails: {
         name: `${customerInfo.firstName} ${customerInfo.lastName}`,
         email: customerInfo.email,
       }
     },
-    // Prevent any form submission behavior
-    business: {
-      name: 'Chamber Booking'
+    // Disable automatic submission
+    readOnly: false,
+    // Terms configuration to prevent additional elements
+    terms: {
+      card: 'never' as const,
     }
   };
 
   return (
-    <form id="payment-form" onSubmit={handleSubmit} className="space-y-6">
+    <div id="payment-form" className="space-y-6">
       <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
         <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
           Payment Details
@@ -295,7 +233,7 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
           {message}
         </div>
       )}
-    </form>
+    </div>
   );
 }
 

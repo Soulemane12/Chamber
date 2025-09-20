@@ -1,79 +1,18 @@
 @import "tailwindcss";
 
-/* Universal Stripe button hiding - most aggressive approach */
-* [class*="SubmitButton"],
-* [class*="submitButton"],
-* [class*="Submit"],
-* [data-testid*="submit"],
-* [data-testid*="Submit"],
-* button[type="submit"][class*="bg-blue"],
-* button[type="submit"][class*="blue"],
+/* Prevent Stripe from generating unwanted buttons - simplified approach */
 .payment-element-container button[type="submit"],
-.payment-element-container [data-testid*="submit"],
+.payment-element-container [class*="SubmitButton"],
+.payment-element-container [class*="submitButton"],
 .__PrivateStripeElement button[type="submit"],
-.__PrivateStripeElement [class*="SubmitButton"] {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  height: 0 !important;
-  width: 0 !important;
-  overflow: hidden !important;
-  position: absolute !important;
-  left: -9999px !important;
-}
-
-/* Hide the specific Complete Booking button structure */
-button.inline-flex.items-center.justify-center.font-medium.transition-colors.duration-200.focus-visible\:outline-none.focus-visible\:ring-2.focus-visible\:ring-blue-500.disabled\:pointer-events-none.disabled\:opacity-50.bg-blue-600.text-white.hover\:bg-blue-700.dark\:bg-blue-600.dark\:hover\:bg-blue-700.active\:bg-blue-800.h-12.rounded-md.px-6.text-lg.w-full.sm\:w-auto.order-1.sm\:order-2[type="submit"] {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-/* Target any button with blue background and submit type */
-button[type="submit"][class*="bg-blue-600"],
-button[type="submit"][class*="bg-blue-700"],
-button[type="submit"][class*="blue-600"],
-button[type="submit"][class*="blue-700"] {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-/* Hide buttons containing specific text patterns */
-button[aria-label*="Complete"],
-button[aria-label*="Book"],
-button[aria-label*="Submit"],
-button[title*="Complete"],
-button[title*="Book"],
-button[title*="Submit"] {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-/* Hide any button with specific order classes that might be generated */
+.__PrivateStripeElement [class*="SubmitButton"],
+.StripeElement button[type="submit"],
+button[class*="bg-blue-600"][type="submit"],
 button[class*="order-1"][type="submit"],
-button[class*="order-2"][type="submit"],
-button[class*="sm:order-1"][type="submit"],
-button[class*="sm:order-2"][type="submit"] {
+button[class*="order-2"][type="submit"] {
   display: none !important;
   visibility: hidden !important;
-}
-
-/* Target Stripe's internal element structure */
-.__PrivateStripeElement button,
-.__PrivateStripeElement [role="button"],
-.StripeElement button,
-.StripeElement [role="button"] {
-  display: none !important;
-  visibility: hidden !important;
-}
-
-/* Hide any dynamically created buttons in payment contexts */
-[id*="payment"] button[type="submit"],
-[class*="payment"] button[type="submit"],
-[class*="stripe"] button[type="submit"],
-[id*="stripe"] button[type="submit"] {
-  display: none !important;
-  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 :root {

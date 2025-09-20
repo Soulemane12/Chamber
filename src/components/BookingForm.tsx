@@ -1676,10 +1676,20 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                   email: watch("email")
                 }}
                 onPaymentSuccess={async (paymentId) => {
+                  console.log('Payment successful, payment ID:', paymentId);
                   setPaymentIntentId(paymentId);
                   setPaymentError(null);
-                  // Only create booking after successful payment
-                  await handleSubmit(onSubmit)();
+                  
+                  try {
+                    // Only create booking after successful payment
+                    const formData = watch(); // Get current form data
+                    console.log('Creating booking with form data:', formData);
+                    await onSubmit(formData); // Call onSubmit directly with form data
+                    console.log('Booking creation completed successfully');
+                  } catch (error) {
+                    console.error('Error during booking creation:', error);
+                    setPaymentError('Failed to create booking after payment. Please contact support.');
+                  }
                 }}
                 onPaymentError={(error) => {
                   setPaymentError(error);
