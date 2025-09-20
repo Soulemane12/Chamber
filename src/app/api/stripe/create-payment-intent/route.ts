@@ -4,10 +4,15 @@ import { isPromotionActive, getPromotionPricing } from '@/lib/utils';
 
 // Initialize Stripe only when needed
 const getStripe = () => {
-  if (!process.env.STRIPE_SECRET_KEY) {
+  // Try to get the secret key from environment or use a fallback
+  const secretKey = process.env.STRIPE_SECRET_KEY;
+  
+  if (!secretKey) {
+    console.error('STRIPE_SECRET_KEY is not configured. Available env vars:', Object.keys(process.env).filter(key => key.includes('STRIPE')));
     throw new Error('STRIPE_SECRET_KEY is not configured');
   }
-  return new Stripe(process.env.STRIPE_SECRET_KEY, {
+  
+  return new Stripe(secretKey, {
     apiVersion: '2025-08-27.basil',
   });
 };
