@@ -220,7 +220,7 @@ export default function Home() {
                         <h4 className="text-xs font-semibold mb-1 text-gray-900 dark:text-white">Take a Virtual Tour</h4>
                         <video 
                           controls 
-                          className="w-full rounded-lg shadow-md"
+                          className="w-full max-w-xs rounded-lg shadow-md"
                           poster="/HBOT.jpg"
                         >
                           <source src="/midtown_vid.mov" type="video/quicktime" />
