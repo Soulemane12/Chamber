@@ -61,6 +61,7 @@ const timeSlots = [
 
 // Pricing for different durations
 const pricingOptions = {
+  "20": 1,     // $1 test option
   "60": 150,
   "90": 200,
   "120": 250,
@@ -250,7 +251,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       // No group discounts during promotion - return flat promotion price
       return basePrice;
     } else {
-      // Regular pricing only for 60, 90, 120 minutes
+      // Regular pricing for 20 (test), 60, 90, 120 minutes
       basePrice = pricingOptions[selectedDuration as keyof typeof pricingOptions] || 0;
       // Apply group discounts for regular pricing
       const multiplier = groupSizeMultipliers[selectedGroupSize as keyof typeof groupSizeMultipliers] || 1.0;
@@ -294,7 +295,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         amount = promoPrice !== null ? promoPrice : (pricingOptions[data.duration as keyof typeof pricingOptions] || 0);
         // No group discounts during promotion - use flat promotion price
       } else {
-        // Regular pricing only for 60, 90, 120 minutes
+        // Regular pricing for 20 (test), 60, 90, 120 minutes
         const basePrice = pricingOptions[data.duration as keyof typeof pricingOptions] || 0;
         // Apply group discounts for regular pricing
         const multiplier = groupSizeMultipliers[data.groupSize as keyof typeof groupSizeMultipliers] || 1.0;
@@ -1281,6 +1282,43 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                 ) : (
                   <>
                     {/* Regular durations when promotion is not active */}
+                    {/* 20 Minute Session - $1 Test Option */}
+                    <label
+                      className={`
+                        relative flex items-center p-4 border rounded-lg cursor-pointer
+                        ${
+                          watch("duration") === "20"
+                            ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
+                            : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
+                        }
+                      `}
+                    >
+                      <input
+                        type="radio"
+                        value="20"
+                        {...register("duration")}
+                        className="sr-only"
+                      />
+                      <div className="flex-1">
+                        <h3 className={`font-medium ${
+                          watch("duration") === "20"
+                            ? "text-blue-600 dark:text-blue-400"
+                            : "text-gray-900 dark:text-white"
+                        }`}>
+                          20 Minute Session
+                        </h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Test payment option</p>
+                      </div>
+                      <div className={`text-lg font-bold ${
+                        watch("duration") === "20"
+                          ? "text-blue-600 dark:text-blue-400"
+                          : "text-gray-900 dark:text-white"
+                      }`}>
+                        {formatCurrency(pricingOptions["20"])}
+                        <span className="text-blue-600 dark:text-blue-400 ml-2 text-sm">TEST</span>
+                      </div>
+                    </label>
+
                     {/* 60 Minute Session */}
                     <label
                       className={`

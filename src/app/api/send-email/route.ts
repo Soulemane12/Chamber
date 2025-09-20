@@ -54,6 +54,7 @@ export async function POST(request: Request) {
     
     // Calculate price based on duration
     const prices: Record<string, number> = {
+      '20': 1,     // $1 test option
       '60': 150,
       '90': 200,
       '120': 250
