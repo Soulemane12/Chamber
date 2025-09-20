@@ -214,6 +214,20 @@ export default function Home() {
                         <p><strong>🕒 Hours:</strong> Mon-Fri 9AM-7PM, Sat 10AM-4PM</p>
                         <p><strong>📞 Phone:</strong> (555) 123-4567</p>
                       </div>
+                      
+                      {/* Video Section */}
+                      <div className="mt-4">
+                        <h4 className="text-sm font-semibold mb-2 text-gray-900 dark:text-white">Take a Virtual Tour</h4>
+                        <video 
+                          controls 
+                          className="w-full rounded-lg shadow-md"
+                          poster="/HBOT.jpg"
+                        >
+                          <source src="/midtown_vid.mov" type="video/quicktime" />
+                          <source src="/midtown_vid.mov" type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+                      </div>
                     </div>
                   ) : (
                     <div>
