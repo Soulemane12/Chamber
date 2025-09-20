@@ -218,9 +218,12 @@ export default function Home() {
                       {/* Video Section */}
                       <div className="mt-2">
                         <h4 className="text-xs font-semibold mb-1 text-white">Take a Virtual Tour</h4>
-                        <div className="bg-gray-100 bg-gray-600 p-3 rounded-lg">
+                        <div className="bg-gray-600 p-3 rounded-lg">
                           <p className="text-xs text-gray-300 mb-2">
                             Video tour of our Midtown Biohack location
+                          </p>
+                          <p className="text-xs text-yellow-400 mb-2">
+                            ⚠️ If video doesn't play in Chrome/Edge, try downloading it below
                           </p>
                           <video 
                             controls 
@@ -228,12 +231,17 @@ export default function Home() {
                             poster="/HBOT.jpg"
                             preload="metadata"
                           >
-                            <source src="/midtown_vid.mp4" type="video/quicktime" />
+                            <source src="/midtown_vid.mp4" type="video/mp4" />
+                            <source src="/midtown_vid.mov" type="video/quicktime" />
                             <p className="text-xs text-gray-500 p-2">
                               Your browser doesn't support this video format. 
                               <br />
                               <a href="/midtown_vid.mp4" className="text-blue-600 hover:text-blue-800 underline" download>
-                                Download video to watch
+                                Download MP4 video
+                              </a>
+                              <br />
+                              <a href="/midtown_vid.mov" className="text-blue-600 hover:text-blue-800 underline" download>
+                                Download MOV video
                               </a>
                             </p>
                           </video>
