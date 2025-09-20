@@ -1,18 +1,42 @@
 @import "tailwindcss";
 
-/* Prevent Stripe from generating unwanted buttons - simplified approach */
-.payment-element-container button[type="submit"],
+/* Completely prevent ANY Stripe-generated buttons */
+.payment-element-container button,
+.payment-element-container [type="submit"],
 .payment-element-container [class*="SubmitButton"],
 .payment-element-container [class*="submitButton"],
-.__PrivateStripeElement button[type="submit"],
+.payment-element-container [class*="Submit"],
+.payment-element-container [role="button"],
+.__PrivateStripeElement button,
+.__PrivateStripeElement [type="submit"],
 .__PrivateStripeElement [class*="SubmitButton"],
-.StripeElement button[type="submit"],
+.StripeElement button,
+.StripeElement [type="submit"],
 button[class*="bg-blue-600"][type="submit"],
 button[class*="order-1"][type="submit"],
-button[class*="order-2"][type="submit"] {
+button[class*="order-2"][type="submit"],
+[data-testid*="submit"],
+[data-testid*="Submit"] {
   display: none !important;
   visibility: hidden !important;
+  opacity: 0 !important;
   pointer-events: none !important;
+  height: 0 !important;
+  width: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
+  z-index: -1 !important;
+}
+
+/* Block all possible button text content */
+button:contains("Complete"),
+button:contains("Book"),
+button:contains("Submit"),
+[role="button"]:contains("Complete"),
+[role="button"]:contains("Book"),
+[role="button"]:contains("Submit") {
+  display: none !important;
 }
 
 :root {

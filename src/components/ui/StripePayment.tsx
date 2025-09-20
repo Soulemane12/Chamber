@@ -76,11 +76,9 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
       ].join(', '));
 
       buttonsToRemove.forEach(button => {
-        const buttonText = button.textContent || '';
-        if (buttonText.includes('Complete Booking') || 
-            buttonText.includes('Book • $') ||
-            button.getAttribute('type') === 'submit') {
-          console.log('Removing unwanted button:', button);
+        // Remove ANY submit button within payment containers
+        if (button.getAttribute('type') === 'submit') {
+          console.log('Removing unwanted submit button:', button);
           button.remove(); // Actually remove from DOM instead of hiding
         }
       });
@@ -100,10 +98,8 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
                 element.matches('[class*="SubmitButton"]') ||
                 element.matches('[class*="submitButton"]')
               )) {
-                const buttonText = element.textContent || '';
-                if (buttonText.includes('Complete Booking') || 
-                    buttonText.includes('Book • $') ||
-                    element.getAttribute('type') === 'submit') {
+                // Remove ANY submit button or Stripe button
+                if (element.getAttribute('type') === 'submit') {
                   console.log('Removing newly added unwanted button:', element);
                   element.remove();
                 }
@@ -112,10 +108,8 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
               // Also check for buttons within the added node
               const nestedButtons = element.querySelectorAll('button[type="submit"], [class*="SubmitButton"], [class*="submitButton"]');
               nestedButtons.forEach(button => {
-                const buttonText = button.textContent || '';
-                if (buttonText.includes('Complete Booking') || 
-                    buttonText.includes('Book • $') ||
-                    button.getAttribute('type') === 'submit') {
+                // Remove ANY submit button or Stripe button
+                if (button.getAttribute('type') === 'submit') {
                   console.log('Removing nested unwanted button:', button);
                   button.remove();
                 }
@@ -134,11 +128,27 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
 
     // Run immediately and periodically
     removeStripeButtons();
-    const interval = setInterval(removeStripeButtons, 500);
+    const interval = setInterval(removeStripeButtons, 300);
+
+    // Also add a global button removal for any button with "Complete" text
+    const globalRemoval = setInterval(() => {
+      const allButtons = document.querySelectorAll('button, [role="button"]');
+      allButtons.forEach(button => {
+        const text = button.textContent || '';
+        if (text.includes('Complete') || text.includes('Book •') || button.getAttribute('type') === 'submit') {
+          // Only remove if it's not our custom payment button
+          if (!button.id?.includes('button-text') && !button.closest('#payment-form')) {
+            console.log('Removing global unwanted button:', button, 'Text:', text);
+            button.remove();
+          }
+        }
+      });
+    }, 200);
 
     return () => {
       observer.disconnect();
       clearInterval(interval);
+      clearInterval(globalRemoval);
     };
   }, []);
 
@@ -327,7 +337,7 @@ export function StripePayment({
 
   const appearance = {
     theme: 'stripe' as const,
-    // Hide any submit buttons that Stripe might generate
+    // Completely hide any button elements that Stripe might generate
     rules: {
       '.Tab': {
         display: 'block'
@@ -335,14 +345,30 @@ export function StripePayment({
       '.Input': {
         display: 'block'
       },
-      // Hide any button elements within the payment element
-      'button[type="submit"]': {
+      // Aggressively hide all possible button variants
+      'button': {
+        display: 'none !important',
+        visibility: 'hidden !important',
+        opacity: '0 !important',
+        height: '0 !important',
+        width: '0 !important',
+        overflow: 'hidden !important',
+        position: 'absolute !important',
+        left: '-9999px !important'
+      },
+      '[type="submit"]': {
         display: 'none !important'
       },
       '.SubmitButton': {
         display: 'none !important'
       },
       '[class*="SubmitButton"]': {
+        display: 'none !important'
+      },
+      '[class*="submitButton"]': {
+        display: 'none !important'
+      },
+      '[class*="Submit"]': {
         display: 'none !important'
       }
     }
