@@ -17,17 +17,14 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
   return (
     <header className="py-6 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center relative">
       <div className="flex items-center mb-4 sm:mb-0">
-        <Link href="/" className="flex items-center space-x-3">
+        <Link href="/" className="flex items-center">
           <Image 
             src="/logo.png" 
             alt="Wellnex02 Logo" 
-            width={60} 
-            height={60}
-            className="h-16 w-16"
+            width={80} 
+            height={80}
+            className="h-20 w-20"
           />
-          <span className="text-2xl font-bold text-gray-800 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-            Wellnex02
-          </span>
         </Link>
       </div>
       <div className="flex flex-col sm:flex-row items-center w-full sm:w-auto">
@@ -151,16 +148,10 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
           </ul>
         </nav>
         <div className="hidden sm:flex items-center ml-6 space-x-4">
-          <div className="text-2xl font-bold text-white dark:text-white">
-            WellNex02
-          </div>
           <LanguageSelector />
         </div>
       </div>
       <div className="sm:hidden w-full mt-2 flex flex-col items-center">
-        <div className="text-2xl font-bold text-white dark:text-white mb-2">
-          WellNex02
-        </div>
         <MobileLanguageSelector />
       </div>
     </header>

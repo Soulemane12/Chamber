@@ -23,13 +23,10 @@ export function Footer({ showSocials = true, className = "" }: FooterProps) {
               <Image 
                 src="/logo.png" 
                 alt="Wellnex02 Logo" 
-                width={32} 
-                height={32} 
-                className="h-8 w-8 mr-3"
+                width={60} 
+                height={60} 
+                className="h-15 w-15"
               />
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                Wellnex02
-              </h3>
             </div>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               {t('companyDescription')}
