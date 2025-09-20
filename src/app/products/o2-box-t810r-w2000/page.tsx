@@ -2,44 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
 import { Header } from "@/components/Header";
 import { useLanguage } from "@/lib/LanguageContext";
 import { Footer } from "@/components/Footer";
 
 export default function O2BoxT810RW2000() {
   const { t } = useLanguage();
-  const [selectedAccessories, setSelectedAccessories] = useState<string[]>([]);
-  const [deliveryDate, setDeliveryDate] = useState("");
-  const [deliveryTime, setDeliveryTime] = useState("");
-  const [addressOrZip, setAddressOrZip] = useState("");
-  const [paymentOption, setPaymentOption] = useState<'half' | 'full' | 'financing'>("full");
-
-  interface Accessory {
-    id: string;
-    name: string;
-    description?: string;
-  }
-
-  const accessories: Accessory[] = [
-    { id: 'premium_couch', name: 'Premium couch' },
-    { id: 'stadium_seating', name: 'Stadium seating' },
-    { id: 'ac_unit', name: 'Air conditioner unit' },
-    { id: 'massage_table', name: 'Massage table' },
-    { id: 'ottoman', name: 'Ottoman' },
-    { id: 'custom_wrap', name: 'Custom wrap' },
-    { id: 'custom_logo', name: 'Custom logo' },
-  ];
-
-  // Pricing removed - contact us for pricing information
-
-  const handleAccessoryToggle = (accessoryId: string) => {
-    setSelectedAccessories(prev => prev.includes(accessoryId) ? prev.filter(id => id !== accessoryId) : [...prev, accessoryId]);
-  };
-
-  const handlePurchase = () => {
-    alert(`Purchase inquiry submitted!\nPlease contact us for pricing and availability.\nDelivery: ${deliveryDate} ${deliveryTime}\nAddress/ZIP: ${addressOrZip}`);
-  };
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
@@ -128,16 +96,20 @@ export default function O2BoxT810RW2000() {
           </div>
         </div>
 
-        {/* Purchase Section */}
+        {/* Inquiry Section */}
         <div className="mb-16 animate-fade-in">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
-              Purchase Your O2 BOX T810-R W2000
+              Inquire About O2 BOX T810-R W2000
             </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300">
+              Contact us for availability and customization options
+            </p>
           </div>
-          <div className="max-w-6xl mx-auto">
+          
+          <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Left Column - Options */}
+              {/* Left Column - Product Info */}
               <div className="space-y-8">
                 {/* Included Items */}
                 <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
@@ -156,162 +128,125 @@ export default function O2BoxT810RW2000() {
                 {/* Optional Add-ons */}
                 <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
                   <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-                    Optional Add-ons
+                    Optional Add-ons Available
                   </h3>
                   <div className="space-y-3">
-                    {accessories.map((accessory) => (
-                      <label key={accessory.id} className="flex items-start space-x-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={selectedAccessories.includes(accessory.id)}
-                          onChange={() => handleAccessoryToggle(accessory.id)}
-                          className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        />
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <p className="font-medium text-gray-900 dark:text-white">{accessory.name}</p>
-                              {accessory.description && (
-                                <p className="text-sm text-gray-600 dark:text-gray-300">{accessory.description}</p>
-                              )}
-                            </div>
-                            <p className="font-semibold text-blue-600">Contact for pricing</p>
-                          </div>
-                        </div>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Delivery Scheduling */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-                  <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-                    Delivery & Installation Scheduling
-                  </h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Preferred Delivery Date
-                      </label>
-                      <input
-                        type="date"
-                        value={deliveryDate}
-                        onChange={(e) => setDeliveryDate(e.target.value)}
-                        min={new Date().toISOString().split('T')[0]}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Preferred Delivery Time
-                      </label>
-                      <input
-                        type="time"
-                        value={deliveryTime}
-                        onChange={(e) => setDeliveryTime(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Address or ZIP Code
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Enter your address or ZIP code"
-                        value={addressOrZip}
-                        onChange={(e) => setAddressOrZip(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Payment Options */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-                  <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-                    Payment Options
-                  </h3>
-                  <div className="space-y-3">
-                    <label className="flex items-center space-x-3 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="payment"
-                        value="full"
-                        checked={paymentOption === 'full'}
-                        onChange={(e) => setPaymentOption(e.target.value as 'full')}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                      />
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white">Pay in Full</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">Pay the full amount upfront</p>
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900 dark:text-white">Premium couch</p>
                       </div>
-                    </label>
-                    <label className="flex items-center space-x-3 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="payment"
-                        value="half"
-                        checked={paymentOption === 'half'}
-                        onChange={(e) => setPaymentOption(e.target.value as 'half')}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                      />
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white">50% Down Payment</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">Pay 50% now, 50% before delivery</p>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900 dark:text-white">Stadium seating</p>
                       </div>
-                    </label>
-                    <label className="flex items-center space-x-3 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="payment"
-                        value="financing"
-                        checked={paymentOption === 'financing'}
-                        onChange={(e) => setPaymentOption(e.target.value as 'financing')}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                      />
-                      <div>
-                        <p className="font-medium text-gray-900 dark:text-white">Financing Available</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">Contact us for financing options</p>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900 dark:text-white">Air conditioner unit</p>
                       </div>
-                    </label>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900 dark:text-white">Massage table</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900 dark:text-white">Ottoman</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900 dark:text-white">Custom wrap</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900 dark:text-white">Custom logo</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Right Column - Inquiry Form */}
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg h-fit">
+              <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
                 <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
                   Request Information
                 </h3>
-                <div className="space-y-4 mb-6">
-                  <p className="text-gray-600 dark:text-gray-300">
-                    Contact us for pricing, availability, and customization options for the O2 BOX T810-R W2000.
+                
+                <form className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      placeholder="Your full name"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Email *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      placeholder="your.email@example.com"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Phone
+                    </label>
+                    <input
+                      type="tel"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      placeholder="(555) 123-4567"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Interest Level
+                    </label>
+                    <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                      <option value="">Select your interest level</option>
+                      <option value="immediate">Immediate Purchase</option>
+                      <option value="3months">Within 3 months</option>
+                      <option value="6months">Within 6 months</option>
+                      <option value="exploring">Just exploring options</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Additional Questions or Requirements
+                    </label>
+                    <textarea
+                      rows={4}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      placeholder="Tell us about your specific needs, location, or any questions you have..."
+                    ></textarea>
+                  </div>
+                  
+                  <button
+                    type="submit"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                  >
+                    Send Inquiry
+                  </button>
+                  
+                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                    We'll contact you within 24 hours with detailed information.
                   </p>
-                  {selectedAccessories.length > 0 && (
-                    <div className="border-t pt-3">
-                      <p className="font-medium text-gray-900 dark:text-white mb-2">Selected Accessories:</p>
-                      {selectedAccessories.map(accessoryId => {
-                        const accessory = accessories.find(a => a.id === accessoryId);
-                        return (
-                          <div key={accessoryId} className="text-sm text-gray-600 dark:text-gray-300">
-                            • {accessory?.name}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-                <button
-                  onClick={handlePurchase}
-                  disabled={!deliveryDate || !deliveryTime || !addressOrZip}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 px-6 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 disabled:cursor-not-allowed"
-                >
-                  Request Quote
-                </button>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 text-center">
-                  We'll contact you within 24 hours with detailed information and pricing.
-                </p>
+                </form>
               </div>
             </div>
           </div>
