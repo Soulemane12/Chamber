@@ -2,9 +2,15 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { isPromotionActive, getPromotionPricing } from '@/lib/utils';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-08-27.basil',
-});
+// Initialize Stripe only when needed
+const getStripe = () => {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error('STRIPE_SECRET_KEY is not configured');
+  }
+  return new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2025-08-27.basil',
+  });
+};
 
 // Group size multipliers (discount for groups) - same as in BookingForm.tsx
 const groupSizeMultipliers = {
@@ -61,6 +67,7 @@ export async function POST(request: Request) {
     const amountInCents = Math.round(calculatedAmount * 100);
 
     // Create a PaymentIntent with the order amount and currency
+    const stripe = getStripe();
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amountInCents,
       currency: currency,
