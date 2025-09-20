@@ -228,18 +228,16 @@ export default function Home() {
                             poster="/HBOT.jpg"
                             preload="metadata"
                           >
-                            <source src="/midtown_vid.mov" type="video/quicktime" />
+                            <source src="/midtown_vid.mp4" type="video/quicktime" />
                             <p className="text-xs text-gray-500 p-2">
                               Your browser doesn't support this video format. 
                               <br />
-                              <a href="/midtown_vid.mov" className="text-blue-600 hover:text-blue-800 underline" download>
+                              <a href="/midtown_vid.mp4" className="text-blue-600 hover:text-blue-800 underline" download>
                                 Download video to watch
                               </a>
                             </p>
                           </video>
-                          <p className="text-xs text-gray-500 mt-1">
-                            If video doesn't play, try downloading it or use Safari/Firefox
-                          </p>
+                         
                         </div>
                       </div>
                     </div>
@@ -349,9 +347,7 @@ export default function Home() {
                       Book Demo Session
                     </button>
                     
-                    <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                      We'll confirm your appointment within 2 hours.
-                    </p>
+                  
                   </form>
                 </div>
               </div>
