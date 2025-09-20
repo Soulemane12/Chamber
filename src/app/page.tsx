@@ -251,63 +251,64 @@ export default function Home() {
                 </div>
                 
                 {/* Right Column - Booking Form */}
-                  <div className="bg-gray-50 bg-gray-700 p-4 rounded-lg">
-                    <h4 className="text-lg font-semibold mb-4 text-white">Schedule Your Demo</h4>
-                    <form className="space-y-4">
+                  <div className="bg-gray-50 bg-gray-700 p-6 rounded-lg">
+                    <h4 className="text-xl font-semibold mb-3 text-white">Schedule Your Demo</h4>
+                    <p className="text-sm text-gray-300 mb-6">Experience our hyperbaric oxygen therapy chambers and discover the benefits for your wellness journey.</p>
+                    <form className="space-y-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-base font-medium text-gray-300 mb-3">
                         Your Name *
                       </label>
                       <input
                         type="text"
                         required
-                        className="w-full px-3 py-2 text-sm border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
+                        className="w-full px-4 py-3 text-base border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
                         placeholder="Enter your full name"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-base font-medium text-gray-300 mb-3">
                         Email Address *
                       </label>
                       <input
                         type="email"
                         required
-                        className="w-full px-3 py-2 text-sm border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
+                        className="w-full px-4 py-3 text-base border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
                         placeholder="your.email@example.com"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-base font-medium text-gray-300 mb-3">
                         Phone Number
                       </label>
                       <input
                         type="tel"
-                        className="w-full px-3 py-2 text-sm border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
+                        className="w-full px-4 py-3 text-base border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
                         placeholder="(555) 123-4567"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-base font-medium text-gray-300 mb-3">
                         Preferred Date *
                       </label>
                       <input
                         type="date"
                         required
                         min={new Date().toISOString().split('T')[0]}
-                        className="w-full px-3 py-2 text-sm border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
+                        className="w-full px-4 py-3 text-base border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-base font-medium text-gray-300 mb-3">
                         Preferred Time *
                       </label>
                       <select
                         required
-                        className="w-full px-3 py-2 text-sm border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
+                        className="w-full px-4 py-3 text-base border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
                       >
                         <option value="">Select a time</option>
                         <option value="09:00">9:00 AM</option>
@@ -323,19 +324,19 @@ export default function Home() {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-base font-medium text-gray-300 mb-3">
                         Special Requests
                       </label>
                       <textarea
-                        rows={1}
-                        className="w-full px-3 py-2 text-sm border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
+                        rows={3}
+                        className="w-full px-4 py-3 text-base border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
                         placeholder="Any specific questions or requirements?"
                       ></textarea>
                     </div>
                     
                       <button
                         type="submit"
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 px-8 rounded-lg text-base font-medium shadow-lg hover:shadow-xl transition-all duration-300"
                       >
                         Book Demo Session
                       </button>
