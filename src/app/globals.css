@@ -1,7 +1,12 @@
 @import "tailwindcss";
 
-/* TARGET THE EXACT BUTTON STRUCTURE FROM THE USER */
-button.inline-flex.items-center.justify-center.font-medium.transition-colors.duration-200.focus-visible\:outline-none.focus-visible\:ring-2.focus-visible\:ring-blue-500.disabled\:pointer-events-none.disabled\:opacity-50.bg-blue-600.text-white.hover\:bg-blue-700.dark\:bg-blue-600.dark\:hover\:bg-blue-700.active\:bg-blue-800.h-12.rounded-md.px-6.text-lg.w-full.sm\:w-auto.order-1.sm\:order-2[type="submit"] {
+/* GLOBAL DOCUMENT-WIDE BUTTON DESTRUCTION */
+/* Target the EXACT button structure from the user ANYWHERE in the document */
+button.inline-flex.items-center.justify-center.font-medium.transition-colors.duration-200.focus-visible\:outline-none.focus-visible\:ring-2.focus-visible\:ring-blue-500.disabled\:pointer-events-none.disabled\:opacity-50.bg-blue-600.text-white.hover\:bg-blue-700.dark\:bg-blue-600.dark\:hover\:bg-blue-700.active\:bg-blue-800.h-12.rounded-md.px-6.text-lg.w-full.sm\:w-auto.order-1.sm\:order-2[type="submit"],
+/* Target anywhere in the document */
+html button.inline-flex.items-center.justify-center.font-medium.transition-colors.duration-200[type="submit"],
+body button.inline-flex.items-center.justify-center.font-medium.transition-colors.duration-200[type="submit"],
+* button.inline-flex.items-center.justify-center.font-medium.transition-colors.duration-200[type="submit"] {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
@@ -13,6 +18,11 @@ button.inline-flex.items-center.justify-center.font-medium.transition-colors.dur
   left: -9999px !important;
   z-index: -1 !important;
   transform: scale(0) !important;
+  max-height: 0 !important;
+  max-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
 }
 
 /* Target any button with these specific class combinations */

@@ -59,7 +59,135 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
     });
   }, [stripe, clientSecret]);
 
-  // Effect to immediately remove any Stripe-generated buttons from DOM
+  // GLOBAL DOCUMENT-WIDE button removal - runs at app level
+  useEffect(() => {
+    // Global function that scans the ENTIRE document
+    const globalButtonDestroyer = () => {
+      // Scan ALL buttons in the entire document, not just payment containers
+      const allButtons = document.querySelectorAll('button, [type="submit"], [role="button"], input[type="submit"]');
+      
+      allButtons.forEach((button) => {
+        const element = button as HTMLElement;
+        const text = element.textContent || '';
+        const innerHTML = element.innerHTML || '';
+        const className = element.className || '';
+        
+        // Check for ANY sign of the unwanted button
+        const hasCompleteText = text.includes('Complete Booking') || text.includes('Complete') && text.includes('$');
+        const hasBookText = text.includes('Book • $') || text.includes('Book •');
+        const hasTargetClasses = className.includes('bg-blue-600') && className.includes('order-1') && className.includes('sm:order-2');
+        const isSubmitWithBlue = element.getAttribute('type') === 'submit' && className.includes('bg-blue-600');
+        const hasInlineFlexClasses = className.includes('inline-flex') && className.includes('items-center') && className.includes('justify-center');
+        
+        // Check spans inside the button
+        const spans = element.querySelectorAll('span');
+        let hasCompleteSpan = false;
+        spans.forEach(span => {
+          const spanText = span.textContent || '';
+          if (spanText.includes('Complete Booking') || spanText.includes('Book • $')) {
+            hasCompleteSpan = true;
+          }
+        });
+        
+        if (hasCompleteText || hasBookText || hasTargetClasses || isSubmitWithBlue || hasInlineFlexClasses || hasCompleteSpan) {
+          // Make sure it's not our custom button
+          const isOurButton = element.textContent?.includes('Pay $') && !element.textContent?.includes('Complete');
+          
+          if (!isOurButton) {
+            console.log('🔥 GLOBAL DESTROYER: Removing button anywhere in document:', element, 'Text:', text);
+            element.remove();
+          }
+        }
+      });
+    };
+
+    // Run immediately when component mounts
+    globalButtonDestroyer();
+    
+    // Set up multiple scanning intervals with different frequencies
+    const intervals = [
+      setInterval(globalButtonDestroyer, 50),   // Every 50ms
+      setInterval(globalButtonDestroyer, 100),  // Every 100ms  
+      setInterval(globalButtonDestroyer, 200),  // Every 200ms
+      setInterval(globalButtonDestroyer, 500),  // Every 500ms
+    ];
+
+    // Set up MutationObserver for the ENTIRE document
+    const globalObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach((node) => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              // Run destroyer whenever ANY element is added to the DOM
+              setTimeout(globalButtonDestroyer, 0);
+            }
+          });
+        }
+      });
+    });
+
+    // Observe the entire document body
+    globalObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    // Also listen for any click events on the document to catch buttons we missed
+    const documentClickHandler = (event: Event) => {
+      const target = event.target as HTMLElement;
+      if (target && target.tagName === 'BUTTON') {
+        const text = target.textContent || '';
+        if (text.includes('Complete Booking') || text.includes('Book • $')) {
+          console.log('🔥 CLICK INTERCEPTED: Preventing Complete Booking button click', target);
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+          target.remove();
+          return false;
+        }
+      }
+    };
+
+    // Add window-level event listener to catch any clicks
+    window.addEventListener('click', documentClickHandler, true);
+    document.addEventListener('click', documentClickHandler, true);
+
+    // Also scan for iframes that might contain the button
+    const scanIframes = () => {
+      const iframes = document.querySelectorAll('iframe');
+      iframes.forEach(iframe => {
+        try {
+          // Try to access iframe content (might fail due to cross-origin)
+          const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+          if (iframeDoc) {
+            const iframeButtons = iframeDoc.querySelectorAll('button, [type="submit"]');
+            iframeButtons.forEach(button => {
+              const text = button.textContent || '';
+              if (text.includes('Complete') || text.includes('Book •')) {
+                console.log('🔥 IFRAME: Removing button from iframe:', button);
+                button.remove();
+              }
+            });
+          }
+        } catch (error) {
+          // Iframe is cross-origin, can't access
+          console.debug('Cannot access iframe content (cross-origin):', iframe);
+        }
+      });
+    };
+
+    const iframeInterval = setInterval(scanIframes, 1000);
+
+    return () => {
+      intervals.forEach(interval => clearInterval(interval));
+      clearInterval(iframeInterval);
+      globalObserver.disconnect();
+      window.removeEventListener('click', documentClickHandler, true);
+      document.removeEventListener('click', documentClickHandler, true);
+    };
+  }, []);
+
+  // LEGACY: Keep the payment-specific removal for extra safety
   useEffect(() => {
     const removeStripeButtons = () => {
       // Target the EXACT button structure from the user's HTML
