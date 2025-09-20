@@ -204,12 +204,12 @@ export default function Home() {
                 <div>
                   {selectedLocation === 'midtown' ? (
                     <div>
-                      <h3 className="text-lg font-bold mb-2 text-white">Midtown Biohack</h3>
-                      <p className="text-gray-300 mb-2 text-xs">
+                      <h3 className="text-xl font-bold mb-3 text-white">Midtown Biohack</h3>
+                      <p className="text-gray-300 mb-3 text-sm">
                         Experience our hyperbaric oxygen chambers in a professional wellness environment. 
                         Our Midtown location offers personalized sessions and expert guidance.
                       </p>
-                      <div className="space-y-0.5 text-gray-300 text-xs">
+                      <div className="space-y-1 text-gray-300 text-sm">
                         <p><strong>📍 Address:</strong> 575 Madison Ave, 23rd Floor, New York, NY 10022</p>
                         <p><strong>🕒 Hours:</strong> Mon-Fri 9AM-7PM, Sat 10AM-4PM</p>
                         <p><strong>📞 Phone:</strong> (555) 123-4567</p>
@@ -217,7 +217,7 @@ export default function Home() {
                       
                       {/* Video Section */}
                       <div className="mt-2">
-                        <h4 className="text-xs font-semibold mb-1 text-white">Take a Virtual Tour</h4>
+                        <h4 className="text-sm font-semibold mb-2 text-white">Take a Virtual Tour</h4>
                         <div className="bg-gray-100 bg-gray-600 p-3 rounded-lg">
                           <p className="text-xs text-gray-300 mb-2">
                             Video tour of our Midtown Biohack location
@@ -252,62 +252,62 @@ export default function Home() {
                 
                 {/* Right Column - Booking Form */}
                 <div className="bg-gray-50 bg-gray-700 p-3 rounded-lg">
-                  <h4 className="text-base font-semibold mb-2 text-white">Schedule Your Demo</h4>
-                  <form className="space-y-2">
+                  <h4 className="text-lg font-semibold mb-3 text-white">Schedule Your Demo</h4>
+                  <form className="space-y-3">
                     <div>
-                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
                         Your Name *
                       </label>
                       <input
                         type="text"
                         required
-                        className="w-full px-2 py-1 text-xs border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
+                        className="w-full px-3 py-2 text-sm border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
                         placeholder="Enter your full name"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
                         Email Address *
                       </label>
                       <input
                         type="email"
                         required
-                        className="w-full px-2 py-1 text-xs border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
+                        className="w-full px-3 py-2 text-sm border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
                         placeholder="your.email@example.com"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
                         Phone Number
                       </label>
                       <input
                         type="tel"
-                        className="w-full px-2 py-1 text-xs border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
+                        className="w-full px-3 py-2 text-sm border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
                         placeholder="(555) 123-4567"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
                         Preferred Date *
                       </label>
                       <input
                         type="date"
                         required
                         min={new Date().toISOString().split('T')[0]}
-                        className="w-full px-2 py-1 text-xs border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
+                        className="w-full px-3 py-2 text-sm border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
                         Preferred Time *
                       </label>
                       <select
                         required
-                        className="w-full px-2 py-1 text-xs border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
+                        className="w-full px-3 py-2 text-sm border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
                       >
                         <option value="">Select a time</option>
                         <option value="09:00">9:00 AM</option>
@@ -323,19 +323,19 @@ export default function Home() {
                     </div>
                     
                     <div>
-                      <label className="block text-xs font-medium text-gray-300 mb-1">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
                         Special Requests
                       </label>
                       <textarea
                         rows={1}
-                        className="w-full px-2 py-1 text-xs border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
+                        className="w-full px-3 py-2 text-sm border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
                         placeholder="Any specific questions or requirements?"
                       ></textarea>
                     </div>
                     
                     <button
                       type="submit"
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-1.5 px-3 rounded-lg text-xs font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-300"
                     >
                       Book Demo Session
                     </button>
