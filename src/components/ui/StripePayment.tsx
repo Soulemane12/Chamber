@@ -59,8 +59,10 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
     });
   }, [stripe, clientSecret]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent | React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
 
     if (!stripe || !elements) {
       return;
@@ -121,7 +123,8 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
       
       <Button
         disabled={isLoading || !stripe || !elements}
-        type="submit"
+        type="button"
+        onClick={handleSubmit}
         className="w-full"
       >
         <span id="button-text">

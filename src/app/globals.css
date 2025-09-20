@@ -9,12 +9,13 @@
   display: none !important;
 }
 
-/* Hide the specific "Complete Booking" button */
-button[class*="sm:order-2"] span[class*="hidden sm:inline"] {
+/* Hide the specific "Complete Booking" button - more specific targeting */
+.payment-element-container button[class*="sm:order-2"] {
   display: none !important;
 }
 
-button[class*="sm:order-2"] {
+/* Hide buttons that contain "Complete Booking" text specifically */
+button span:contains("Complete Booking") {
   display: none !important;
 }
 
