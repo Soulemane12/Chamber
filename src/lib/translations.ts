@@ -90,7 +90,7 @@ export const translations = {
     contact: "Contact",
     
     // Homepage
-    heroTitle: "Découvrez les bienfaits de l'oxygénothérapie hyperbare (HBOT)",
+    heroTitle: "Découvrez les bienfaits de l'oxygénothérapie hyperbare",
     heroSubtitle: "Améliorez votre récupération, augmentez vos performances et votre bien-être avec nos chambres hyperbares de pointe.",
     bookYourSession: "Réserver votre séance",
     
@@ -171,7 +171,7 @@ export const translations = {
     contact: "Contacto",
     
     // Homepage
-    heroTitle: "Experimente los beneficios de la terapia de oxígeno hiperbárico (HBOT)",
+    heroTitle: "Experimente los beneficios de la terapia de oxígeno hiperbárico",
     heroSubtitle: "Mejore su recuperación, aumente su rendimiento y bienestar general con nuestras cámaras hiperbáricas de última generación.",
     bookYourSession: "Reserve su sesión",
     
@@ -252,7 +252,7 @@ export const translations = {
     contact: "联系我们",
     
     // Homepage
-    heroTitle: "体验高压氧疗法 (HBOT) 的益处",
+    heroTitle: "体验高压氧疗法的益处",
     heroSubtitle: "通过我们的先进高压氧舱，提升恢复能力，增强表现，改善整体健康。",
     bookYourSession: "预约您的疗程",
     
@@ -333,7 +333,7 @@ export const translations = {
     contact: "お問い合わせ",
     
     // Homepage
-    heroTitle: "高気圧酸素療法 (HBOT) の効果を体験しましょう",
+    heroTitle: "高気圧酸素療法の効果を体験しましょう",
     heroSubtitle: "私たちの最先端の高気圧酸素室で、回復力を高め、パフォーマンスを向上させ、全体的な健康状態を改善しましょう。",
     bookYourSession: "セッションを予約する",
     
@@ -414,7 +414,7 @@ export const translations = {
     contact: "Contatti",
     
     // Homepage
-    heroTitle: "Sperimenta i benefici della terapia iperbarica (HBOT)",
+    heroTitle: "Sperimenta i benefici della terapia iperbarica",
     heroSubtitle: "Migliora il tuo recupero, aumenta le prestazioni e il benessere generale con le nostre camere iperbariche all'avanguardia.",
     bookYourSession: "Prenota la tua sessione",
     
