@@ -34,8 +34,8 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
               <Link 
                 href="/" 
                 className={currentPage === 'home' 
-                  ? "text-blue-600 dark:text-blue-400 font-medium" 
-                  : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"}
+                  ? "text-blue-400 font-medium" 
+                  : "text-gray-300 hover:text-blue-400"}
               >
                 {t('home')}
               </Link>
@@ -44,8 +44,8 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
               <Link 
                 href="/about" 
                 className={currentPage === 'about' 
-                  ? "text-blue-600 dark:text-blue-400 font-medium" 
-                  : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"}
+                  ? "text-blue-400 font-medium" 
+                  : "text-gray-300 hover:text-blue-400"}
               >
                 {t('about')}
               </Link>
@@ -54,8 +54,8 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
               <Link 
                 href="/oxygen-therapy" 
                 className={currentPage === 'oxygenTherapy' 
-                  ? "text-blue-600 dark:text-blue-400 font-medium" 
-                  : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"}
+                  ? "text-blue-400 font-medium" 
+                  : "text-gray-300 hover:text-blue-400"}
               >
                 {t('oxygenTherapy')}
               </Link>
@@ -67,8 +67,8 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
                 onMouseLeave={() => setIsProductsDropdownOpen(false)}
                 className={`flex items-center justify-center space-x-1 w-full sm:w-auto text-center ${
                   currentPage === 'products' 
-                    ? "text-blue-600 dark:text-blue-400 font-medium" 
-                    : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
+                    ? "text-blue-400 font-medium" 
+                    : "text-gray-300 hover:text-blue-400"
                 }`}
               >
                 <span>{t('products')}</span>
@@ -129,8 +129,8 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
               <Link 
                 href="/faq" 
                 className={currentPage === 'faq' 
-                  ? "text-blue-600 dark:text-blue-400 font-medium" 
-                  : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"}
+                  ? "text-blue-400 font-medium" 
+                  : "text-gray-300 hover:text-blue-400"}
               >
                 {t('faq')}
               </Link>
@@ -139,8 +139,8 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
               <Link 
                 href="/contact" 
                 className={currentPage === 'contact' 
-                  ? "text-blue-600 dark:text-blue-400 font-medium" 
-                  : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"}
+                  ? "text-blue-400 font-medium" 
+                  : "text-gray-300 hover:text-blue-400"}
               >
                 {t('contact')}
               </Link>

@@ -13,7 +13,7 @@ export function Footer({ showSocials = true, className = "" }: FooterProps) {
   const { t } = useLanguage();
   
   return (
-    <footer className={`bg-white dark:bg-gray-800 py-8 px-4 sm:px-6 lg:px-8 ${className}`}>
+    <footer className={`bg-gray-800 py-8 px-4 sm:px-6 lg:px-8 ${className}`}>
       <div className="max-w-7xl mx-auto">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
@@ -28,11 +28,11 @@ export function Footer({ showSocials = true, className = "" }: FooterProps) {
                 className="h-20 w-20"
               />
             </div>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-gray-400 mb-4">
               {t('companyDescription')}
             </p>
             <div className="mb-4">
-              <h4 className="font-semibold text-gray-900 dark:text-white mb-2">
+              <h4 className="font-semibold text-white mb-2">
                 {t('subscribeTitle')}
               </h4>
               <div className="flex">
@@ -46,39 +46,39 @@ export function Footer({ showSocials = true, className = "" }: FooterProps) {
                 </button>
               </div>
             </div>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-400">
               {t('email')}
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-4">
+            <h4 className="font-semibold text-white mb-4">
               {t('quickLinks')}
             </h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/about" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <Link href="/about" className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                   {t('about')}
                 </Link>
               </li>
               <li>
-                <Link href="/oxygen-therapy" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <Link href="/oxygen-therapy" className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                   {t('oxygenTherapy')}
                 </Link>
               </li>
               <li>
-                <Link href="/products" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <Link href="/products" className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                   {t('products')}
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <Link href="/faq" className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                   {t('faq')}
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <Link href="/contact" className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                   {t('contact')}
                 </Link>
               </li>
@@ -87,10 +87,10 @@ export function Footer({ showSocials = true, className = "" }: FooterProps) {
 
           {/* Contact Info */}
           <div>
-            <h4 className="font-semibold text-gray-900 dark:text-white mb-4">
+            <h4 className="font-semibold text-white mb-4">
               {t('contactUs')}
             </h4>
-            <div className="space-y-2 text-gray-600 dark:text-gray-400">
+            <div className="space-y-2 text-gray-400">
               <p>
                 <span className="font-medium">{t('mail')}</span> {t('email')}
               </p>
@@ -100,8 +100,8 @@ export function Footer({ showSocials = true, className = "" }: FooterProps) {
         </div>
 
         {/* Copyright */}
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-          <p className="text-center text-gray-600 dark:text-gray-400">
+        <div className="border-t border-gray-700 pt-6">
+          <p className="text-center text-gray-400">
             {t('copyright')}
           </p>
         </div>

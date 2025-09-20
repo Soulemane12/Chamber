@@ -17,7 +17,7 @@ export const translations = {
     welcomeTitle: "Welcome to Wellnex02",
     welcomeSubtitle: "Innovative Hyperbaric Oxygen Therapy Rooted in Japanese Wellness",
     welcomeDescription: "Wellnex02, in collaboration with 02CapsuleBox, a leading Japan-based manufacturer, brings over 25 years of excellence in hyperbaric oxygen therapy to the U.S. market. As Asia's top producer of oxygen chambers, our legacy is built on the timeless principles of Japanese wellness—focusing on longevity, vitality, and holistic health.",
-    discoverText: "Join the movement toward better health and vitality. Discover how Wellnex02 can support your journey to optimal wellness—one breath at a time.",
+    discoverText: "Join the movement towards better health and vitality. Discover how Wellnex02 can support your journey to optimal wellness—one breath at a time.",
     readMore: "Read More",
     
     // Products
@@ -44,7 +44,7 @@ export const translations = {
     
     // Experience Future
     experienceFutureTitle: "Experience the Future of Wellness",
-    experienceFutureDescription: "Join the movement toward better health and vitality. Discover how Wellnex02 can support your journey to optimal wellness—one breath at a time.",
+    experienceFutureDescription: "Join the movement towards better health and vitality. Discover how Wellnex02 can support your journey to optimal wellness—one breath at a time.",
     
     // Mission
     missionTitle: "Immerse yourself in the process",

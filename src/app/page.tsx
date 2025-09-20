@@ -11,16 +11,16 @@ export default function Home() {
   const [selectedLocation, setSelectedLocation] = useState<'midtown' | 'platinum'>('midtown');
   
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
       <Header currentPage="home" />
 
       <main className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         {/* Hero Section */}
         <div className="text-center mb-16 animate-fade-in">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6 animate-slide-in-up">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 animate-slide-in-up">
             {t('heroTitle')}
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto animate-slide-in-up animate-delay-200">
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto animate-slide-in-up animate-delay-200">
             {t('heroSubtitle')}
           </p>
           <div className="mt-10 animate-fade-in animate-delay-300 px-4 sm:px-0">
@@ -36,18 +36,18 @@ export default function Home() {
         {/* Welcome Section */}
         <div className="mb-16 animate-fade-in">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
+            <h2 className="text-3xl font-bold mb-4 text-white">
               {t('welcomeTitle')}
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
+            <p className="text-xl text-gray-300 mb-6">
               {t('welcomeSubtitle')}
             </p>
           </div>
           <div className="max-w-4xl mx-auto">
-            <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed">
+            <p className="text-gray-300 mb-6 leading-relaxed">
               {t('welcomeDescription')}
             </p>
-            <p className="text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
+            <p className="text-gray-300 mb-8 leading-relaxed">
               {t('discoverText')}
             </p>
             <div className="text-center">
@@ -80,25 +80,25 @@ export default function Home() {
         {/* Why Choose Wellnex02 Section */}
         <div className="mb-16 animate-fade-in">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
+            <h2 className="text-3xl font-bold mb-4 text-white">
               {t('whyChooseTitle')}
             </h2>
           </div>
           
           <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
-                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+              <div className="bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
+                <p className="text-gray-300 leading-relaxed">
                   {t('scienceDrivenWellness')}
                 </p>
               </div>
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
-                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+              <div className="bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
+                <p className="text-gray-300 leading-relaxed">
                   {t('durableUserFriendly')}
                 </p>
               </div>
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
-                <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+              <div className="bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
+                <p className="text-gray-300 leading-relaxed">
                   {t('inspiredByTradition')}
                 </p>
               </div>
@@ -109,10 +109,10 @@ export default function Home() {
         {/* Recovery Series Section */}
         <div className="mb-16 animate-fade-in">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
+            <h2 className="text-3xl font-bold mb-4 text-white">
               {t('recoverySeriesTitle')}
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               {t('recoverySeriesDescription')}
             </p>
           </div>
@@ -121,29 +121,29 @@ export default function Home() {
         {/* Products Section */}
         <div className="mb-16 animate-fade-in">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
+            <h2 className="text-3xl font-bold mb-4 text-white">
               {t('productTitle')}
             </h2>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">{t('o2BoxT2R')}</h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">{t('o2BoxT2RDesc')}</p>
+            <div className="bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
+              <h3 className="text-xl font-semibold mb-3 text-white">{t('o2BoxT2R')}</h3>
+              <p className="text-gray-300 mb-4">{t('o2BoxT2RDesc')}</p>
               <Link href="/products" className="text-blue-600 hover:text-blue-700 font-medium">
                 {t('learnMore')}
               </Link>
             </div>
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">{t('o2BoxT68R')}</h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">{t('o2BoxT68RDesc')}</p>
+            <div className="bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
+              <h3 className="text-xl font-semibold mb-3 text-white">{t('o2BoxT68R')}</h3>
+              <p className="text-gray-300 mb-4">{t('o2BoxT68RDesc')}</p>
               <Link href="/products" className="text-blue-600 hover:text-blue-700 font-medium">
                 {t('learnMore')}
               </Link>
             </div>
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">{t('o2BoxT810R')}</h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">{t('o2BoxT810RDesc')}</p>
+            <div className="bg-gray-800 p-6 rounded-xl shadow-md hover:scale-105 transition-all duration-300">
+              <h3 className="text-xl font-semibold mb-3 text-white">{t('o2BoxT810R')}</h3>
+              <p className="text-gray-300 mb-4">{t('o2BoxT810RDesc')}</p>
               <Link href="/products" className="text-blue-600 hover:text-blue-700 font-medium">
                 {t('learnMore')}
               </Link>
@@ -151,9 +151,9 @@ export default function Home() {
           </div>
           
           <div className="mt-8 text-center">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md inline-block">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">{t('operationalItems')}</h3>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">{t('operationalItemsDesc')}</p>
+            <div className="bg-gray-800 p-6 rounded-xl shadow-md inline-block">
+              <h3 className="text-xl font-semibold mb-3 text-white">{t('operationalItems')}</h3>
+              <p className="text-gray-300 mb-4">{t('operationalItemsDesc')}</p>
               <Link href="/products" className="text-blue-600 hover:text-blue-700 font-medium">
                 {t('learnMore')}
               </Link>
@@ -164,23 +164,23 @@ export default function Home() {
         {/* In-Person Demo Sites Section */}
         <div className="mb-16 animate-fade-in">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
+            <h2 className="text-3xl font-bold mb-4 text-white">
               Experience Our Products In-Person
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               Book a demo session at one of our partner locations to experience hyperbaric oxygen therapy firsthand
             </p>
           </div>
           
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4">
+            <div className="bg-gray-800 rounded-xl shadow-lg p-4">
               {/* Tab Navigation */}
-              <div className="flex flex-col sm:flex-row mb-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex flex-col sm:flex-row mb-4 border-b border-gray-700">
                 <button 
                   className={`px-3 py-1.5 text-sm font-medium border-b-2 transition-colors ${
                     selectedLocation === 'midtown' 
                       ? 'border-blue-600 text-blue-600 dark:text-blue-400' 
-                      : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
+                      : 'border-transparent text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
                   }`}
                   onClick={() => setSelectedLocation('midtown')}
                 >
@@ -190,7 +190,7 @@ export default function Home() {
                   className={`px-3 py-1.5 text-sm font-medium border-b-2 transition-colors ${
                     selectedLocation === 'platinum' 
                       ? 'border-blue-600 text-blue-600 dark:text-blue-400' 
-                      : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
+                      : 'border-transparent text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
                   }`}
                   onClick={() => setSelectedLocation('platinum')}
                 >
@@ -204,12 +204,12 @@ export default function Home() {
                 <div>
                   {selectedLocation === 'midtown' ? (
                     <div>
-                      <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white">Midtown Biohack</h3>
-                      <p className="text-gray-600 dark:text-gray-300 mb-2 text-xs">
+                      <h3 className="text-lg font-bold mb-2 text-white">Midtown Biohack</h3>
+                      <p className="text-gray-300 mb-2 text-xs">
                         Experience our hyperbaric oxygen chambers in a professional wellness environment. 
                         Our Midtown location offers personalized sessions and expert guidance.
                       </p>
-                      <div className="space-y-0.5 text-gray-600 dark:text-gray-300 text-xs">
+                      <div className="space-y-0.5 text-gray-300 text-xs">
                         <p><strong>📍 Address:</strong> 575 Madison Ave, 23rd Floor, New York, NY 10022</p>
                         <p><strong>🕒 Hours:</strong> Mon-Fri 9AM-7PM, Sat 10AM-4PM</p>
                         <p><strong>📞 Phone:</strong> (555) 123-4567</p>
@@ -217,9 +217,9 @@ export default function Home() {
                       
                       {/* Video Section */}
                       <div className="mt-2">
-                        <h4 className="text-xs font-semibold mb-1 text-gray-900 dark:text-white">Take a Virtual Tour</h4>
-                        <div className="bg-gray-100 dark:bg-gray-600 p-3 rounded-lg">
-                          <p className="text-xs text-gray-600 dark:text-gray-300 mb-2">
+                        <h4 className="text-xs font-semibold mb-1 text-white">Take a Virtual Tour</h4>
+                        <div className="bg-gray-100 bg-gray-600 p-3 rounded-lg">
+                          <p className="text-xs text-gray-300 mb-2">
                             Video tour of our Midtown Biohack location
                           </p>
                           <video 
@@ -245,12 +245,12 @@ export default function Home() {
                     </div>
                   ) : (
                     <div>
-                      <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white">Platinum Wellness</h3>
-                      <p className="text-gray-600 dark:text-gray-300 mb-2 text-xs">
+                      <h3 className="text-lg font-bold mb-2 text-white">Platinum Wellness</h3>
+                      <p className="text-gray-300 mb-2 text-xs">
                         Discover the transformative power of hyperbaric oxygen therapy at our Platinum Wellness center. 
                         Multiple locations available for your convenience.
                       </p>
-                      <div className="space-y-0.5 text-gray-600 dark:text-gray-300 text-xs">
+                      <div className="space-y-0.5 text-gray-300 text-xs">
                         <p><strong>📍 Locations:</strong> 1990 Parker Rd SE, Conyers, GA 30094</p>
                         <p><strong>🕒 Hours:</strong> Mon-Fri 8AM-8PM, Sat-Sun 9AM-6PM</p>
                         <p><strong>📞 Phone:</strong> (555) 987-6543</p>
@@ -260,63 +260,63 @@ export default function Home() {
                 </div>
                 
                 {/* Right Column - Booking Form */}
-                <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
-                  <h4 className="text-base font-semibold mb-2 text-gray-900 dark:text-white">Schedule Your Demo</h4>
+                <div className="bg-gray-50 bg-gray-700 p-3 rounded-lg">
+                  <h4 className="text-base font-semibold mb-2 text-white">Schedule Your Demo</h4>
                   <form className="space-y-2">
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
                         Your Name *
                       </label>
                       <input
                         type="text"
                         required
-                        className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white"
+                        className="w-full px-2 py-1 text-xs border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
                         placeholder="Enter your full name"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
                         Email Address *
                       </label>
                       <input
                         type="email"
                         required
-                        className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white"
+                        className="w-full px-2 py-1 text-xs border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
                         placeholder="your.email@example.com"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
                         Phone Number
                       </label>
                       <input
                         type="tel"
-                        className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white"
+                        className="w-full px-2 py-1 text-xs border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
                         placeholder="(555) 123-4567"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
                         Preferred Date *
                       </label>
                       <input
                         type="date"
                         required
                         min={new Date().toISOString().split('T')[0]}
-                        className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white"
+                        className="w-full px-2 py-1 text-xs border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
                       />
                     </div>
                     
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
                         Preferred Time *
                       </label>
                       <select
                         required
-                        className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white"
+                        className="w-full px-2 py-1 text-xs border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
                       >
                         <option value="">Select a time</option>
                         <option value="09:00">9:00 AM</option>
@@ -332,12 +332,12 @@ export default function Home() {
                     </div>
                     
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      <label className="block text-xs font-medium text-gray-300 mb-1">
                         Special Requests
                       </label>
                       <textarea
                         rows={1}
-                        className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white"
+                        className="w-full px-2 py-1 text-xs border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-600 dark:text-white"
                         placeholder="Any specific questions or requirements?"
                       ></textarea>
                     </div>
@@ -362,10 +362,10 @@ export default function Home() {
         {/* Experience Future Section */}
         <div className="mb-16 animate-fade-in">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
+            <h2 className="text-3xl font-bold mb-4 text-white">
               {t('experienceFutureTitle')}
             </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               {t('experienceFutureDescription')}
             </p>
           </div>
@@ -375,7 +375,7 @@ export default function Home() {
               Wellnex02
             </h3>
             <p className="text-xl mb-6">
-              Join the movement toward better health and vitality
+              Join the movement towards better health and vitality
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
