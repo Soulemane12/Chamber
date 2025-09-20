@@ -1,5 +1,6 @@
 "use client";
 
+
 import { useState, useEffect } from "react";
 import { formatCurrency } from "@/lib/utils";
 import UserEditModal, { UserProfile } from "./ui/UserEditModal";
