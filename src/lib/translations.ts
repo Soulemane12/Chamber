@@ -59,7 +59,6 @@ export const translations = {
     expirationDate: "Expiration Date",
     cvv: "CVV",
     nameOnCard: "Name on Card",
-    completeBooking: "Complete Booking",
     book: "Book",
     
     // Confirmation
@@ -141,7 +140,6 @@ export const translations = {
     expirationDate: "Date d'expiration",
     cvv: "CVV",
     nameOnCard: "Nom sur la carte",
-    completeBooking: "Finaliser la réservation",
     book: "Réserver",
     
     // Confirmation
@@ -223,7 +221,6 @@ export const translations = {
     expirationDate: "Fecha de vencimiento",
     cvv: "CVV",
     nameOnCard: "Nombre en la tarjeta",
-    completeBooking: "Completar reserva",
     book: "Reservar",
     
     // Confirmation
@@ -305,7 +302,6 @@ export const translations = {
     expirationDate: "到期日",
     cvv: "CVV",
     nameOnCard: "持卡人姓名",
-    completeBooking: "完成预约",
     book: "预约",
     
     // Confirmation
@@ -387,7 +383,6 @@ export const translations = {
     expirationDate: "有効期限",
     cvv: "CVV",
     nameOnCard: "カード名義人",
-    completeBooking: "予約を完了する",
     book: "予約",
     
     // Confirmation
@@ -469,7 +464,6 @@ export const translations = {
     expirationDate: "Data scadenza",
     cvv: "CVV",
     nameOnCard: "Nome sulla carta",
-    completeBooking: "Completa prenotazione",
     book: "Prenota",
     
     // Confirmation
