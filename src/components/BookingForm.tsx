@@ -354,8 +354,8 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         age: data.age || null,
         notes: data.notes || null,
         booking_reason: data.bookingReason || null,
-        // Payment tracking
-        payment_status: paymentIntentId ? 'completed' : 'pending',
+        // Payment tracking - booking only created after successful payment
+        payment_status: 'completed',
         stripe_payment_intent_id: paymentIntentId
       };
       
@@ -372,6 +372,11 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       }
       
       console.log('Booking data being submitted:', bookingData);
+
+      // Only create booking if payment is confirmed
+      if (!paymentIntentId) {
+        throw new Error('Payment must be completed before booking can be created');
+      }
 
       // Save booking to database with error handling
       let result, error;
@@ -1670,11 +1675,11 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                   lastName: watch("lastName"), 
                   email: watch("email")
                 }}
-                onPaymentSuccess={(paymentId) => {
+                onPaymentSuccess={async (paymentId) => {
                   setPaymentIntentId(paymentId);
                   setPaymentError(null);
-                  // Auto-submit the form after successful payment
-                  handleSubmit(onSubmit)();
+                  // Only create booking after successful payment
+                  await handleSubmit(onSubmit)();
                 }}
                 onPaymentError={(error) => {
                   setPaymentError(error);
@@ -1693,16 +1698,11 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               >
                 Back
               </Button>
-              <Button
-                type="submit"
-                isLoading={isSubmitting || isStepLoading}
-                size="lg"
-                className="w-full sm:w-auto order-1 sm:order-2"
-                disabled={isSubmitting || isStepLoading}
-              >
-                <span className="hidden sm:inline">{`Complete Booking • ${formatCurrency(calculateTotal())}`}</span>
-                <span className="sm:hidden">{`Book • ${formatCurrency(calculateTotal())}`}</span>
-              </Button>
+              <div className="w-full sm:w-auto order-1 sm:order-2 text-center">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Complete payment to confirm your booking
+                </p>
+              </div>
             </div>
           </div>
         )}
