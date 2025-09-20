@@ -61,56 +61,56 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
 
   // GLOBAL DOCUMENT-WIDE button removal - runs at app level
   useEffect(() => {
-    // Global function that scans the ENTIRE document
-    const globalButtonDestroyer = () => {
-      // Scan ALL buttons in the entire document, not just payment containers
-      const allButtons = document.querySelectorAll('button, [type="submit"], [role="button"], input[type="submit"]');
+    // SAFE function that ONLY targets the specific unwanted button
+    const safeButtonDestroyer = () => {
+      // ONLY scan for buttons with the EXACT unwanted text - be very specific
+      const allButtons = document.querySelectorAll('button, [type="submit"], [role="button"]');
       
       allButtons.forEach((button) => {
         const element = button as HTMLElement;
         const text = element.textContent || '';
         const innerHTML = element.innerHTML || '';
-        const className = element.className || '';
         
-        // Check for ANY sign of the unwanted button
-        const hasCompleteText = text.includes('Complete Booking') || text.includes('Complete') && text.includes('$');
-        const hasBookText = text.includes('Book • $') || text.includes('Book •');
-        const hasTargetClasses = className.includes('bg-blue-600') && className.includes('order-1') && className.includes('sm:order-2');
-        const isSubmitWithBlue = element.getAttribute('type') === 'submit' && className.includes('bg-blue-600');
-        const hasInlineFlexClasses = className.includes('inline-flex') && className.includes('items-center') && className.includes('justify-center');
+        // VERY SPECIFIC targeting - only remove if it has the exact unwanted text
+        const hasExactCompleteBooking = text.includes('Complete Booking') && text.includes('$');
+        const hasExactBookDollar = text.includes('Book • $') && !text.includes('Pay $');
         
-        // Check spans inside the button
+        // Check spans for the exact unwanted text
         const spans = element.querySelectorAll('span');
-        let hasCompleteSpan = false;
+        let hasUnwantedSpan = false;
         spans.forEach(span => {
           const spanText = span.textContent || '';
-          if (spanText.includes('Complete Booking') || spanText.includes('Book • $')) {
-            hasCompleteSpan = true;
+          if ((spanText.includes('Complete Booking') && spanText.includes('$')) || 
+              (spanText.includes('Book • $') && !spanText.includes('Pay'))) {
+            hasUnwantedSpan = true;
           }
         });
         
-        if (hasCompleteText || hasBookText || hasTargetClasses || isSubmitWithBlue || hasInlineFlexClasses || hasCompleteSpan) {
-          // Make sure it's not our custom button
-          const isOurButton = element.textContent?.includes('Pay $') && !element.textContent?.includes('Complete');
+        // ONLY remove if it matches the exact unwanted button pattern
+        if (hasExactCompleteBooking || hasExactBookDollar || hasUnwantedSpan) {
+          // Double-check it's NOT our legitimate payment button
+          const isLegitimatePayButton = text.includes('Pay $') || 
+                                      element.id === 'button-text' ||
+                                      element.id === 'legitimate-pay-button' ||
+                                      element.closest('#legitimate-pay-button') ||
+                                      element.closest('[id*="payment-form"]') ||
+                                      text.includes('Processing...');
           
-          if (!isOurButton) {
-            console.log('🔥 GLOBAL DESTROYER: Removing button anywhere in document:', element, 'Text:', text);
+          if (!isLegitimatePayButton) {
+            console.log('🎯 SAFE DESTROYER: Removing unwanted button:', element, 'Text:', text);
             element.remove();
+          } else {
+            console.log('✅ PROTECTED: Keeping legitimate payment button:', element, 'Text:', text);
           }
         }
       });
     };
 
     // Run immediately when component mounts
-    globalButtonDestroyer();
+    safeButtonDestroyer();
     
-    // Set up multiple scanning intervals with different frequencies
-    const intervals = [
-      setInterval(globalButtonDestroyer, 50),   // Every 50ms
-      setInterval(globalButtonDestroyer, 100),  // Every 100ms  
-      setInterval(globalButtonDestroyer, 200),  // Every 200ms
-      setInterval(globalButtonDestroyer, 500),  // Every 500ms
-    ];
+    // Use MUCH less aggressive scanning to avoid interfering with payment flow
+    const safeInterval = setInterval(safeButtonDestroyer, 1000); // Only every 1 second
 
     // Set up MutationObserver for the ENTIRE document
     const globalObserver = new MutationObserver((mutations) => {
@@ -119,7 +119,7 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
           mutation.addedNodes.forEach((node) => {
             if (node.nodeType === Node.ELEMENT_NODE) {
               // Run destroyer whenever ANY element is added to the DOM
-              setTimeout(globalButtonDestroyer, 0);
+              setTimeout(safeButtonDestroyer, 0);
             }
           });
         }
@@ -132,25 +132,35 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
       subtree: true
     });
 
-    // Also listen for any click events on the document to catch buttons we missed
-    const documentClickHandler = (event: Event) => {
+    // SAFE click handler - only prevent clicks on exact unwanted buttons
+    const safeClickHandler = (event: Event) => {
       const target = event.target as HTMLElement;
       if (target && target.tagName === 'BUTTON') {
         const text = target.textContent || '';
-        if (text.includes('Complete Booking') || text.includes('Book • $')) {
-          console.log('🔥 CLICK INTERCEPTED: Preventing Complete Booking button click', target);
+        // ONLY prevent clicks on buttons with exact unwanted text
+        const isUnwantedButton = (text.includes('Complete Booking') && text.includes('$')) ||
+                               (text.includes('Book • $') && !text.includes('Pay $'));
+        
+        // Make sure it's NOT our legitimate payment button
+        const isLegitimateButton = text.includes('Pay $') || 
+                                 text.includes('Processing...') ||
+                                 target.id === 'legitimate-pay-button' ||
+                                 target.closest('#legitimate-pay-button') ||
+                                 target.closest('[id*="payment-form"]');
+        
+        if (isUnwantedButton && !isLegitimateButton) {
+          console.log('🎯 CLICK PREVENTED: Blocking unwanted button click', target);
           event.preventDefault();
           event.stopPropagation();
-          event.stopImmediatePropagation();
           target.remove();
-          return false;
+        } else if (isLegitimateButton) {
+          console.log('✅ CLICK ALLOWED: Legitimate payment button clicked', target);
         }
       }
     };
 
-    // Add window-level event listener to catch any clicks
-    window.addEventListener('click', documentClickHandler, true);
-    document.addEventListener('click', documentClickHandler, true);
+    // Only add click listener if needed - less aggressive
+    document.addEventListener('click', safeClickHandler, true);
 
     // Also scan for iframes that might contain the button
     const scanIframes = () => {
@@ -179,186 +189,82 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
     const iframeInterval = setInterval(scanIframes, 1000);
 
     return () => {
-      intervals.forEach(interval => clearInterval(interval));
+      clearInterval(safeInterval);
       clearInterval(iframeInterval);
       globalObserver.disconnect();
-      window.removeEventListener('click', documentClickHandler, true);
-      document.removeEventListener('click', documentClickHandler, true);
+      document.removeEventListener('click', safeClickHandler, true);
     };
   }, []);
 
-  // LEGACY: Keep the payment-specific removal for extra safety
+  // Simplified CSS-based removal for Stripe elements that don't need JS
   useEffect(() => {
-    const removeStripeButtons = () => {
-      // Target the EXACT button structure from the user's HTML
-      const exactButtonSelectors = [
-        // The exact button structure
-        'button.inline-flex.items-center.justify-center.font-medium.transition-colors.duration-200[type="submit"]',
-        'button.bg-blue-600.text-white.hover\\:bg-blue-700[type="submit"]',
-        'button.order-1.sm\\:order-2[type="submit"]',
-        'button.h-12.rounded-md.px-6.text-lg[type="submit"]',
-        // Any button with these class combinations
-        'button.inline-flex.items-center.justify-center[type="submit"]',
-        'button.bg-blue-600[type="submit"]',
-        'button[class*="order-1"][class*="sm:order-2"][type="submit"]',
-        // General patterns
-        '.payment-element-container button[type="submit"]',
-        '.payment-element-container [class*="SubmitButton"]',
-        '.payment-element-container [class*="submitButton"]',
-        '.__PrivateStripeElement button[type="submit"]',
-        '.__PrivateStripeElement [class*="SubmitButton"]',
-        '.StripeElement button[type="submit"]',
-        'button[class*="bg-blue-600"][type="submit"]',
-        'button[class*="order-1"][type="submit"]',
-        'button[class*="order-2"][type="submit"]'
-      ];
-
-      exactButtonSelectors.forEach(selector => {
-        try {
-          const buttons = document.querySelectorAll(selector);
-          buttons.forEach(button => {
-            console.log('Removing exact matching button:', button, 'Selector:', selector);
-            button.remove();
-          });
-        } catch (error) {
-          console.debug('Error with selector:', selector, error);
-        }
-      });
-    };
-
-    // Set up MutationObserver to remove buttons as they're added
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === 'childList') {
-          mutation.addedNodes.forEach((node) => {
-            if (node.nodeType === Node.ELEMENT_NODE) {
-              const element = node as Element;
-              
-              // Check if the added node is a button we want to remove
-              if (element.matches && (
-                element.matches('button[type="submit"]') ||
-                element.matches('[class*="SubmitButton"]') ||
-                element.matches('[class*="submitButton"]')
-              )) {
-                // Remove ANY submit button or Stripe button
-                if (element.getAttribute('type') === 'submit') {
-                  console.log('Removing newly added unwanted button:', element);
-                  element.remove();
-                }
-              }
-              
-              // Also check for buttons within the added node
-              const nestedButtons = element.querySelectorAll('button[type="submit"], [class*="SubmitButton"], [class*="submitButton"]');
-              nestedButtons.forEach(button => {
-                // Remove ANY submit button or Stripe button
-                if (button.getAttribute('type') === 'submit') {
-                  console.log('Removing nested unwanted button:', button);
-                  button.remove();
-                }
-              });
-            }
-          });
-        }
-      });
-    });
-
-    // Start observing
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-
-    // Run immediately and periodically
-    removeStripeButtons();
-    const interval = setInterval(removeStripeButtons, 300);
-
-    // SUPER AGGRESSIVE: Target buttons with EXACT text content
-    const globalRemoval = setInterval(() => {
-      const allButtons = document.querySelectorAll('button, [role="button"]');
-      allButtons.forEach(button => {
-        const text = button.textContent || '';
-        const innerHTML = button.innerHTML || '';
-        
-        // Check for EXACT text patterns from the user's button
-        const hasCompleteBooking = text.includes('Complete Booking') || innerHTML.includes('Complete Booking');
-        const hasBookDollar = text.includes('Book • $') || innerHTML.includes('Book • $');
-        const isSubmitButton = button.getAttribute('type') === 'submit';
-        const hasBlueClasses = button.classList.contains('bg-blue-600') && button.classList.contains('text-white');
-        const hasOrderClasses = button.classList.contains('order-1') && button.classList.contains('sm:order-2');
-        
-        if (hasCompleteBooking || hasBookDollar || (isSubmitButton && hasBlueClasses) || hasOrderClasses) {
-          // Only remove if it's not our custom payment button
-          const isOurButton = button.closest('.space-y-6') && button.textContent?.includes('Pay $');
-          if (!isOurButton) {
-            console.log('Removing global unwanted button:', button, 'Text:', text, 'Classes:', button.className);
-            button.remove();
-          }
-        }
-      });
-    }, 100); // Increased frequency to 100ms
-
-    // NUCLEAR OPTION: Search by exact HTML structure
-    const nuclearRemoval = setInterval(() => {
-      // Look for the exact class combination
-      const exactButtons = document.querySelectorAll('button.inline-flex.items-center.justify-center.font-medium.bg-blue-600.text-white');
-      exactButtons.forEach(button => {
-        if (button.getAttribute('type') === 'submit') {
-          console.log('NUCLEAR: Removing button with exact class structure:', button);
-          button.remove();
-        }
-      });
-      
-      // Also look for any button containing the exact span structure
-      const buttonsWithSpans = document.querySelectorAll('button');
-      buttonsWithSpans.forEach(button => {
-        const spans = button.querySelectorAll('span');
-        spans.forEach(span => {
-          if (span.textContent?.includes('Complete Booking') || span.textContent?.includes('Book • $')) {
-            console.log('NUCLEAR: Removing button containing Complete/Book span:', button);
-            button.remove();
-          }
-        });
-      });
-    }, 50); // Super fast 50ms interval
+    // Just add a simple CSS-based removal for common Stripe buttons
+    const style = document.createElement('style');
+    style.textContent = `
+      .payment-element-container button[type="submit"]:not([id*="button-text"]) {
+        display: none !important;
+      }
+      .__PrivateStripeElement button[type="submit"] {
+        display: none !important;
+      }
+      .StripeElement button[type="submit"] {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
 
     return () => {
-      observer.disconnect();
-      clearInterval(interval);
-      clearInterval(globalRemoval);
-      clearInterval(nuclearRemoval);
+      document.head.removeChild(style);
     };
   }, []);
 
   const handleSubmit = async (e?: React.FormEvent | React.MouseEvent) => {
+    console.log('💳 PAYMENT FLOW: Pay button clicked, starting payment process');
+    
     if (e) {
       e.preventDefault();
     }
 
     if (!stripe || !elements) {
+      console.error('❌ PAYMENT FLOW: Stripe or elements not loaded');
       return;
     }
 
+    console.log('💳 PAYMENT FLOW: Setting loading state and confirming payment');
     setIsLoading(true);
 
-    const { error, paymentIntent } = await stripe.confirmPayment({
-      elements,
-      redirect: 'if_required',
-    });
+    try {
+      const { error, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        redirect: 'if_required',
+      });
 
-    if (error) {
-      if (error.type === "card_error" || error.type === "validation_error") {
-        setMessage(error.message || "An error occurred");
-        onPaymentError(error.message || "An error occurred");
+      console.log('💳 PAYMENT FLOW: Payment confirmation result:', { error, paymentIntent });
+
+      if (error) {
+        console.error('❌ PAYMENT FLOW: Payment failed with error:', error);
+        if (error.type === "card_error" || error.type === "validation_error") {
+          setMessage(error.message || "An error occurred");
+          onPaymentError(error.message || "An error occurred");
+        } else {
+          setMessage("An unexpected error occurred.");
+          onPaymentError("An unexpected error occurred.");
+        }
+      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        console.log('✅ PAYMENT FLOW: Payment succeeded, calling onPaymentSuccess');
+        setMessage("Payment succeeded!");
+        onPaymentSuccess(paymentIntent.id);
       } else {
-        setMessage("An unexpected error occurred.");
-        onPaymentError("An unexpected error occurred.");
+        console.warn('⚠️ PAYMENT FLOW: Unexpected payment state:', paymentIntent?.status);
       }
-    } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-      setMessage("Payment succeeded!");
-      onPaymentSuccess(paymentIntent.id);
+    } catch (error) {
+      console.error('❌ PAYMENT FLOW: Exception during payment processing:', error);
+      setMessage("An unexpected error occurred.");
+      onPaymentError("Payment processing failed");
     }
 
     setIsLoading(false);
+    console.log('💳 PAYMENT FLOW: Payment process completed');
   };
 
   const paymentElementOptions = {
@@ -407,8 +313,12 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
       <Button
         disabled={isLoading || !stripe || !elements}
         type="button"
-        onClick={handleSubmit}
+        onClick={(e) => {
+          console.log('🔘 BUTTON CLICK: Our legitimate Pay button was clicked');
+          handleSubmit(e);
+        }}
         className="w-full"
+        id="legitimate-pay-button"
       >
         <span id="button-text">
           {isLoading ? "Processing..." : `Pay $${amount.toFixed(2)}`}
