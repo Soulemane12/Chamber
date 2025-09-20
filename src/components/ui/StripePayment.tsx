@@ -230,8 +230,31 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
       return;
     }
 
-    console.log('💳 PAYMENT FLOW: Setting loading state and confirming payment');
+    // First validate the payment form is complete
+    console.log('💳 PAYMENT FLOW: Validating payment form completeness');
+    
+    // Check if the payment element is complete and valid
+    const paymentElement = elements.getElement('payment');
+    if (!paymentElement) {
+      console.error('❌ PAYMENT FLOW: Payment element not found');
+      setMessage("Payment form is not ready. Please try again.");
+      return;
+    }
+
+    // Set loading state early to show user that processing is starting
     setIsLoading(true);
+
+    // Validate the form before processing payment
+    const { error: submitError } = await elements.submit();
+    if (submitError) {
+      console.error('❌ PAYMENT FLOW: Form validation failed:', submitError);
+      setMessage(submitError.message || "Please complete all required payment fields.");
+      onPaymentError(submitError.message || "Please complete all required payment fields.");
+      setIsLoading(false);
+      return;
+    }
+
+    console.log('💳 PAYMENT FLOW: Form validation passed, confirming payment');
 
     try {
       const { error, paymentIntent } = await stripe.confirmPayment({
@@ -268,28 +291,39 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
   };
 
   const paymentElementOptions = {
-    layout: "accordion" as const, // Changed from tabs to accordion
-    // Completely disable billing details collection
+    layout: "accordion" as const,
+    // Require all payment fields to be completed
     fields: {
-      billingDetails: 'never' as const,
+      billingDetails: {
+        name: 'auto' as const,
+        email: 'auto' as const,
+        phone: 'never' as const,
+        address: {
+          line1: 'auto' as const,
+          line2: 'never' as const,
+          city: 'auto' as const,
+          state: 'auto' as const,
+          postalCode: 'auto' as const,
+          country: 'auto' as const,
+        }
+      }
     },
-    // Only allow card payments
+    // Only allow card payments - no digital wallets to ensure proper validation
     paymentMethodTypes: ['card'],
-    // Disable all wallet options
+    // Disable wallet options to force form completion
     wallets: {
       applePay: 'never' as const,
       googlePay: 'never' as const,
     },
-    // Provide default values to minimize form fields
+    // Provide default values but still require validation
     defaultValues: {
       billingDetails: {
         name: `${customerInfo.firstName} ${customerInfo.lastName}`,
         email: customerInfo.email,
       }
     },
-    // Disable automatic submission
+    // Enable validation and require form completion
     readOnly: false,
-    // Terms configuration to prevent additional elements
     terms: {
       card: 'never' as const,
     }
@@ -321,7 +355,7 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
         id="legitimate-pay-button"
       >
         <span id="button-text">
-          {isLoading ? "Processing..." : `Pay $${amount.toFixed(2)}`}
+          {isLoading ? "Processing payment..." : `Pay $${amount.toFixed(2)}`}
         </span>
       </Button>
       
