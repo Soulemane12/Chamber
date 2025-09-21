@@ -241,6 +241,7 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
         elements,
         redirect: 'if_required',
         confirmParams: {
+          return_url: `${window.location.origin}/booking`, // Required for some payment methods like CashApp
           payment_method_data: {
             billing_details: {
               phone: '', // Required since we set phone to 'never' in PaymentElement
@@ -296,7 +297,7 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
         }
       }
     },
-    // Only allow card payments - no digital wallets to ensure proper validation
+    // Only allow card payments - no digital wallets or other payment methods
     paymentMethodTypes: ['card'],
     // Disable wallet options to force form completion
     wallets: {
@@ -446,7 +447,7 @@ export function StripePayment({
 
   const appearance = {
     theme: 'stripe' as const,
-    // Completely hide any button elements that Stripe might generate
+    // Only hide specific submit buttons, not all buttons (which might include payment method selection)
     rules: {
       '.Tab': {
         display: 'block'
@@ -454,30 +455,11 @@ export function StripePayment({
       '.Input': {
         display: 'block'
       },
-      // Aggressively hide all possible button variants
-      'button': {
-        display: 'none !important',
-        visibility: 'hidden !important',
-        opacity: '0 !important',
-        height: '0 !important',
-        width: '0 !important',
-        overflow: 'hidden !important',
-        position: 'absolute !important',
-        left: '-9999px !important'
-      },
+      // Only hide submit buttons, allow other buttons for payment method selection
       '[type="submit"]': {
         display: 'none !important'
       },
       '.SubmitButton': {
-        display: 'none !important'
-      },
-      '[class*="SubmitButton"]': {
-        display: 'none !important'
-      },
-      '[class*="submitButton"]': {
-        display: 'none !important'
-      },
-      '[class*="Submit"]': {
         display: 'none !important'
       }
     }
