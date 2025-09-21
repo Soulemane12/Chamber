@@ -230,6 +230,18 @@ export default function HipHopBookingPage() {
               👉 Book your session below and begin your journey toward peak health and well-being with us:
             </p>
             
+            <div className="my-8">
+              <button
+                onClick={() => {
+                  const bookingForm = document.getElementById('booking-form');
+                  bookingForm?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 animate-pulse"
+              >
+                🎤 Book Your Wellness Session Now
+              </button>
+            </div>
+            
             <p className="text-sm">
               We look forward to supporting your wellness journey.
             </p>
@@ -263,7 +275,7 @@ export default function HipHopBookingPage() {
         </div>
 
         {/* Booking Form */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8">
+        <div id="booking-form" className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
             Book Your Wellness Session
           </h2>
