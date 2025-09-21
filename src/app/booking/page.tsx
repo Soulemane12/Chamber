@@ -52,10 +52,18 @@ export default function BookingPage() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        setIsAuthenticated(!!session);
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.warn("Authentication check failed:", error);
+          // Don't treat auth errors as fatal - allow guest booking
+          setIsAuthenticated(false);
+        } else {
+          setIsAuthenticated(!!session);
+        }
       } catch (error) {
-        console.error("Error checking authentication:", error);
+        console.warn("Error checking authentication:", error);
+        // Allow guest booking if auth check fails
+        setIsAuthenticated(false);
       } finally {
         setIsLoading(false);
       }
