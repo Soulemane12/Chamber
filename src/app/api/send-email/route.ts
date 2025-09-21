@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import * as nodemailer from 'nodemailer';
 import { BookingFormData } from '@/components/BookingForm';
 import { formatCurrency, isPromotionActive, getPromotionPricing } from '@/lib/utils';
 import { format } from 'date-fns';

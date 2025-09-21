@@ -8,7 +8,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format } from "date-fns";
-import Image from "next/image";
 
 // Form validation schema
 const hipHopBookingSchema = z.object({
@@ -192,14 +191,18 @@ export default function HipHopBookingPage() {
         {/* Hero Section */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
-            <Image
-              src="/HBOT.jpg"
-              alt="Wellness Services"
+            <video
               width={400}
               height={300}
               className="rounded-lg shadow-lg"
-              priority
-            />
+              controls
+              autoPlay
+              muted
+              loop
+            >
+              <source src="/hiphop.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
           </div>
           
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">

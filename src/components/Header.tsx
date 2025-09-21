@@ -78,6 +78,16 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
             </li>
             <li className="px-2 sm:px-0 py-1 sm:py-0">
               <Link
+                href="/hiphop"
+                className={`text-sm sm:text-base ${currentPage === 'hiphop'
+                  ? "text-purple-600 dark:text-purple-400 font-medium"
+                  : "text-gray-700 hover:text-purple-600 dark:text-gray-300 dark:hover:text-purple-400"}`}
+              >
+                🎤 Hip Hop
+              </Link>
+            </li>
+            <li className="px-2 sm:px-0 py-1 sm:py-0">
+              <Link
                 href={isAuthenticated ? "/account" : "/login?redirect=/account"}
                 className={`text-sm sm:text-base ${currentPage === 'account'
                   ? "text-blue-600 dark:text-blue-400 font-medium"
