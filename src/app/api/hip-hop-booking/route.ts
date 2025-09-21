@@ -34,7 +34,7 @@ export async function POST(request: Request) {
           duration: '60', // Default duration
           group_size: '1',
           payment_intent_id: 'hip_hop_' + Date.now(), // Unique identifier
-          notes: `HIP HOP NOMINEE - Service: ${bookingData.service}. ${bookingData.notes || ''}`,
+          notes: `HIP HOP NOMINEE - Services: ${Array.isArray(bookingData.services) ? bookingData.services.join(', ') : bookingData.services || bookingData.service}. ${bookingData.notes || ''}`,
           amount: 0, // Free for hip hop nominees
           created_at: new Date().toISOString()
         };
@@ -102,6 +102,8 @@ export async function POST(request: Request) {
           lastName: bookingData.last_name,
           date: new Date(bookingData.preferred_date),
           time: bookingData.preferred_time,
+          // Handle both single service (backward compatibility) and multiple services
+          services: bookingData.services || [bookingData.service].filter(Boolean),
         }),
       });
 

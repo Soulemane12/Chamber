@@ -15,15 +15,13 @@ const hipHopBookingSchema = z.object({
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Please enter a valid email address"),
   phone: z.string().min(10, "Please enter a valid phone number"),
-  service: z.enum([
+  services: z.array(z.enum([
     "hbot",
     "electric-exercise", 
     "pemf",
     "nmr",
     "nutrition"
-  ], {
-    required_error: "Please select a service"
-  }),
+  ])).min(1, "Please select at least one service"),
   preferredDate: z.string().min(1, "Please select a preferred date"),
   preferredTime: z.string().min(1, "Please select a preferred time"),
   notes: z.string().optional(),
@@ -83,7 +81,8 @@ export default function HipHopBookingPage() {
     resolver: zodResolver(hipHopBookingSchema),
   });
 
-  const selectedService = services.find(s => s.id === watch("service"));
+  const selectedServices = watch("services") || [];
+  const selectedServiceObjects = services.filter(s => selectedServices.includes(s.id as any));
 
   const onSubmit = async (data: HipHopBookingData) => {
     setIsSubmitting(true);
@@ -100,7 +99,7 @@ export default function HipHopBookingPage() {
           last_name: data.lastName,
           email: data.email,
           phone: data.phone,
-          service: data.service,
+          services: data.services,
           preferred_date: data.preferredDate,
           preferred_time: data.preferredTime,
           notes: data.notes || '',
@@ -154,7 +153,14 @@ export default function HipHopBookingPage() {
               <div className="text-left space-y-2">
                 <p><strong>Name:</strong> {bookingDetails.firstName} {bookingDetails.lastName}</p>
                 <p><strong>Email:</strong> {bookingDetails.email}</p>
-                <p><strong>Service:</strong> {selectedService?.title}</p>
+                <div>
+                  <p><strong>Selected Services:</strong></p>
+                  <ul className="list-disc list-inside ml-4 mt-2">
+                    {selectedServiceObjects.map((service) => (
+                      <li key={service.id} className="text-sm">{service.title}</li>
+                    ))}
+                  </ul>
+                </div>
                 <p><strong>Preferred Date:</strong> {format(new Date(bookingDetails.preferredDate), 'MMMM d, yyyy')}</p>
                 <p><strong>Preferred Time:</strong> {bookingDetails.preferredTime}</p>
               </div>
@@ -325,28 +331,28 @@ export default function HipHopBookingPage() {
             {/* Service Selection */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                Select Service *
+                Select Services * (You can choose multiple)
               </label>
               <div className="grid grid-cols-1 gap-3">
                 {services.map((service) => (
                   <label
                     key={service.id}
                     className={`flex items-start p-4 border rounded-lg cursor-pointer transition-all ${
-                      watch("service") === service.id
+                      selectedServices.includes(service.id as any)
                         ? "bg-purple-50 border-purple-500 dark:bg-purple-900/30 dark:border-purple-400"
                         : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
                     }`}
                   >
                     <input
-                      type="radio"
+                      type="checkbox"
                       value={service.id}
-                      {...register("service")}
-                      className="sr-only"
+                      {...register("services")}
+                      className="mt-1 mr-3 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                     />
                     <div className="text-2xl mr-3">{service.icon}</div>
                     <div className="flex-1">
                       <h3 className={`font-medium ${
-                        watch("service") === service.id
+                        selectedServices.includes(service.id as any)
                           ? "text-purple-600 dark:text-purple-400"
                           : "text-gray-900 dark:text-white"
                       }`}>
@@ -359,8 +365,8 @@ export default function HipHopBookingPage() {
                   </label>
                 ))}
               </div>
-              {errors.service && (
-                <p className="text-red-600 text-sm mt-1">{errors.service.message}</p>
+              {errors.services && (
+                <p className="text-red-600 text-sm mt-1">{errors.services.message}</p>
               )}
             </div>
 

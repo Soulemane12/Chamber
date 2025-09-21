@@ -7,7 +7,8 @@ interface HipHopBookingData {
   lastName: string;
   email: string;
   phone: string;
-  service: string;
+  service?: string; // Keep for backward compatibility
+  services?: string[]; // New field for multiple services
   preferred_date: string;
   preferred_time: string;
   notes?: string;
@@ -69,8 +70,11 @@ export async function POST(request: Request) {
       : new Date(bookingData.preferred_date);
     const formattedDate = format(dateToFormat, 'MMMM d, yyyy');
     
-    // Get service name
-    const serviceName = serviceNames[bookingData.service as keyof typeof serviceNames] || bookingData.service;
+    // Get service names - handle both single and multiple services
+    const selectedServices = bookingData.services || [bookingData.service].filter(Boolean);
+    const serviceNamesFormatted = selectedServices.map(serviceId => 
+      serviceNames[serviceId as keyof typeof serviceNames] || serviceId
+    );
     
     // User confirmation email
     const userMailOptions = {
@@ -112,8 +116,10 @@ export async function POST(request: Request) {
             </div>
             
             <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e5e7eb;">
-              <p style="margin: 8px 0;"><strong style="color: #7c3aed;">Requested Service:</strong></p>
-              <p style="color: #6b21a8; font-size: 18px; margin: 5px 0; font-weight: 600;">${serviceName}</p>
+              <p style="margin: 8px 0;"><strong style="color: #7c3aed;">Requested Services:</strong></p>
+              <ul style="color: #6b21a8; font-size: 16px; margin: 5px 0; font-weight: 600; list-style: disc; padding-left: 20px;">
+                ${serviceNamesFormatted.map(name => `<li style="margin: 5px 0;">${name}</li>`).join('')}
+              </ul>
             </div>
             
             ${bookingData.notes ? `
@@ -195,8 +201,10 @@ export async function POST(request: Request) {
             </div>
             
             <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e5e7eb;">
-              <p style="margin: 8px 0;"><strong style="color: #7c3aed;">Requested Service:</strong></p>
-              <p style="color: #6b21a8; font-size: 18px; margin: 5px 0; font-weight: 600;">${serviceName}</p>
+              <p style="margin: 8px 0;"><strong style="color: #7c3aed;">Requested Services:</strong></p>
+              <ul style="color: #6b21a8; font-size: 16px; margin: 5px 0; font-weight: 600; list-style: disc; padding-left: 20px;">
+                ${serviceNamesFormatted.map(name => `<li style="margin: 5px 0;">${name}</li>`).join('')}
+              </ul>
             </div>
             
             ${bookingData.notes ? `
