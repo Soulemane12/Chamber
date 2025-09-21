@@ -50,7 +50,9 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
           setMessage("Your payment is processing.");
           break;
         case "requires_payment_method":
-          setMessage("Your payment was not successful, please try again.");
+          // Don't show error message for fresh payment intents
+          // This is the normal initial state
+          setMessage(null);
           break;
         default:
           setMessage("Something went wrong.");
