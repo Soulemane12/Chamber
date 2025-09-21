@@ -59,20 +59,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Create the trigger if it doesn't exist
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.triggers 
-    WHERE trigger_name = 'trigger_hip_hop_bookings_updated_at'
-    AND event_object_table = 'hip_hop_bookings'
-  ) THEN
-    CREATE TRIGGER trigger_hip_hop_bookings_updated_at
-      BEFORE UPDATE ON hip_hop_bookings
-      FOR EACH ROW
-      EXECUTE FUNCTION update_hip_hop_bookings_updated_at();
-  END IF;
-END $$;
+-- Drop and recreate the trigger to ensure it uses the latest function
+DROP TRIGGER IF EXISTS trigger_hip_hop_bookings_updated_at ON hip_hop_bookings;
+
+CREATE TRIGGER trigger_hip_hop_bookings_updated_at
+  BEFORE UPDATE ON hip_hop_bookings
+  FOR EACH ROW
+  EXECUTE FUNCTION update_hip_hop_bookings_updated_at();
 
 -- Add or update comments to document the table structure
 COMMENT ON TABLE hip_hop_bookings IS 'Stores booking requests from Hip Hop nominees for wellness services';
