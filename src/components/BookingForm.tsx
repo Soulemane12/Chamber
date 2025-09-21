@@ -283,7 +283,13 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
     }
   };
 
+  // Form submission handler
   const onSubmit = async (data: BookingFormData) => {
+    // This is called by the form - payment should already be completed
+    await createBooking(data);
+  };
+
+  const createBooking = async (data: BookingFormData, providedPaymentId?: string) => {
     setIsSubmitting(true);
     try {
       // Calculate booking amount
@@ -305,6 +311,12 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       // Get user ID if authenticated
       const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user?.id;
+      
+      // Only create booking if payment is confirmed
+      const actualPaymentId = providedPaymentId || paymentIntentId;
+      if (!actualPaymentId) {
+        throw new Error('Payment must be completed before booking can be created');
+      }
       
       // Basic booking data with only essential fields
       const bookingData: {
@@ -356,7 +368,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         booking_reason: data.bookingReason || null,
         // Payment tracking - booking only created after successful payment
         payment_status: 'completed',
-        stripe_payment_intent_id: paymentIntentId
+        stripe_payment_intent_id: actualPaymentId
       };
       
       // Remove any undefined properties to avoid database errors
@@ -372,11 +384,6 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       }
       
       console.log('Booking data being submitted:', bookingData);
-
-      // Only create booking if payment is confirmed
-      if (!paymentIntentId) {
-        throw new Error('Payment must be completed before booking can be created');
-      }
 
       // Save booking to database with error handling
       let result, error;
@@ -1684,7 +1691,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     // Only create booking after successful payment
                     const formData = watch(); // Get current form data
                     console.log('Creating booking with form data:', formData);
-                    await onSubmit(formData); // Call onSubmit directly with form data
+                    await createBooking(formData, paymentId); // Pass payment ID directly to avoid race condition
                     console.log('Booking creation completed successfully');
                   } catch (error) {
                     console.error('Error during booking creation:', error);
