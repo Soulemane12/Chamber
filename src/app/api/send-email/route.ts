@@ -37,12 +37,21 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create a transporter
+    console.log('Creating nodemailer transporter with Gmail service');
+    console.log('Email user:', 'b.duc@wellnex02.com');
+    console.log('Password length:', process.env.EMAIL_PASSWORD.length);
+
+    // Create a transporter with more explicit configuration
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false, // true for 465, false for other ports
       auth: {
         user: 'b.duc@wellnex02.com',
         pass: process.env.EMAIL_PASSWORD
+      },
+      tls: {
+        rejectUnauthorized: false
       }
     });
 
@@ -55,6 +64,7 @@ export async function POST(request: Request) {
     // Calculate price based on duration
     const prices: Record<string, number> = {
       '20': 1,     // $1 test option
+      '45': 100,   // Promotion pricing
       '60': 150,
       '90': 200,
       '120': 250
@@ -167,20 +177,40 @@ export async function POST(request: Request) {
     };
 
     try {
+      // Test the transporter connection first
+      console.log('Testing transporter connection...');
+      await transporter.verify();
+      console.log('Transporter connection verified successfully');
+      
       // Send the email
-      await transporter.sendMail(mailOptions);
+      console.log('Sending email to:', bookingData.email);
+      const result = await transporter.sendMail(mailOptions);
+      console.log('Email sent successfully:', result.messageId);
       
       return NextResponse.json({ 
         success: true, 
-        message: 'Confirmation email sent successfully' 
+        message: 'Confirmation email sent successfully',
+        messageId: result.messageId
       });
     } catch (emailError) {
       console.error('Error sending email through transporter:', emailError);
+      console.error('Email error details:', {
+        code: (emailError as any).code,
+        command: (emailError as any).command,
+        response: (emailError as any).response,
+        responseCode: (emailError as any).responseCode,
+      });
+      
       return NextResponse.json(
         { 
           success: false, 
           message: 'Error sending through email service',
-          error: emailError instanceof Error ? emailError.message : 'Unknown error'
+          error: emailError instanceof Error ? emailError.message : 'Unknown error',
+          details: {
+            code: (emailError as any).code,
+            command: (emailError as any).command,
+            responseCode: (emailError as any).responseCode,
+          }
         },
         { status: 500 }
       );

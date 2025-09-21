@@ -14,6 +14,8 @@ import { Footer } from "@/components/Footer";
 
 // Pricing for different durations
 const pricingOptions = {
+  "20": 1,     // $1 test option
+  "45": 100,   // Promotion pricing
   "60": 150,
   "90": 200,
   "120": 250,

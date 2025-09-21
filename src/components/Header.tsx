@@ -8,7 +8,7 @@ import { useLanguage } from "@/lib/LanguageContext";
 import { supabase } from "@/lib/supabaseClient";
 
 interface HeaderProps {
-  currentPage?: 'home' | 'booking' | 'admin' | 'account';
+  currentPage?: 'home' | 'booking' | 'admin' | 'account' | 'hiphop';
 }
 
 export function Header({ currentPage = 'home' }: HeaderProps) {
