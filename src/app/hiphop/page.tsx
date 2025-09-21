@@ -129,13 +129,13 @@ export default function HipHopBookingPage() {
 
   if (bookingComplete && bookingDetails) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
         <Header currentPage="hiphop" />
         
         <main className="py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
-          <div className="bg-gradient-to-br from-white to-purple-50 dark:from-gray-800 dark:to-purple-900/10 rounded-2xl shadow-2xl overflow-hidden">
+          <div className="bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-900/10 rounded-2xl shadow-2xl overflow-hidden">
             {/* Header with gradient background */}
-            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-8 py-12 text-center text-white">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-12 text-center text-white">
               <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -146,7 +146,7 @@ export default function HipHopBookingPage() {
                 🎉 Booking Request Submitted!
               </h2>
               
-              <p className="text-xl text-purple-100 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-xl text-blue-100 max-w-2xl mx-auto leading-relaxed">
                 <strong>Congratulations on your Hip Hop nomination!</strong><br/>
                 Thank you for choosing our wellness services. We'll contact you within 24 hours to confirm your appointment.
               </p>
@@ -155,10 +155,10 @@ export default function HipHopBookingPage() {
             {/* Content section */}
             <div className="p-8">
               {/* Booking Details Card */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-purple-100 dark:border-purple-800 p-8 mb-8">
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-blue-100 dark:border-blue-800 p-8 mb-8">
                 <div className="flex items-center mb-6">
-                  <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mr-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
@@ -198,11 +198,11 @@ export default function HipHopBookingPage() {
                   <label className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-4 block">Selected Wellness Services</label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {selectedServiceObjects.map((service) => (
-                      <div key={service.id} className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-700">
+                      <div key={service.id} className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-700">
                         <div className="flex items-center">
                           <span className="text-2xl mr-3">{service.icon}</span>
                           <div>
-                            <h4 className="font-semibold text-purple-900 dark:text-purple-100 text-sm leading-tight">{service.title}</h4>
+                            <h4 className="font-semibold text-blue-900 dark:text-blue-100 text-sm leading-tight">{service.title}</h4>
                           </div>
                         </div>
                       </div>
@@ -276,7 +276,7 @@ export default function HipHopBookingPage() {
               <div className="text-center">
                 <button 
                   onClick={() => window.location.href = '/'}
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-12 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-12 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   🏠 Return to Home
                 </button>
