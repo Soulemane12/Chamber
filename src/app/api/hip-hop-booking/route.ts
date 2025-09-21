@@ -8,14 +8,13 @@ export async function POST(request: Request) {
     console.log('Received hip hop booking data:', bookingData);
     
     // Convert services array to single service or comma-separated string for database
+    const { services, ...restData } = bookingData;
     const processedBookingData = {
-      ...bookingData,
+      ...restData,
       // If it's an array, join them; if it's a single service, keep it
-      service: Array.isArray(bookingData.services) 
-        ? bookingData.services.join(', ') 
-        : bookingData.services || bookingData.service,
-      // Remove the services array since the table expects 'service'
-      services: undefined
+      service: Array.isArray(services) 
+        ? services.join(', ') 
+        : services || bookingData.service,
     };
 
     // Insert the booking data into hip_hop_bookings table
