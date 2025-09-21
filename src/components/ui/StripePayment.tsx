@@ -240,6 +240,13 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
         redirect: 'if_required',
+        confirmParams: {
+          payment_method_data: {
+            billing_details: {
+              phone: '', // Required since we set phone to 'never' in PaymentElement
+            }
+          }
+        }
       });
 
       console.log('💳 PAYMENT FLOW: Payment confirmation result:', { error, paymentIntent });
