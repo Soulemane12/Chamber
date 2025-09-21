@@ -72,8 +72,8 @@ export async function POST(request: Request) {
     // Get service name
     const serviceName = serviceNames[bookingData.service as keyof typeof serviceNames] || bookingData.service;
     
-    // Email content
-    const mailOptions = {
+    // User confirmation email
+    const userMailOptions = {
       from: 'b.duc@wellnex02.com',
       to: bookingData.email,
       subject: 'Hip Hop Nominee Wellness Session - Booking Request Received',
@@ -162,21 +162,82 @@ export async function POST(request: Request) {
       `
     };
 
+    // Admin notification email
+    const adminMailOptions = {
+      from: 'b.duc@wellnex02.com',
+      to: 'b.duc@wellnex02.com',
+      subject: 'New Hip Hop Nominee Booking Request',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #7c3aed; text-align: center; margin-bottom: 10px;">🎤 New Hip Hop Booking Request</h1>
+            <div style="width: 50px; height: 3px; background: linear-gradient(90deg, #7c3aed, #a855f7); margin: 0 auto;"></div>
+          </div>
+          
+          <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
+            A new Hip Hop nominee has submitted a booking request.
+          </p>
+          
+          <div style="margin: 30px 0; padding: 25px; background: linear-gradient(135deg, #faf5ff, #f3e8ff); border-left: 4px solid #7c3aed; border-radius: 5px;">
+            <h2 style="color: #6b21a8; font-size: 20px; margin-bottom: 20px; text-align: center;">Booking Request Details</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+              <div>
+                <p style="margin: 8px 0;"><strong style="color: #7c3aed;">Name:</strong> ${bookingData.firstName} ${bookingData.lastName}</p>
+                <p style="margin: 8px 0;"><strong style="color: #7c3aed;">Email:</strong> ${bookingData.email}</p>
+                <p style="margin: 8px 0;"><strong style="color: #7c3aed;">Phone:</strong> ${bookingData.phone}</p>
+              </div>
+              <div>
+                <p style="margin: 8px 0;"><strong style="color: #7c3aed;">Preferred Date:</strong> ${formattedDate}</p>
+                <p style="margin: 8px 0;"><strong style="color: #7c3aed;">Preferred Time:</strong> ${bookingData.preferred_time}</p>
+                <p style="margin: 8px 0;"><strong style="color: #7c3aed;">Status:</strong> <span style="color: #dc2626; font-weight: bold;">NEEDS CONFIRMATION</span></p>
+              </div>
+            </div>
+            
+            <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e5e7eb;">
+              <p style="margin: 8px 0;"><strong style="color: #7c3aed;">Requested Service:</strong></p>
+              <p style="color: #6b21a8; font-size: 18px; margin: 5px 0; font-weight: 600;">${serviceName}</p>
+            </div>
+            
+            ${bookingData.notes ? `
+              <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e5e7eb;">
+                <p style="margin: 8px 0;"><strong style="color: #7c3aed;">Additional Notes:</strong></p>
+                <p style="color: #4b5563; margin: 5px 0;">${bookingData.notes}</p>
+              </div>
+            ` : ''}
+          </div>
+          
+          <div style="margin: 25px 0; padding: 20px; background: linear-gradient(135deg, #fef2f2, #fee2e2); border-left: 4px solid #dc2626; border-radius: 5px;">
+            <h4 style="color: #dc2626; font-size: 16px; margin-bottom: 10px;">⚡ Action Required</h4>
+            <p style="color: #dc2626; margin: 5px 0;">
+              Please contact ${bookingData.firstName} within 24 hours to confirm their appointment.
+            </p>
+          </div>
+        </div>
+      `
+    };
+
     try {
       // Test the transporter connection first
       console.log('Testing transporter connection for Hip Hop email...');
       await transporter.verify();
       console.log('Hip Hop email transporter connection verified successfully');
       
-      // Send the email
+      // Send user confirmation email
       console.log('Sending Hip Hop confirmation email to:', bookingData.email);
-      const result = await transporter.sendMail(mailOptions);
-      console.log('Hip Hop email sent successfully:', result.messageId);
+      const userResult = await transporter.sendMail(userMailOptions);
+      console.log('Hip Hop user confirmation email sent successfully:', userResult.messageId);
+      
+      // Send admin notification email
+      console.log('Sending Hip Hop admin notification email to: b.duc@wellnex02.com');
+      const adminResult = await transporter.sendMail(adminMailOptions);
+      console.log('Hip Hop admin notification email sent successfully:', adminResult.messageId);
       
       return NextResponse.json({ 
         success: true, 
-        message: 'Hip Hop confirmation email sent successfully',
-        messageId: result.messageId
+        message: 'Hip Hop emails sent successfully',
+        userMessageId: userResult.messageId,
+        adminMessageId: adminResult.messageId
       });
     } catch (emailError) {
       console.error('Error sending Hip Hop email through transporter:', emailError);

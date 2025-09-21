@@ -137,8 +137,8 @@ export async function POST(request: Request) {
       }
     }
 
-    // Email content
-    const mailOptions = {
+    // User confirmation email
+    const userMailOptions = {
       from: 'b.duc@wellnex02.com',
       to: bookingData.email,
       subject: 'Your Hyperbaric Chamber Session Confirmation',
@@ -176,21 +176,65 @@ export async function POST(request: Request) {
       `
     };
 
+    // Admin notification email
+    const adminMailOptions = {
+      from: 'b.duc@wellnex02.com',
+      to: 'b.duc@wellnex02.com',
+      subject: 'New Hyperbaric Chamber Booking',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+          <h1 style="color: #3b82f6; text-align: center;">New Booking Received!</h1>
+          <p style="text-align: center;">A new hyperbaric chamber session has been booked and paid for.</p>
+          
+          <div style="margin: 30px 0; padding: 20px; background-color: #f8fafc; border-radius: 5px;">
+            <h2 style="color: #1e3a8a; font-size: 18px; margin-bottom: 15px;">Booking Details</h2>
+            
+            <p><strong>Name:</strong> ${bookingData.firstName} ${bookingData.lastName}</p>
+            <p><strong>Email:</strong> ${bookingData.email}</p>
+            <p><strong>Date & Time:</strong> ${formattedDate} at ${bookingData.time}</p>
+            <p><strong>Duration:</strong> ${bookingData.duration} minutes</p>
+            <p><strong>Location:</strong> ${locationName}</p>
+            <p><strong>Address:</strong> ${locationAddress}</p>
+            <p><strong>Group Size:</strong> ${groupSize} ${parseInt(groupSize) > 1 ? 'guests' : 'guest'}</p>
+            ${discountInfo}
+            ${promotionInfo}
+            <p><strong>Total Amount:</strong> ${formatCurrency(totalPrice)}</p>
+          </div>
+          
+          <div style="margin: 20px 0; padding: 15px; background-color: #ecfdf5; border-radius: 5px; border-left: 4px solid #10b981;">
+            <h3 style="color: #047857; font-size: 16px; margin-bottom: 10px;">✅ Payment Status</h3>
+            <p style="color: #047857; margin: 5px 0;">Payment completed successfully</p>
+          </div>
+          
+          <div style="margin: 20px 0; padding: 15px; background-color: #fef2f2; border-radius: 5px; border-left: 4px solid #dc2626;">
+            <h3 style="color: #dc2626; font-size: 16px; margin-bottom: 10px;">📞 Next Steps</h3>
+            <p style="color: #dc2626; margin: 5px 0;">Please prepare for the session and contact the customer if needed.</p>
+          </div>
+        </div>
+      `
+    };
+
     try {
       // Test the transporter connection first
       console.log('Testing transporter connection...');
       await transporter.verify();
       console.log('Transporter connection verified successfully');
       
-      // Send the email
-      console.log('Sending email to:', bookingData.email);
-      const result = await transporter.sendMail(mailOptions);
-      console.log('Email sent successfully:', result.messageId);
+      // Send user confirmation email
+      console.log('Sending confirmation email to:', bookingData.email);
+      const userResult = await transporter.sendMail(userMailOptions);
+      console.log('User confirmation email sent successfully:', userResult.messageId);
+      
+      // Send admin notification email
+      console.log('Sending admin notification email to: b.duc@wellnex02.com');
+      const adminResult = await transporter.sendMail(adminMailOptions);
+      console.log('Admin notification email sent successfully:', adminResult.messageId);
       
       return NextResponse.json({ 
         success: true, 
-        message: 'Confirmation email sent successfully',
-        messageId: result.messageId
+        message: 'Emails sent successfully',
+        userMessageId: userResult.messageId,
+        adminMessageId: adminResult.messageId
       });
     } catch (emailError) {
       console.error('Error sending email through transporter:', emailError);
