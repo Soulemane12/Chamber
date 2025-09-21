@@ -9,7 +9,7 @@ export const translations = {
     contact: "Contact",
     
     // Homepage
-    heroTitle: "Experience the Benefits of Hyperbaric Oxygen Therapy",
+    heroTitle: "Experience the Benefits of Hyperbaric Oxygen Therapy", 
     heroSubtitle: "Enhance your recovery, boost performance, and improve overall wellness with our state-of-the-art hyperbaric chambers.",
     bookYourSession: "Book Your Session",
     
