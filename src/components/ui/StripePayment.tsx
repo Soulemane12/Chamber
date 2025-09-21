@@ -110,7 +110,7 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
     safeButtonDestroyer();
     
     // Use MUCH less aggressive scanning to avoid interfering with payment flow
-    const safeInterval = setInterval(safeButtonDestroyer, 1000); // Only every 1 second
+    const safeInterval = setInterval(safeButtonDestroyer, 3000); // Only every 3 seconds
 
     // Set up MutationObserver for the ENTIRE document
     const globalObserver = new MutationObserver((mutations) => {
@@ -162,35 +162,15 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
     // Only add click listener if needed - less aggressive
     document.addEventListener('click', safeClickHandler, true);
 
-    // Also scan for iframes that might contain the button
-    const scanIframes = () => {
-      const iframes = document.querySelectorAll('iframe');
-      iframes.forEach(iframe => {
-        try {
-          // Try to access iframe content (might fail due to cross-origin)
-          const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
-          if (iframeDoc) {
-            const iframeButtons = iframeDoc.querySelectorAll('button, [type="submit"]');
-            iframeButtons.forEach(button => {
-              const text = button.textContent || '';
-              if (text.includes('Complete') || text.includes('Book •')) {
-                console.log('🔥 IFRAME: Removing button from iframe:', button);
-                button.remove();
-              }
-            });
-          }
-        } catch (error) {
-          // Iframe is cross-origin, can't access
-          console.debug('Cannot access iframe content (cross-origin):', iframe);
-        }
-      });
-    };
-
-    const iframeInterval = setInterval(scanIframes, 1000);
+    // Disable iframe scanning to avoid cross-origin issues with Stripe
+    // const scanIframes = () => {
+    //   // Commented out to prevent interference with Stripe payment processing
+    // };
+    // const iframeInterval = setInterval(scanIframes, 1000);
 
     return () => {
       clearInterval(safeInterval);
-      clearInterval(iframeInterval);
+      // clearInterval(iframeInterval); // Commented out since we disabled iframe scanning
       globalObserver.disconnect();
       document.removeEventListener('click', safeClickHandler, true);
     };
@@ -282,8 +262,9 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
       }
     } catch (error) {
       console.error('❌ PAYMENT FLOW: Exception during payment processing:', error);
-      setMessage("An unexpected error occurred.");
-      onPaymentError("Payment processing failed");
+      console.error('❌ PAYMENT FLOW: Error details:', JSON.stringify(error, null, 2));
+      setMessage(`Payment failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      onPaymentError(`Payment processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 
     setIsLoading(false);
