@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import * as nodemailer from 'nodemailer';
 import { format } from 'date-fns';
 
 interface HipHopBookingData {
