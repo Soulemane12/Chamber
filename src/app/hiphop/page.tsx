@@ -132,55 +132,156 @@ export default function HipHopBookingPage() {
       <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white dark:from-gray-900 dark:to-gray-800">
         <Header currentPage="hiphop" />
         
-        <main className="py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 text-center">
-            <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              Booking Request Submitted! 🎉
-            </h2>
-            
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
-              Thank you for your interest in our wellness services. We'll contact you within 24 hours to confirm your appointment.
-            </p>
-
-            <div className="bg-purple-50 dark:bg-purple-900/20 p-6 rounded-lg mb-6">
-              <h3 className="text-lg font-semibold mb-4 text-purple-900 dark:text-purple-100">Your Booking Details</h3>
-              <div className="text-left space-y-2">
-                <p><strong>Name:</strong> {bookingDetails.firstName} {bookingDetails.lastName}</p>
-                <p><strong>Email:</strong> {bookingDetails.email}</p>
-                <div>
-                  <p><strong>Selected Services:</strong></p>
-                  <ul className="list-disc list-inside ml-4 mt-2">
-                    {selectedServiceObjects.map((service) => (
-                      <li key={service.id} className="text-sm">{service.title}</li>
-                    ))}
-                  </ul>
-                </div>
-                <p><strong>Preferred Date:</strong> {format(new Date(bookingDetails.preferredDate), 'MMMM d, yyyy')}</p>
-                <p><strong>Preferred Time:</strong> {bookingDetails.preferredTime}</p>
+        <main className="py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+          <div className="bg-gradient-to-br from-white to-purple-50 dark:from-gray-800 dark:to-purple-900/10 rounded-2xl shadow-2xl overflow-hidden">
+            {/* Header with gradient background */}
+            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 px-8 py-12 text-center text-white">
+              <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
               </div>
-            </div>
-
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mb-6">
-              <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2">Contact Information</h4>
-              <p className="text-blue-700 dark:text-blue-300 text-sm">
-                <strong>Midtown Biohack</strong><br/>
-                575 Madison Ave, 23rd floor, New York, NY<br/>
-                Email: b.duc@wellnex02.com
+              
+              <h2 className="text-4xl font-bold mb-4">
+                🎉 Booking Request Submitted!
+              </h2>
+              
+              <p className="text-xl text-purple-100 max-w-2xl mx-auto leading-relaxed">
+                <strong>Congratulations on your Hip Hop nomination!</strong><br/>
+                Thank you for choosing our wellness services. We'll contact you within 24 hours to confirm your appointment.
               </p>
             </div>
 
-            <Button 
-              onClick={() => window.location.href = '/'}
-              className="bg-purple-600 hover:bg-purple-700"
-            >
-              Return to Home
-            </Button>
+            {/* Content section */}
+            <div className="p-8">
+              {/* Booking Details Card */}
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-purple-100 dark:border-purple-800 p-8 mb-8">
+                <div className="flex items-center mb-6">
+                  <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Your Booking Details</h3>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {/* Personal Info */}
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Full Name</label>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">{bookingDetails.firstName} {bookingDetails.lastName}</p>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Email Address</label>
+                      <p className="text-lg text-gray-900 dark:text-white">{bookingDetails.email}</p>
+                    </div>
+                  </div>
+
+                  {/* Appointment Info */}
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Preferred Date</label>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">{format(new Date(bookingDetails.preferredDate), 'EEEE, MMMM d, yyyy')}</p>
+                    </div>
+                    
+                    <div>
+                      <label className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Preferred Time</label>
+                      <p className="text-lg font-semibold text-gray-900 dark:text-white">{bookingDetails.preferredTime}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Selected Services */}
+                <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-4 block">Selected Wellness Services</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {selectedServiceObjects.map((service) => (
+                      <div key={service.id} className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-700">
+                        <div className="flex items-center">
+                          <span className="text-2xl mr-3">{service.icon}</span>
+                          <div>
+                            <h4 className="font-semibold text-purple-900 dark:text-purple-100 text-sm leading-tight">{service.title}</h4>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact Information Card */}
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-8 mb-8 border border-blue-200 dark:border-blue-700">
+                <div className="flex items-center mb-6">
+                  <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <h4 className="text-xl font-bold text-blue-900 dark:text-blue-100">Contact Information</h4>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h5 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">📍 Location</h5>
+                    <p className="text-blue-700 dark:text-blue-300">
+                      <strong>Midtown Biohack</strong><br/>
+                      575 Madison Ave, 23rd floor<br/>
+                      New York, NY
+                    </p>
+                  </div>
+                  <div>
+                    <h5 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">💬 Contact</h5>
+                    <p className="text-blue-700 dark:text-blue-300">
+                      <strong>Billy Duc</strong><br/>
+                      Email: b.duc@wellnex02.com
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Next Steps */}
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-8 mb-8 border border-green-200 dark:border-green-700">
+                <h4 className="text-xl font-bold text-green-900 dark:text-green-100 mb-4 flex items-center">
+                  <span className="mr-3">✨</span>
+                  What Happens Next?
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <div className="flex items-start">
+                      <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5">1</span>
+                      <p className="text-green-800 dark:text-green-200">We'll review your request within 24 hours</p>
+                    </div>
+                    <div className="flex items-start">
+                      <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5">2</span>
+                      <p className="text-green-800 dark:text-green-200">Billy will contact you to confirm your appointment</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-start">
+                      <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5">3</span>
+                      <p className="text-green-800 dark:text-green-200">You'll receive final details via email</p>
+                    </div>
+                    <div className="flex items-start">
+                      <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5">4</span>
+                      <p className="text-green-800 dark:text-green-200">Arrive 15 minutes early for your session</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <div className="text-center">
+                <button 
+                  onClick={() => window.location.href = '/'}
+                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-12 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  🏠 Return to Home
+                </button>
+              </div>
+            </div>
           </div>
         </main>
         
