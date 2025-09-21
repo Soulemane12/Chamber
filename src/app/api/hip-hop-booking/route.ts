@@ -52,6 +52,31 @@ export async function POST(request: Request) {
           );
         }
         
+        // Send confirmation email for fallback booking
+        try {
+          const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/send-hip-hop-email`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              ...bookingData,
+              // Convert to format expected by email service
+              firstName: bookingData.first_name,
+              lastName: bookingData.last_name,
+              date: new Date(bookingData.preferred_date),
+              time: bookingData.preferred_time,
+            }),
+          });
+
+          const emailResult = await emailResponse.json();
+          if (!emailResult.success) {
+            console.error('Failed to send Hip Hop confirmation email (fallback):', emailResult.message);
+          } else {
+            console.log('Hip Hop confirmation email sent successfully (fallback)');
+          }
+        } catch (emailError) {
+          console.error('Error sending Hip Hop confirmation email (fallback):', emailError);
+        }
+
         return NextResponse.json({ 
           success: true, 
           data: fallbackResult[0],
@@ -63,6 +88,31 @@ export async function POST(request: Request) {
         { success: false, error: error.message },
         { status: 500 }
       );
+    }
+
+    // Send confirmation email
+    try {
+      const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/send-hip-hop-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...bookingData,
+          // Convert to format expected by email service
+          firstName: bookingData.first_name,
+          lastName: bookingData.last_name,
+          date: new Date(bookingData.preferred_date),
+          time: bookingData.preferred_time,
+        }),
+      });
+
+      const emailResult = await emailResponse.json();
+      if (!emailResult.success) {
+        console.error('Failed to send Hip Hop confirmation email:', emailResult.message);
+      } else {
+        console.log('Hip Hop confirmation email sent successfully');
+      }
+    } catch (emailError) {
+      console.error('Error sending Hip Hop confirmation email:', emailError);
     }
 
     return NextResponse.json({ 
