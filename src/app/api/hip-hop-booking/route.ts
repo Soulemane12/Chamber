@@ -7,18 +7,31 @@ export async function POST(request: Request) {
     
     console.log('Received hip hop booking data:', bookingData);
     
+    // Convert services array to single service or comma-separated string for database
+    const processedBookingData = {
+      ...bookingData,
+      // If it's an array, join them; if it's a single service, keep it
+      service: Array.isArray(bookingData.services) 
+        ? bookingData.services.join(', ') 
+        : bookingData.services || bookingData.service,
+      // Remove the services array since the table expects 'service'
+      services: undefined
+    };
+
     // Try to insert the booking data first
     // If the table doesn't exist, the error will tell us
     const { data, error } = await supabase
       .from('hip_hop_bookings')
-      .insert([bookingData])
+      .insert([processedBookingData])
       .select();
 
     if (error) {
       console.error('Error inserting hip hop booking:', error);
       
-      // If it's a table not found error, we'll store it in the regular bookings table as a fallback
-      if (error.message?.includes('relation "hip_hop_bookings" does not exist')) {
+      // If it's a table not found error or schema error, we'll store it in the regular bookings table as a fallback
+      if (error.message?.includes('relation "hip_hop_bookings" does not exist') || 
+          error.message?.includes('column') || 
+          error.message?.includes('schema cache')) {
         console.log('hip_hop_bookings table does not exist, using bookings table as fallback');
         
         // Map the data to the regular bookings table format
