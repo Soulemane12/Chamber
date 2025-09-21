@@ -73,7 +73,7 @@ export default function Home() {
         <div className="mb-12 sm:mb-16 animate-fade-in">
           <div className="text-center mb-8 sm:mb-10 px-4 sm:px-0">
             <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-gray-900 dark:text-white">
-              🌿 5 Wellness-Level Benefits of HBOT
+              🌿 5 Wellness-Level Benefits of Hyperbaric Oxygen Therapy
             </h2>
             <div className="w-16 sm:w-20 h-1 bg-blue-600 mx-auto"></div>
           </div>
@@ -82,7 +82,7 @@ export default function Home() {
             <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover-scale transition-all-300">
               <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Enhanced Immune Function</h3>
               <p className="text-gray-600 dark:text-gray-300">
-                HBOT boosts white blood cell activity and helps the body fight infections more effectively.
+                Hyperbaric oxygen therapy boosts white blood cell activity and helps the body fight infections more effectively.
               </p>
             </div>
             
@@ -96,7 +96,7 @@ export default function Home() {
             <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover-scale transition-all-300">
               <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Improved Cognitive Function</h3>
               <p className="text-gray-600 dark:text-gray-300">
-                Some studies suggest HBOT may enhance memory, focus, and mental clarity, especially in aging individuals or those recovering from brain injuries.
+                Some studies suggest hyperbaric oxygen therapy may enhance memory, focus, and mental clarity, especially in aging individuals or those recovering from brain injuries.
               </p>
             </div>
             
@@ -110,7 +110,7 @@ export default function Home() {
             <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover-scale transition-all-300">
               <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Better Physical Recovery</h3>
               <p className="text-gray-600 dark:text-gray-300">
-                Athletes and active individuals use HBOT to speed up recovery from workouts, injuries, and surgeries by improving oxygen delivery to tissues.
+                Athletes and active individuals use hyperbaric oxygen therapy to speed up recovery from workouts, injuries, and surgeries by improving oxygen delivery to tissues.
               </p>
             </div>
           </div>
@@ -123,7 +123,7 @@ export default function Home() {
         <div className="mb-12 sm:mb-16 animate-fade-in">
           <div className="text-center mb-8 sm:mb-10 px-4 sm:px-0">
             <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-gray-900 dark:text-white">
-              🩺 5 Conditions Commonly Treated with HBOT
+              🩺 5 Conditions Commonly Treated with Hyperbaric Oxygen Therapy
             </h2>
             <div className="w-16 sm:w-20 h-1 bg-blue-600 mx-auto"></div>
           </div>
@@ -132,7 +132,7 @@ export default function Home() {
             <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover-scale transition-all-300">
               <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Chronic Wounds</h3>
               <p className="text-gray-600 dark:text-gray-300">
-                HBOT promotes healing in wounds that are slow to close due to poor circulation or infection.
+                Hyperbaric oxygen therapy promotes healing in wounds that are slow to close due to poor circulation or infection.
               </p>
             </div>
             
@@ -153,7 +153,7 @@ export default function Home() {
             <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover-scale transition-all-300">
               <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Decompression Sickness</h3>
               <p className="text-gray-600 dark:text-gray-300">
-                Common in divers, HBOT helps eliminate nitrogen bubbles from the bloodstream.
+                Common in divers, hyperbaric oxygen therapy helps eliminate nitrogen bubbles from the bloodstream.
               </p>
             </div>
             
