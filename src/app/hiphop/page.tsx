@@ -532,51 +532,16 @@ export default function HipHopBookingPage() {
               />
             </div>
 
-            {/* TEST BUTTON - SUPER VISIBLE */}
-            <div style={{
-              backgroundColor: 'red',
-              padding: '50px',
-              margin: '50px 0',
-              border: '10px solid black',
-              textAlign: 'center'
-            }}>
-              <h1 style={{color: 'white', fontSize: '30px', margin: '20px 0'}}>
-                🚨 TEST BUTTON SECTION 🚨
-              </h1>
-              <button
-                type="submit"
-                style={{
-                  backgroundColor: 'yellow',
-                  color: 'black',
-                  fontSize: '24px',
-                  padding: '30px 60px',
-                  border: '5px solid green',
-                  fontWeight: 'bold'
-                }}
-              >
-                🎤 SUBMIT HIP HOP BOOKING NOW
-              </button>
-            </div>
-
             {/* Submit Button */}
-            <div 
-              className="text-center mt-8 mb-6"
-              style={{
-                display: 'block',
-                visibility: 'visible',
-                opacity: '1',
-                position: 'relative',
-                zIndex: '9999'
-              }}
-            >
+            <div style={{
+              textAlign: 'center',
+              padding: '30px 0',
+              margin: '30px 0'
+            }}>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-16 py-5 rounded-lg font-bold text-xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 focus:outline-none focus:ring-4 focus:ring-blue-500 border-2 border-blue-700"
                 style={{
-                  display: 'block',
-                  visibility: 'visible',
-                  opacity: '1',
                   backgroundColor: '#2563eb',
                   color: 'white',
                   border: '2px solid #1d4ed8',
@@ -585,12 +550,29 @@ export default function HipHopBookingPage() {
                   fontWeight: 'bold',
                   borderRadius: '8px',
                   cursor: 'pointer',
-                  margin: '0 auto'
+                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                  transition: 'all 0.3s ease',
+                  display: 'block',
+                  margin: '0 auto',
+                  minWidth: '300px'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.backgroundColor = '#1d4ed8';
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.backgroundColor = '#2563eb';
+                  e.currentTarget.style.transform = 'scale(1)';
                 }}
               >
                 {isSubmitting ? "🔄 Submitting Your Booking..." : "🎤 BOOK NOW - FREE SESSION"}
               </button>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-3 font-medium">
+              <p style={{
+                color: '#6b7280',
+                fontSize: '14px',
+                marginTop: '12px',
+                fontWeight: '500'
+              }}>
                 ✨ Free for Hip Hop nominees • Confirmation emails will be sent
               </p>
             </div>
