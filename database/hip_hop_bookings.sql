@@ -48,24 +48,3 @@ COMMENT ON COLUMN hip_hop_bookings.preferred_time IS 'Preferred time slot for th
 COMMENT ON COLUMN hip_hop_bookings.notes IS 'Additional notes or special requests';
 COMMENT ON COLUMN hip_hop_bookings.created_at IS 'Timestamp when the booking was created';
 COMMENT ON COLUMN hip_hop_bookings.updated_at IS 'Timestamp when the booking was last updated';
-
--- Insert sample data for testing (optional - remove in production)
--- INSERT INTO hip_hop_bookings (
---   first_name, 
---   last_name, 
---   email, 
---   phone, 
---   service, 
---   preferred_date, 
---   preferred_time, 
---   notes
--- ) VALUES (
---   'Test',
---   'Nominee',
---   'test@example.com',
---   '555-0123',
---   'hbot',
---   CURRENT_DATE + INTERVAL '7 days',
---   '10:00 AM',
---   'Sample booking for testing'
--- );

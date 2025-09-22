@@ -291,7 +291,7 @@ export default function HipHopBookingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
       <Header currentPage="hiphop" />
       
       <main className="py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
@@ -327,7 +327,7 @@ export default function HipHopBookingPage() {
               to help you recharge, recover, and perform at your best.
             </p>
             
-            <p className="text-purple-600 dark:text-purple-400 font-semibold">
+            <p className="text-blue-600 dark:text-blue-400 font-semibold">
               👉 Book your session below and begin your journey toward peak health and well-being with us:
             </p>
             
@@ -337,7 +337,7 @@ export default function HipHopBookingPage() {
                   const bookingForm = document.getElementById('booking-form');
                   bookingForm?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 animate-pulse"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 animate-pulse"
               >
                 🎤 Book Your Wellness Session Now
               </button>
@@ -349,7 +349,7 @@ export default function HipHopBookingPage() {
             
             <p className="font-medium">
               Best regards,<br/>
-              <span className="text-purple-600 dark:text-purple-400">Wellnex02 & Midtown Biohack</span>
+              <span className="text-blue-600 dark:text-blue-400">Wellnex02 & Midtown Biohack</span>
             </p>
           </div>
         </div>
@@ -390,7 +390,7 @@ export default function HipHopBookingPage() {
                 </label>
                 <input
                   {...register("firstName")}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 />
                 {errors.firstName && (
                   <p className="text-red-600 text-sm mt-1">{errors.firstName.message}</p>
@@ -403,7 +403,7 @@ export default function HipHopBookingPage() {
                 </label>
                 <input
                   {...register("lastName")}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 />
                 {errors.lastName && (
                   <p className="text-red-600 text-sm mt-1">{errors.lastName.message}</p>
@@ -419,7 +419,7 @@ export default function HipHopBookingPage() {
                 <input
                   type="email"
                   {...register("email")}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 />
                 {errors.email && (
                   <p className="text-red-600 text-sm mt-1">{errors.email.message}</p>
@@ -433,7 +433,7 @@ export default function HipHopBookingPage() {
                 <input
                   type="tel"
                   {...register("phone")}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 />
                 {errors.phone && (
                   <p className="text-red-600 text-sm mt-1">{errors.phone.message}</p>
@@ -452,7 +452,7 @@ export default function HipHopBookingPage() {
                     key={service.id}
                     className={`flex items-start p-4 border rounded-lg cursor-pointer transition-all ${
                       selectedServices.includes(service.id as any)
-                        ? "bg-purple-50 border-purple-500 dark:bg-purple-900/30 dark:border-purple-400"
+                        ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
                         : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
                     }`}
                   >
@@ -460,13 +460,13 @@ export default function HipHopBookingPage() {
                       type="checkbox"
                       value={service.id}
                       {...register("services")}
-                      className="mt-1 mr-3 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                      className="mt-1 mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     />
                     <div className="text-2xl mr-3">{service.icon}</div>
                     <div className="flex-1">
                       <h3 className={`font-medium ${
                         selectedServices.includes(service.id as any)
-                          ? "text-purple-600 dark:text-purple-400"
+                          ? "text-blue-600 dark:text-blue-400"
                           : "text-gray-900 dark:text-white"
                       }`}>
                         {service.title}
@@ -493,7 +493,7 @@ export default function HipHopBookingPage() {
                   type="date"
                   {...register("preferredDate")}
                   min={new Date().toISOString().split('T')[0]}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 />
                 {errors.preferredDate && (
                   <p className="text-red-600 text-sm mt-1">{errors.preferredDate.message}</p>
@@ -506,7 +506,7 @@ export default function HipHopBookingPage() {
                 </label>
                 <select
                   {...register("preferredTime")}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 >
                   <option value="">Select a time</option>
                   {timeSlots.map((time) => (
@@ -527,7 +527,7 @@ export default function HipHopBookingPage() {
               <textarea
                 {...register("notes")}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 placeholder="Any special requests or questions..."
               />
             </div>
@@ -537,7 +537,7 @@ export default function HipHopBookingPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-12 py-4 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-12 py-4 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 {isSubmitting ? "🔄 Submitting..." : "🎤 Book Now"}
               </button>
