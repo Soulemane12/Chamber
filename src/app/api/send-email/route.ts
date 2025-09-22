@@ -41,12 +41,9 @@ export async function POST(request: Request) {
     console.log('Email user:', 'billydduc@gmail.com');
     console.log('Password length:', process.env.EMAIL_PASSWORD?.length || 'undefined');
 
-    // Create a transporter matching working configuration
+    // Create a transporter exactly like working commit cc6f364
     const transporter = nodemailer.createTransport({
       service: 'gmail',
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
       auth: {
         user: 'billydduc@gmail.com',
         pass: process.env.EMAIL_PASSWORD
