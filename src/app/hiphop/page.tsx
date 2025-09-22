@@ -532,17 +532,17 @@ export default function HipHopBookingPage() {
               />
             </div>
 
-            {/* Submit Button - Always Visible */}
-            <div className="w-full bg-yellow-100 border-4 border-yellow-500 p-8 mt-8 mb-6 text-center">
+            {/* Submit Button */}
+            <div className="text-center mt-8 mb-6">
               <button
                 type="submit"
-                className="w-full bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-bold text-2xl border-4 border-red-800"
-                style={{display: 'block !important', visibility: 'visible !important'}}
+                disabled={isSubmitting}
+                className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-16 py-5 rounded-lg font-bold text-xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 focus:outline-none focus:ring-4 focus:ring-blue-500 border-2 border-blue-700"
               >
-                🎤 SUBMIT BOOKING NOW
+                {isSubmitting ? "🔄 Submitting Your Booking..." : "🎤 BOOK NOW - FREE SESSION"}
               </button>
-              <p className="text-black font-bold mt-4 text-lg">
-                ✨ FREE SESSION - CLICK ABOVE TO BOOK
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-3 font-medium">
+                ✨ Free for Hip Hop nominees • Confirmation emails will be sent
               </p>
             </div>
           </form>
