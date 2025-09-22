@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       port: 587,
       secure: false, // true for 465, false for other ports
       auth: {
-        user: 'b.duc@wellnex02.com',
+        user: 'billydduc@gmail.com',
         pass: process.env.EMAIL_PASSWORD
       },
       tls: {
@@ -139,7 +139,7 @@ export async function POST(request: Request) {
 
     // User confirmation email
     const userMailOptions = {
-      from: 'b.duc@wellnex02.com',
+      from: 'billydduc@gmail.com',
       to: bookingData.email,
       subject: 'Your Hyperbaric Chamber Session Confirmation',
       html: `
@@ -178,8 +178,8 @@ export async function POST(request: Request) {
 
     // Admin notification email
     const adminMailOptions = {
-      from: 'b.duc@wellnex02.com',
-      to: 'b.duc@wellnex02.com',
+      from: 'billydduc@gmail.com',
+      to: 'billydduc@gmail.com',
       subject: 'New Hyperbaric Chamber Booking',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
@@ -226,7 +226,7 @@ export async function POST(request: Request) {
       console.log('User confirmation email sent successfully:', userResult.messageId);
       
       // Send admin notification email
-      console.log('Sending admin notification email to: b.duc@wellnex02.com');
+      console.log('Sending admin notification email to: billydduc@gmail.com');
       const adminResult = await transporter.sendMail(adminMailOptions);
       console.log('Admin notification email sent successfully:', adminResult.messageId);
       

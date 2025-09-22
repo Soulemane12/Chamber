@@ -56,7 +56,7 @@ export async function POST(request: Request) {
       port: 587,
       secure: false, // true for 465, false for other ports
       auth: {
-        user: 'b.duc@wellnex02.com',
+        user: 'billydduc@gmail.com',
         pass: process.env.EMAIL_PASSWORD
       },
       tls: {
@@ -78,7 +78,7 @@ export async function POST(request: Request) {
     
     // User confirmation email
     const userMailOptions = {
-      from: 'b.duc@wellnex02.com',
+      from: 'billydduc@gmail.com',
       to: bookingData.email,
       subject: 'Hip Hop Nominee Wellness Session - Booking Request Received',
       html: `
@@ -135,7 +135,7 @@ export async function POST(request: Request) {
             <div style="text-align: center;">
               <p style="margin: 5px 0; color: #1e40af;"><strong>Address:</strong> 575 Madison Ave, 23rd floor, New York, NY</p>
               <p style="margin: 5px 0; color: #1e40af;"><strong>Contact:</strong> Billy Duc</p>
-              <p style="margin: 5px 0; color: #1e40af;"><strong>Email:</strong> b.duc@wellnex02.com</p>
+              <p style="margin: 5px 0; color: #1e40af;"><strong>Email:</strong> billydduc@gmail.com</p>
             </div>
           </div>
           
@@ -170,8 +170,8 @@ export async function POST(request: Request) {
 
     // Admin notification email
     const adminMailOptions = {
-      from: 'b.duc@wellnex02.com',
-      to: 'b.duc@wellnex02.com',
+      from: 'billydduc@gmail.com',
+      to: 'billydduc@gmail.com',
       subject: 'New Hip Hop Nominee Booking Request',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
@@ -237,7 +237,7 @@ export async function POST(request: Request) {
       console.log('Hip Hop user confirmation email sent successfully:', userResult.messageId);
       
       // Send admin notification email
-      console.log('Sending Hip Hop admin notification email to: b.duc@wellnex02.com');
+      console.log('Sending Hip Hop admin notification email to: billydduc@gmail.com');
       const adminResult = await transporter.sendMail(adminMailOptions);
       console.log('Hip Hop admin notification email sent successfully:', adminResult.messageId);
       

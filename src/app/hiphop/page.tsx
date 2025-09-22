@@ -236,7 +236,7 @@ export default function HipHopBookingPage() {
                     <h5 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">💬 Contact</h5>
                     <p className="text-blue-700 dark:text-blue-300">
                       <strong>Billy Duc</strong><br/>
-                      Email: b.duc@wellnex02.com
+                      Email: billydduc@gmail.com
                     </p>
                   </div>
                 </div>
