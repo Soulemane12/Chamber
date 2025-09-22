@@ -532,6 +532,32 @@ export default function HipHopBookingPage() {
               />
             </div>
 
+            {/* TEST BUTTON - SUPER VISIBLE */}
+            <div style={{
+              backgroundColor: 'red',
+              padding: '50px',
+              margin: '50px 0',
+              border: '10px solid black',
+              textAlign: 'center'
+            }}>
+              <h1 style={{color: 'white', fontSize: '30px', margin: '20px 0'}}>
+                🚨 TEST BUTTON SECTION 🚨
+              </h1>
+              <button
+                type="submit"
+                style={{
+                  backgroundColor: 'yellow',
+                  color: 'black',
+                  fontSize: '24px',
+                  padding: '30px 60px',
+                  border: '5px solid green',
+                  fontWeight: 'bold'
+                }}
+              >
+                🎤 SUBMIT HIP HOP BOOKING NOW
+              </button>
+            </div>
+
             {/* Submit Button */}
             <div 
               className="text-center mt-8 mb-6"
