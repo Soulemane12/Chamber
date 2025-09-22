@@ -78,9 +78,10 @@ export async function POST(request: Request) {
     
     // User confirmation email
     const userMailOptions = {
-      from: 'billydduc@gmail.com',
+      from: '"Wellnex02 Hip Hop Program" <billydduc@gmail.com>',
       to: bookingData.email,
       subject: 'Hip Hop Nominee Wellness Session - Booking Request Received',
+      replyTo: 'billydduc@gmail.com',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
           <div style="text-align: center; margin-bottom: 30px;">
@@ -170,9 +171,10 @@ export async function POST(request: Request) {
 
     // Admin notification email
     const adminMailOptions = {
-      from: 'billydduc@gmail.com',
+      from: '"Wellnex02 Hip Hop Program" <billydduc@gmail.com>',
       to: 'billydduc@gmail.com',
       subject: 'New Hip Hop Nominee Booking Request',
+      replyTo: 'billydduc@gmail.com',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
           <div style="text-align: center; margin-bottom: 30px;">
@@ -233,8 +235,19 @@ export async function POST(request: Request) {
       
       // Send user confirmation email
       console.log('Sending Hip Hop confirmation email to:', bookingData.email);
+      console.log('Hip Hop user email options:', {
+        from: userMailOptions.from,
+        to: userMailOptions.to,
+        subject: userMailOptions.subject
+      });
       const userResult = await transporter.sendMail(userMailOptions);
       console.log('Hip Hop user confirmation email sent successfully:', userResult.messageId);
+      console.log('Hip Hop user email result details:', {
+        accepted: userResult.accepted,
+        rejected: userResult.rejected,
+        pending: userResult.pending,
+        response: userResult.response
+      });
       
       // Send admin notification email
       console.log('Sending Hip Hop admin notification email to: billydduc@gmail.com');

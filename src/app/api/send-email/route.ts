@@ -38,8 +38,8 @@ export async function POST(request: Request) {
     }
 
     console.log('Creating nodemailer transporter with Gmail service');
-    console.log('Email user:', 'b.duc@wellnex02.com');
-    console.log('Password length:', process.env.EMAIL_PASSWORD.length);
+    console.log('Email user:', 'billydduc@gmail.com');
+    console.log('Password length:', process.env.EMAIL_PASSWORD?.length || 'undefined');
 
     // Create a transporter with more explicit configuration
     const transporter = nodemailer.createTransport({
@@ -139,9 +139,10 @@ export async function POST(request: Request) {
 
     // User confirmation email
     const userMailOptions = {
-      from: 'billydduc@gmail.com',
+      from: '"Wellnex02 Booking" <billydduc@gmail.com>',
       to: bookingData.email,
       subject: 'Your Hyperbaric Chamber Session Confirmation',
+      replyTo: 'billydduc@gmail.com',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
           <h1 style="color: #3b82f6; text-align: center;">Booking Confirmed!</h1>
@@ -178,9 +179,10 @@ export async function POST(request: Request) {
 
     // Admin notification email
     const adminMailOptions = {
-      from: 'billydduc@gmail.com',
+      from: '"Wellnex02 Booking" <billydduc@gmail.com>',
       to: 'billydduc@gmail.com',
       subject: 'New Hyperbaric Chamber Booking',
+      replyTo: 'billydduc@gmail.com',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
           <h1 style="color: #3b82f6; text-align: center;">New Booking Received!</h1>
@@ -222,8 +224,19 @@ export async function POST(request: Request) {
       
       // Send user confirmation email
       console.log('Sending confirmation email to:', bookingData.email);
+      console.log('User email options:', {
+        from: userMailOptions.from,
+        to: userMailOptions.to,
+        subject: userMailOptions.subject
+      });
       const userResult = await transporter.sendMail(userMailOptions);
       console.log('User confirmation email sent successfully:', userResult.messageId);
+      console.log('User email result details:', {
+        accepted: userResult.accepted,
+        rejected: userResult.rejected,
+        pending: userResult.pending,
+        response: userResult.response
+      });
       
       // Send admin notification email
       console.log('Sending admin notification email to: billydduc@gmail.com');
