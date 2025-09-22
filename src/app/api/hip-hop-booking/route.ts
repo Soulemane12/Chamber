@@ -33,22 +33,31 @@ export async function POST(request: Request) {
 
     // Send confirmation email
     try {
-      const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/send-hip-hop-email`, {
+      const emailUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3002'}/api/send-hip-hop-email`;
+      console.log('Sending Hip Hop email to URL:', emailUrl);
+      
+      const emailPayload = {
+        ...bookingData,
+        // Convert to format expected by email service
+        firstName: bookingData.first_name || bookingData.firstName,
+        lastName: bookingData.last_name || bookingData.lastName,
+        date: new Date(bookingData.preferred_date),
+        time: bookingData.preferred_time,
+        // Handle both single service (backward compatibility) and multiple services
+        services: bookingData.services || [bookingData.service].filter(Boolean),
+      };
+      
+      console.log('Hip Hop email payload:', emailPayload);
+      
+      const emailResponse = await fetch(emailUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...bookingData,
-          // Convert to format expected by email service
-          firstName: bookingData.first_name,
-          lastName: bookingData.last_name,
-          date: new Date(bookingData.preferred_date),
-          time: bookingData.preferred_time,
-          // Handle both single service (backward compatibility) and multiple services
-          services: bookingData.services || [bookingData.service].filter(Boolean),
-        }),
+        body: JSON.stringify(emailPayload),
       });
 
       const emailResult = await emailResponse.json();
+      console.log('Hip Hop email response:', emailResult);
+      
       if (!emailResult.success) {
         console.error('Failed to send Hip Hop confirmation email:', emailResult.message);
       } else {

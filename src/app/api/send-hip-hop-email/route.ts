@@ -32,6 +32,12 @@ export async function POST(request: Request) {
     
     // Safety check for required fields
     if (!bookingData.email || !bookingData.firstName || !bookingData.preferred_date) {
+      console.error('Missing required fields:', {
+        email: !!bookingData.email,
+        firstName: !!bookingData.firstName,
+        preferred_date: !!bookingData.preferred_date,
+        bookingData: bookingData
+      });
       return NextResponse.json(
         { success: false, message: 'Missing required booking data' },
         { status: 400 }
