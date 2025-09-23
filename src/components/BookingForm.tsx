@@ -41,7 +41,9 @@ const bookingSchema = z.object({
   profession: z.string().min(1, "Please select your profession"),
   age: z.string().min(1, "Please select your age range"),
   // Add field for uploaded files
-  uploadedFiles: z.array(z.any()).optional()
+  uploadedFiles: z.array(z.any()).optional(),
+  // Add amount field for email service
+  amount: z.number().optional()
 });
 
 export type BookingFormData = z.infer<typeof bookingSchema>;
@@ -483,7 +485,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
           },
           body: JSON.stringify({
             action: 'send-email',
-            data: data
+            data: { ...data, amount: amount }
           }),
         });
 

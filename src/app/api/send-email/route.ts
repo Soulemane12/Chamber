@@ -66,19 +66,25 @@ export async function POST(request: Request) {
       '120': 250
     };
     
-    // Check if promotion is active
-    const isPromoActive = isPromotionActive(bookingData.location, bookingData.date);
+    // Use the amount from booking data if available, otherwise calculate price
     let totalPrice: number;
-    if (isPromoActive) {
-      // Use promotion pricing - no group discounts during promotion
-      const promoPrice = getPromotionPricing(bookingData.duration);
-      totalPrice = promoPrice !== null ? promoPrice : (prices[bookingData.duration] || 150);
+    if (bookingData.amount !== undefined && bookingData.amount !== null) {
+      // Use the amount that was already calculated in the booking form
+      totalPrice = bookingData.amount;
     } else {
-      // Regular pricing with group discounts
-      const basePrice = prices[bookingData.duration] || 150;
-      const groupSize = bookingData.groupSize || "1";
-      const multiplier = groupSizeMultipliers[groupSize as keyof typeof groupSizeMultipliers] || 1.0;
-      totalPrice = basePrice * multiplier;
+      // Fallback to price calculation (for backwards compatibility)
+      const isPromoActive = isPromotionActive(bookingData.location, bookingData.date);
+      if (isPromoActive) {
+        // Use promotion pricing - no group discounts during promotion
+        const promoPrice = getPromotionPricing(bookingData.duration);
+        totalPrice = promoPrice !== null ? promoPrice : (prices[bookingData.duration] || 150);
+      } else {
+        // Regular pricing with group discounts
+        const basePrice = prices[bookingData.duration] || 150;
+        const groupSize = bookingData.groupSize || "1";
+        const multiplier = groupSizeMultipliers[groupSize as keyof typeof groupSizeMultipliers] || 1.0;
+        totalPrice = basePrice * multiplier;
+      }
     }
     
     // Location details
@@ -103,6 +109,7 @@ export async function POST(request: Request) {
     // Group discount info - only show when not in promotion
     let discountInfo = '';
     const groupSize = bookingData.groupSize || "1";
+    const isPromoActive = isPromotionActive(bookingData.location, bookingData.date);
     if (!isPromoActive && groupSize !== "1") {
       const discountPercentages = {
         "2": "10%",
