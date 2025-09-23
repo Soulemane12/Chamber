@@ -58,6 +58,7 @@ export async function POST(request: Request) {
     
     // Calculate price based on duration
     const prices: Record<string, number> = {
+      '0': 0,      // Demo session
       '20': 1,     // $1 test option
       '45': 100,   // Promotion pricing
       '60': 150,
@@ -149,13 +150,13 @@ export async function POST(request: Request) {
             <p><strong>Name:</strong> ${bookingData.firstName} ${bookingData.lastName}</p>
             <p><strong>Email:</strong> ${bookingData.email}</p>
             <p><strong>Date & Time:</strong> ${formattedDate} at ${bookingData.time}</p>
-            <p><strong>Duration:</strong> ${bookingData.duration} minutes</p>
+            <p><strong>Duration:</strong> ${bookingData.duration === '0' ? 'Demo Session' : `${bookingData.duration} minutes`}</p>
             <p><strong>Location:</strong> ${locationName}</p>
             <p><strong>Address:</strong> ${locationAddress}</p>
             <p><strong>Group Size:</strong> ${groupSize} ${parseInt(groupSize) > 1 ? 'guests' : 'guest'}</p>
             ${discountInfo}
             ${promotionInfo}
-            <p><strong>Total Amount:</strong> ${formatCurrency(totalPrice)}</p>
+            <p><strong>Total Amount:</strong> ${totalPrice === 0 ? 'Demo Session - FREE' : formatCurrency(totalPrice)}</p>
           </div>
           
           <div style="margin: 20px 0; padding: 15px; background-color: #eff6ff; border-radius: 5px; border-left: 4px solid #3b82f6;">
@@ -176,12 +177,12 @@ export async function POST(request: Request) {
     const adminMailOptions = {
       from: '"Wellnex02 Booking" <billydduc@gmail.com>',
       to: 'billydduc@gmail.com',
-      subject: 'New Hyperbaric Chamber Booking',
+      subject: totalPrice === 0 ? 'New Demo Session Booking' : 'New Hyperbaric Chamber Booking',
       replyTo: 'billydduc@gmail.com',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-          <h1 style="color: #3b82f6; text-align: center;">New Booking Received!</h1>
-          <p style="text-align: center;">A new hyperbaric chamber session has been booked and paid for.</p>
+          <h1 style="color: #3b82f6; text-align: center;">${totalPrice === 0 ? 'New Demo Session Received!' : 'New Booking Received!'}</h1>
+          <p style="text-align: center;">${totalPrice === 0 ? 'A new demo session has been booked (no payment required).' : 'A new hyperbaric chamber session has been booked and paid for.'}</p>
           
           <div style="margin: 30px 0; padding: 20px; background-color: #f8fafc; border-radius: 5px;">
             <h2 style="color: #1e3a8a; font-size: 18px; margin-bottom: 15px;">Booking Details</h2>
@@ -189,18 +190,18 @@ export async function POST(request: Request) {
             <p><strong>Name:</strong> ${bookingData.firstName} ${bookingData.lastName}</p>
             <p><strong>Email:</strong> ${bookingData.email}</p>
             <p><strong>Date & Time:</strong> ${formattedDate} at ${bookingData.time}</p>
-            <p><strong>Duration:</strong> ${bookingData.duration} minutes</p>
+            <p><strong>Duration:</strong> ${bookingData.duration === '0' ? 'Demo Session' : `${bookingData.duration} minutes`}</p>
             <p><strong>Location:</strong> ${locationName}</p>
             <p><strong>Address:</strong> ${locationAddress}</p>
             <p><strong>Group Size:</strong> ${groupSize} ${parseInt(groupSize) > 1 ? 'guests' : 'guest'}</p>
             ${discountInfo}
             ${promotionInfo}
-            <p><strong>Total Amount:</strong> ${formatCurrency(totalPrice)}</p>
+            <p><strong>Total Amount:</strong> ${totalPrice === 0 ? 'Demo Session - FREE' : formatCurrency(totalPrice)}</p>
           </div>
           
-          <div style="margin: 20px 0; padding: 15px; background-color: #ecfdf5; border-radius: 5px; border-left: 4px solid #10b981;">
-            <h3 style="color: #047857; font-size: 16px; margin-bottom: 10px;">✅ Payment Status</h3>
-            <p style="color: #047857; margin: 5px 0;">Payment completed successfully</p>
+          <div style="margin: 20px 0; padding: 15px; background-color: ${totalPrice === 0 ? '#fef3c7' : '#ecfdf5'}; border-radius: 5px; border-left: 4px solid ${totalPrice === 0 ? '#f59e0b' : '#10b981'};">
+            <h3 style="color: ${totalPrice === 0 ? '#92400e' : '#047857'}; font-size: 16px; margin-bottom: 10px;">${totalPrice === 0 ? '🎉 Demo Session' : '✅ Payment Status'}</h3>
+            <p style="color: ${totalPrice === 0 ? '#92400e' : '#047857'}; margin: 5px 0;">${totalPrice === 0 ? 'Demo session - no payment required' : 'Payment completed successfully'}</p>
           </div>
           
           <div style="margin: 20px 0; padding: 15px; background-color: #fef2f2; border-radius: 5px; border-left: 4px solid #dc2626;">
