@@ -4,7 +4,10 @@ import { supabase } from '@/lib/supabaseClient';
 export async function POST(request: Request) {
   try {
     const bookingData = await request.json();
-    
+
+    console.log('=== HIP HOP BOOKING REQUEST ===');
+    console.log('Raw request body:', JSON.stringify(bookingData, null, 2));
+    console.log('Request headers:', Object.fromEntries(request.headers.entries()));
     console.log('Received hip hop booking data:', bookingData);
     
     // Convert services array to single service or comma-separated string for database
@@ -48,8 +51,8 @@ export async function POST(request: Request) {
         services: bookingData.services || [bookingData.service].filter(Boolean),
       };
       
-      console.log('Hip Hop email payload:', emailPayload);
-      
+      console.log('Hip Hop email payload:', JSON.stringify(emailPayload, null, 2));
+
       const emailResponse = await fetch(emailUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -57,7 +60,7 @@ export async function POST(request: Request) {
       });
 
       const emailResult = await emailResponse.json();
-      console.log('Hip Hop email response:', emailResult);
+      console.log('Hip Hop email response:', JSON.stringify(emailResult, null, 2));
       
       if (!emailResult.success) {
         console.error('Failed to send Hip Hop confirmation email:', emailResult.message);
