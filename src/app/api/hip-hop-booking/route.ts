@@ -43,6 +43,7 @@ export async function POST(request: Request) {
         lastName: bookingData.last_name || bookingData.lastName,
         date: new Date(bookingData.preferred_date),
         time: bookingData.preferred_time,
+        preferred_time: bookingData.preferred_time,
         // Handle both single service (backward compatibility) and multiple services
         services: bookingData.services || [bookingData.service].filter(Boolean),
       };
