@@ -1722,7 +1722,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       try {
                         setIsSubmitting(true);
                         const formData = watch();
-                        await createBooking(formData, null); // No payment ID for free test
+                        await createBooking(formData, undefined); // No payment ID for free test
                       } catch (error) {
                         console.error('Error creating free booking:', error);
                         setPaymentError('Failed to create booking. Please try again.');
