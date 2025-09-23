@@ -25,7 +25,7 @@ const bookingSchema = z.object({
   time: z.string({
     required_error: "Please select a time",
   }),
-  duration: z.enum(["0", "20", "45", "60", "90", "120"], {
+  duration: z.enum(["0", "45", "60", "90", "120"], {
     required_error: "Please select a duration",
   }),
   location: z.enum(["midtown", "conyers"], {
@@ -62,7 +62,6 @@ const timeSlots = [
 // Pricing for different durations
 const pricingOptions = {
   "0": 0,      // Free test option
-  "20": 1,     // $1 test option
   "60": 150,
   "90": 200,
   "120": 250,
@@ -246,13 +245,13 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
     
     let basePrice: number;
     if (isPromoActive) {
-      // Use promotion pricing for 20, 45, 60 minutes during promotion
+      // Use promotion pricing for 45, 60 minutes during promotion
       const promoPrice = getPromotionPricing(selectedDuration);
       basePrice = promoPrice !== null ? promoPrice : (pricingOptions[selectedDuration as keyof typeof pricingOptions] || 0);
       // No group discounts during promotion - return flat promotion price
       return basePrice;
     } else {
-      // Regular pricing for 20 (test), 60, 90, 120 minutes
+      // Regular pricing for 60, 90, 120 minutes
       basePrice = pricingOptions[selectedDuration as keyof typeof pricingOptions] || 0;
       // Apply group discounts for regular pricing
       const multiplier = groupSizeMultipliers[selectedGroupSize as keyof typeof groupSizeMultipliers] || 1.0;
@@ -297,12 +296,12 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       const isPromoActive = isPromotionActive(data.location, data.date);
       let amount: number;
       if (isPromoActive) {
-        // Use promotion pricing for 20, 45, 60 minutes during promotion
+        // Use promotion pricing for 45, 60 minutes during promotion
         const promoPrice = getPromotionPricing(data.duration);
         amount = promoPrice !== null ? promoPrice : (pricingOptions[data.duration as keyof typeof pricingOptions] || 0);
         // No group discounts during promotion - use flat promotion price
       } else {
-        // Regular pricing for 20 (test), 60, 90, 120 minutes
+        // Regular pricing for 60, 90, 120 minutes
         const basePrice = pricingOptions[data.duration as keyof typeof pricingOptions] || 0;
         // Apply group discounts for regular pricing
         const multiplier = groupSizeMultipliers[data.groupSize as keyof typeof groupSizeMultipliers] || 1.0;
@@ -1192,42 +1191,6 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                 {/* Show promotion durations when promotion is active */}
                 {selectedDate && selectedLocation && isPromotionActive(selectedLocation, selectedDate) ? (
                   <>
-                    {/* 20 Minute Session - FREE during promotion */}
-                    <label
-                      className={`
-                        relative flex items-center p-4 border rounded-lg cursor-pointer
-                        ${
-                          watch("duration") === "20"
-                            ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
-                            : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
-                        }
-                      `}
-                    >
-                      <input
-                        type="radio"
-                        value="20"
-                        {...register("duration")}
-                        className="sr-only"
-                      />
-                      <div className="flex-1">
-                        <h3 className={`font-medium ${
-                          watch("duration") === "20"
-                            ? "text-blue-600 dark:text-blue-400"
-                            : "text-gray-900 dark:text-white"
-                        }`}>
-                          20 Minute Session
-                        </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Quick session</p>
-                      </div>
-                      <div className={`text-lg font-bold ${
-                        watch("duration") === "20"
-                          ? "text-blue-600 dark:text-blue-400"
-                          : "text-gray-900 dark:text-white"
-                      }`}>
-                        {formatCurrency(0)}
-                        <span className="text-green-600 dark:text-green-400 ml-2">FREE!</span>
-                      </div>
-                    </label>
 
                     {/* 45 Minute Session - $75 during promotion */}
                     <label
@@ -1341,42 +1304,6 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       </div>
                     </label>
 
-                    {/* 20 Minute Session - $1 Test Option */}
-                    <label
-                      className={`
-                        relative flex items-center p-4 border rounded-lg cursor-pointer
-                        ${
-                          watch("duration") === "20"
-                            ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
-                            : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
-                        }
-                      `}
-                    >
-                      <input
-                        type="radio"
-                        value="20"
-                        {...register("duration")}
-                        className="sr-only"
-                      />
-                      <div className="flex-1">
-                        <h3 className={`font-medium ${
-                          watch("duration") === "20"
-                            ? "text-blue-600 dark:text-blue-400"
-                            : "text-gray-900 dark:text-white"
-                        }`}>
-                          20 Minute Session
-                        </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Test payment option</p>
-                      </div>
-                      <div className={`text-lg font-bold ${
-                        watch("duration") === "20"
-                          ? "text-blue-600 dark:text-blue-400"
-                          : "text-gray-900 dark:text-white"
-                      }`}>
-                        {formatCurrency(pricingOptions["20"])}
-                        <span className="text-blue-600 dark:text-blue-400 ml-2 text-sm">TEST</span>
-                      </div>
-                    </label>
 
                     {/* 60 Minute Session */}
                     <label
