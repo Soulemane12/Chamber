@@ -61,7 +61,7 @@ const timeSlots = [
 
 // Pricing for different durations
 const pricingOptions = {
-  "0": 0,      // Free test option
+  "0": 0,      // Demo session option
   "60": 150,
   "90": 200,
   "120": 250,
@@ -1267,7 +1267,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                 ) : (
                   <>
                     {/* Regular durations when promotion is not active */}
-                    {/* Free Test Session */}
+                    {/* Demo Session */}
                     <label
                       className={`
                         relative flex items-center p-4 border rounded-lg cursor-pointer
@@ -1290,7 +1290,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                             ? "text-green-600 dark:text-green-400"
                             : "text-gray-900 dark:text-white"
                         }`}>
-                          Free Test Session
+                          Demo Session
                         </h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400">No payment required • Skip directly to confirmation</p>
                       </div>
@@ -1641,7 +1641,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
                 <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-6 text-center">
                   <div className="text-4xl mb-4">🎉</div>
-                  <h3 className="text-lg font-semibold text-green-800 dark:text-green-200 mb-2">Free Test Session!</h3>
+                  <h3 className="text-lg font-semibold text-green-800 dark:text-green-200 mb-2">Demo Session!</h3>
                   <p className="text-green-700 dark:text-green-300 mb-4">No payment required. Click confirm to complete your booking.</p>
                   <Button
                     type="button"
@@ -1649,9 +1649,9 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       try {
                         setIsSubmitting(true);
                         const formData = watch();
-                        await createBooking(formData, undefined); // No payment ID for free test
+                        await createBooking(formData, undefined); // No payment ID for demo session
                       } catch (error) {
-                        console.error('Error creating free booking:', error);
+                        console.error('Error creating demo booking:', error);
                         setPaymentError('Failed to create booking. Please try again.');
                       } finally {
                         setIsSubmitting(false);
@@ -1660,7 +1660,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     isLoading={isSubmitting}
                     className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
                   >
-                    Confirm Free Booking
+                    Confirm Demo Booking
                   </Button>
                 </div>
               </div>
