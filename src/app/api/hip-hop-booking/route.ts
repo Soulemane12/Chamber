@@ -34,11 +34,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // Send confirmation email
+    // Send confirmation email directly
     try {
-      const emailUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3002'}/api/send-hip-hop-email`;
-      console.log('Sending Hip Hop email to URL:', emailUrl);
-      
+      console.log('Sending Hip Hop confirmation email directly...');
+
       const emailPayload = {
         ...bookingData,
         // Convert to format expected by email service
@@ -50,18 +49,21 @@ export async function POST(request: Request) {
         // Handle both single service (backward compatibility) and multiple services
         services: bookingData.services || [bookingData.service].filter(Boolean),
       };
-      
+
       console.log('Hip Hop email payload:', JSON.stringify(emailPayload, null, 2));
 
-      const emailResponse = await fetch(emailUrl, {
+      // Import and call the email service directly instead of HTTP fetch
+      const { POST: sendHipHopEmail } = await import('../send-hip-hop-email/route');
+      const emailRequest = new Request('http://localhost/api/send-hip-hop-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(emailPayload),
       });
 
+      const emailResponse = await sendHipHopEmail(emailRequest);
       const emailResult = await emailResponse.json();
       console.log('Hip Hop email response:', JSON.stringify(emailResult, null, 2));
-      
+
       if (!emailResult.success) {
         console.error('Failed to send Hip Hop confirmation email:', emailResult.message);
       } else {
