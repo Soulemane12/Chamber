@@ -25,7 +25,7 @@ const bookingSchema = z.object({
   time: z.string({
     required_error: "Please select a time",
   }),
-  duration: z.enum(["20", "45", "60", "90", "120"], {
+  duration: z.enum(["0", "20", "45", "60", "90", "120"], {
     required_error: "Please select a duration",
   }),
   location: z.enum(["midtown", "conyers"], {
@@ -61,6 +61,7 @@ const timeSlots = [
 
 // Pricing for different durations
 const pricingOptions = {
+  "0": 0,      // Free test option
   "20": 1,     // $1 test option
   "60": 150,
   "90": 200,
@@ -1303,6 +1304,43 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                 ) : (
                   <>
                     {/* Regular durations when promotion is not active */}
+                    {/* Free Test Session */}
+                    <label
+                      className={`
+                        relative flex items-center p-4 border rounded-lg cursor-pointer
+                        ${
+                          watch("duration") === "0"
+                            ? "bg-green-50 border-green-500 dark:bg-green-900/30 dark:border-green-400"
+                            : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
+                        }
+                      `}
+                    >
+                      <input
+                        type="radio"
+                        value="0"
+                        {...register("duration")}
+                        className="sr-only"
+                      />
+                      <div className="flex-1">
+                        <h3 className={`font-medium ${
+                          watch("duration") === "0"
+                            ? "text-green-600 dark:text-green-400"
+                            : "text-gray-900 dark:text-white"
+                        }`}>
+                          Free Test Session
+                        </h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">No payment required • Skip directly to confirmation</p>
+                      </div>
+                      <div className={`text-lg font-bold ${
+                        watch("duration") === "0"
+                          ? "text-green-600 dark:text-green-400"
+                          : "text-gray-900 dark:text-white"
+                      }`}>
+                        {formatCurrency(0)}
+                        <span className="text-green-600 dark:text-green-400 ml-2">FREE!</span>
+                      </div>
+                    </label>
+
                     {/* 20 Minute Session - $1 Test Option */}
                     <label
                       className={`
@@ -1671,48 +1709,78 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               )}
             </div>
 
-            <div className="border-t border-gray-200 dark:border-gray-700 pt-6 animate-slide-in-up animate-delay-200">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Payment Details</h3>
-              
-              {paymentError && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-red-700 text-sm">{paymentError}</p>
+            {/* Free test confirmation or payment */}
+            {watch("duration") === "0" ? (
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
+                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-6 text-center">
+                  <div className="text-4xl mb-4">🎉</div>
+                  <h3 className="text-lg font-semibold text-green-800 dark:text-green-200 mb-2">Free Test Session!</h3>
+                  <p className="text-green-700 dark:text-green-300 mb-4">No payment required. Click confirm to complete your booking.</p>
+                  <Button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        setIsSubmitting(true);
+                        const formData = watch();
+                        await createBooking(formData, null); // No payment ID for free test
+                      } catch (error) {
+                        console.error('Error creating free booking:', error);
+                        setPaymentError('Failed to create booking. Please try again.');
+                      } finally {
+                        setIsSubmitting(false);
+                      }
+                    }}
+                    isLoading={isSubmitting}
+                    className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
+                  >
+                    Confirm Free Booking
+                  </Button>
                 </div>
-              )}
-              
-              <StripePayment
-                amount={calculateTotal()}
-                duration={selectedDuration}
-                groupSize={selectedGroupSize}
-                location={selectedLocation}
-                date={selectedDate}
-                customerInfo={{
-                  firstName: watch("firstName"),
-                  lastName: watch("lastName"), 
-                  email: watch("email")
-                }}
-                onPaymentSuccess={async (paymentId) => {
-                  console.log('Payment successful, payment ID:', paymentId);
-                  setPaymentIntentId(paymentId);
-                  setPaymentError(null);
-                  
-                  try {
-                    // Only create booking after successful payment
-                    const formData = watch(); // Get current form data
-                    console.log('Creating booking with form data:', formData);
-                    await createBooking(formData, paymentId); // Pass payment ID directly to avoid race condition
-                    console.log('Booking creation completed successfully');
-                  } catch (error) {
-                    console.error('Error during booking creation:', error);
-                    setPaymentError('Failed to create booking after payment. Please contact support.');
-                  }
-                }}
-                onPaymentError={(error) => {
-                  setPaymentError(error);
-                  setPaymentIntentId(null);
-                }}
-              />
-            </div>
+              </div>
+            ) : (
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-6 animate-slide-in-up animate-delay-200">
+                <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Payment Details</h3>
+
+                {paymentError && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-700 text-sm">{paymentError}</p>
+                  </div>
+                )}
+
+                <StripePayment
+                  amount={calculateTotal()}
+                  duration={selectedDuration}
+                  groupSize={selectedGroupSize}
+                  location={selectedLocation}
+                  date={selectedDate}
+                  customerInfo={{
+                    firstName: watch("firstName"),
+                    lastName: watch("lastName"),
+                    email: watch("email")
+                  }}
+                  onPaymentSuccess={async (paymentId) => {
+                    console.log('Payment successful, payment ID:', paymentId);
+                    setPaymentIntentId(paymentId);
+                    setPaymentError(null);
+
+                    try {
+                      // Only create booking after successful payment
+                      const formData = watch(); // Get current form data
+                      console.log('Creating booking with form data:', formData);
+                      await createBooking(formData, paymentId); // Pass payment ID directly to avoid race condition
+                      console.log('Booking creation completed successfully');
+                    } catch (error) {
+                      console.error('Error during booking creation:', error);
+                      setPaymentError('Failed to create booking after payment. Please contact support.');
+                    }
+                  }}
+                  onPaymentError={(error) => {
+                    setPaymentError(error);
+                    setPaymentIntentId(null);
+                  }}
+                />
+              </div>
+            )}
 
             <div className="pt-4 flex flex-col sm:flex-row justify-between gap-3 sm:gap-4">
               <Button
@@ -1724,11 +1792,13 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               >
                 Back
               </Button>
-              <div className="w-full sm:w-auto order-1 sm:order-2 text-center">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Payment will be processed automatically
-                </p>
-              </div>
+              {watch("duration") !== "0" && (
+                <div className="w-full sm:w-auto order-1 sm:order-2 text-center">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Payment will be processed automatically
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}
