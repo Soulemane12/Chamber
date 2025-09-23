@@ -233,7 +233,7 @@ export async function POST(request: Request) {
       console.log('Testing transporter connection for Hip Hop email...');
       await transporter.verify();
       console.log('Hip Hop email transporter connection verified successfully');
-      
+
       // Send user confirmation email
       console.log('Sending Hip Hop confirmation email to:', bookingData.email);
       console.log('Hip Hop user email options:', {
@@ -247,19 +247,50 @@ export async function POST(request: Request) {
         accepted: userResult.accepted,
         rejected: userResult.rejected,
         pending: userResult.pending,
-        response: userResult.response
+        response: userResult.response,
+        envelope: userResult.envelope
       });
-      
+
+      // Check if email was rejected
+      if (userResult.rejected && userResult.rejected.length > 0) {
+        console.error('Hip Hop user email was rejected:', userResult.rejected);
+        return NextResponse.json(
+          {
+            success: false,
+            message: 'User email was rejected by server',
+            rejected: userResult.rejected,
+            response: userResult.response
+          },
+          { status: 500 }
+        );
+      }
+
       // Send admin notification email
       console.log('Sending Hip Hop admin notification email to: billydduc@gmail.com');
       const adminResult = await transporter.sendMail(adminMailOptions);
       console.log('Hip Hop admin notification email sent successfully:', adminResult.messageId);
-      
-      return NextResponse.json({ 
-        success: true, 
+      console.log('Hip Hop admin email result details:', {
+        accepted: adminResult.accepted,
+        rejected: adminResult.rejected,
+        pending: adminResult.pending,
+        response: adminResult.response,
+        envelope: adminResult.envelope
+      });
+
+      // Check if admin email was rejected
+      if (adminResult.rejected && adminResult.rejected.length > 0) {
+        console.error('Hip Hop admin email was rejected:', adminResult.rejected);
+      }
+
+      return NextResponse.json({
+        success: true,
         message: 'Hip Hop emails sent successfully',
         userMessageId: userResult.messageId,
-        adminMessageId: adminResult.messageId
+        adminMessageId: adminResult.messageId,
+        userAccepted: userResult.accepted,
+        userRejected: userResult.rejected,
+        adminAccepted: adminResult.accepted,
+        adminRejected: adminResult.rejected
       });
     } catch (emailError) {
       console.error('Error sending Hip Hop email through transporter:', emailError);
