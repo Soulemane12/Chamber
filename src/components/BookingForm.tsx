@@ -312,9 +312,9 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user?.id;
       
-      // Only create booking if payment is confirmed
+      // Only create booking if payment is confirmed (except for demo sessions)
       const actualPaymentId = providedPaymentId || paymentIntentId;
-      if (!actualPaymentId) {
+      if (!actualPaymentId && amount > 0) {
         throw new Error('Payment must be completed before booking can be created');
       }
       
@@ -367,8 +367,8 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         notes: data.notes || null,
         booking_reason: data.bookingReason || null,
         // Payment tracking - booking only created after successful payment
-        payment_status: 'completed',
-        stripe_payment_intent_id: actualPaymentId
+        payment_status: amount > 0 ? 'completed' : 'demo',
+        stripe_payment_intent_id: amount > 0 ? actualPaymentId : null
       };
       
       // Remove any undefined properties to avoid database errors
