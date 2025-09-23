@@ -56,9 +56,11 @@ export async function POST(request: Request) {
 
     console.log('Creating nodemailer transporter for Hip Hop email');
 
-    // Create a transporter exactly like working commit cc6f364
+    // Create transporter following Nodemailer docs exactly
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false, // true for 465, false for other ports
       auth: {
         user: 'billydduc@gmail.com',
         pass: process.env.EMAIL_PASSWORD
