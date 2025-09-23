@@ -8,7 +8,7 @@ import { useLanguage } from "@/lib/LanguageContext";
 import { supabase } from "@/lib/supabaseClient";
 
 interface HeaderProps {
-  currentPage?: 'home' | 'booking' | 'admin' | 'account' | 'hiphop';
+  currentPage?: 'home' | 'booking' | 'admin' | 'account';
 }
 
 export function Header({ currentPage = 'home' }: HeaderProps) {
@@ -74,16 +74,6 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
                   : "text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"}`}
               >
                 {t('bookNow')}
-              </Link>
-            </li>
-            <li className="px-2 sm:px-0 py-1 sm:py-0">
-              <Link
-                href="/hiphop"
-                className={`text-sm sm:text-base ${currentPage === 'hiphop'
-                  ? "text-purple-600 dark:text-purple-400 font-medium"
-                  : "text-gray-700 hover:text-purple-600 dark:text-gray-300 dark:hover:text-purple-400"}`}
-              >
-                🎤 Hip Hop
               </Link>
             </li>
             <li className="px-2 sm:px-0 py-1 sm:py-0">
