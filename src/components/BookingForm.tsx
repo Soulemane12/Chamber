@@ -472,21 +472,22 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       
       console.log('Booking saved successfully:', result);
       
-      // Send confirmation email directly - wrap this in a try/catch to prevent it from blocking the booking completion
+      // Send confirmation email via API route - wrap this in a try/catch to prevent it from blocking the booking completion
       try {
-        console.log('Sending booking confirmation email directly...');
+        console.log('Sending booking confirmation email...');
 
-        // Import and call the email service directly instead of HTTP fetch
-        const { POST: sendEmail } = await import('../app/api/send-email/route');
-        const emailRequest = new Request('http://localhost/api/send-email', {
+        const emailResponse = await fetch('/api/bookings', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'send-email',
+            data: data
+          }),
         });
 
-        const emailResponse = await sendEmail(emailRequest);
         const emailResult = await emailResponse.json();
-
         console.log('Email response:', emailResult);
 
         if (!emailResult.success) {

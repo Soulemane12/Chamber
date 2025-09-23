@@ -130,7 +130,7 @@ export default function HipHopBookingPage() {
   if (bookingComplete && bookingDetails) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
-        <Header currentPage="hiphop" />
+        <Header />
         
         <main className="py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
           <div className="bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-900/10 rounded-2xl shadow-2xl overflow-hidden">
@@ -292,7 +292,7 @@ export default function HipHopBookingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
-      <Header currentPage="hiphop" />
+      <Header />
       
       <main className="py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
         {/* Hero Section */}
