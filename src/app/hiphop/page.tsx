@@ -17,10 +17,11 @@ const hipHopBookingSchema = z.object({
   phone: z.string().min(10, "Please enter a valid phone number"),
   services: z.array(z.enum([
     "hbot",
-    "electric-exercise", 
+    "electric-exercise",
     "pemf",
     "nmr",
-    "nutrition"
+    "nutrition",
+    "ifs"
   ])).min(1, "Please select at least one service"),
   preferredDate: z.string().min(1, "Please select a preferred date"),
   preferredTime: z.string().min(1, "Please select a preferred time"),
@@ -59,6 +60,12 @@ const services = [
     title: "Personalized Nutrition & Metabolic Optimization",
     description: "Complete metabolic assessment including VO₂ Max testing, resting metabolic rate analysis, personalized nutrition plan, and expert consultation for optimal performance.",
     icon: "🥗"
+  },
+  {
+    id: "ifs",
+    title: "Internal Family Systems (IFS) with Ty Cutner",
+    description: "Ty Cutner offers IFS sessions that help individuals explore and heal the different 'parts' of themselves—inner voices, emotions, and patterns that shape their lives. Through a compassionate, non-judgmental approach, Ty guides clients in building self-awareness, resolving inner conflicts, and accessing their core Self for deeper healing, clarity, and personal growth.",
+    icon: "🧘‍♂️"
   }
 ];
 
