@@ -14,9 +14,7 @@ interface InquiryFormData {
 
 export async function POST(request: Request) {
   try {
-    console.log('Inquiry API called');
     const inquiryData: InquiryFormData = await request.json();
-    console.log('Inquiry data received:', inquiryData);
 
     // Safety check for required fields
     if (!inquiryData.email || !inquiryData.name) {
@@ -26,20 +24,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if email password is configured
-    console.log('EMAIL_PASSWORD exists:', !!process.env.EMAIL_PASSWORD);
-    if (!process.env.EMAIL_PASSWORD) {
-      console.error('EMAIL_PASSWORD environment variable is not set');
-      return NextResponse.json(
-        { success: false, message: 'Email service not configured. Please contact support.' },
-        { status: 500 }
-      );
-    }
-
-    console.log('Creating nodemailer transporter with Gmail service');
-    console.log('Email user:', 'billydduc@gmail.com');
-
-    // Create a transporter using the same configuration as the app branch
+    // Create a transporter using the same simple configuration as the working app branch
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -119,20 +104,11 @@ export async function POST(request: Request) {
     };
 
     try {
-      // Test the transporter connection first
-      console.log('Testing transporter connection...');
-      await transporter.verify();
-      console.log('Transporter connection verified successfully');
-
       // Send user confirmation email
-      console.log('Sending confirmation email to:', inquiryData.email);
       const userResult = await transporter.sendMail(userMailOptions);
-      console.log('User confirmation email sent successfully:', userResult.messageId);
 
       // Send admin notification email
-      console.log('Sending admin notification email to: billydduc@gmail.com');
       const adminResult = await transporter.sendMail(adminMailOptions);
-      console.log('Admin notification email sent successfully:', adminResult.messageId);
 
       return NextResponse.json({
         success: true,
@@ -142,13 +118,8 @@ export async function POST(request: Request) {
       });
     } catch (emailError) {
       console.error('Error sending email through transporter:', emailError);
-
       return NextResponse.json(
-        {
-          success: false,
-          message: 'Error sending inquiry email',
-          error: emailError instanceof Error ? emailError.message : 'Unknown error'
-        },
+        { success: false, message: 'Error sending through email service' },
         { status: 500 }
       );
     }
