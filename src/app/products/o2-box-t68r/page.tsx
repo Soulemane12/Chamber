@@ -266,14 +266,27 @@ export default function O2BoxT68R() {
                 <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
                   Request Information
                 </h3>
-                
-                <form className="space-y-4">
+
+                {submitMessage && (
+                  <div className={`mb-6 p-4 rounded-lg ${
+                    submitMessage.includes('Thank you')
+                      ? 'bg-green-100 dark:bg-green-900 border border-green-400 text-green-700 dark:text-green-300'
+                      : 'bg-red-100 dark:bg-red-900 border border-red-400 text-red-700 dark:text-red-300'
+                  }`}>
+                    {submitMessage}
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Name *
                     </label>
                     <input
                       type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
                       required
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                       placeholder="Your full name"
@@ -286,6 +299,9 @@ export default function O2BoxT68R() {
                     </label>
                     <input
                       type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
                       required
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                       placeholder="your.email@example.com"
@@ -298,6 +314,9 @@ export default function O2BoxT68R() {
                     </label>
                     <input
                       type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                       placeholder="(555) 123-4567"
                     />
@@ -307,7 +326,11 @@ export default function O2BoxT68R() {
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Interest Level
                     </label>
-                    <select className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
+                    <select
+                      name="interestLevel"
+                      value={formData.interestLevel}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
                       <option value="">Select your interest level</option>
                       <option value="immediate">Immediate Purchase</option>
                       <option value="3months">Within 3 months</option>
@@ -321,6 +344,9 @@ export default function O2BoxT68R() {
                       Additional Questions or Requirements
                     </label>
                     <textarea
+                      name="message"
+                      value={formData.message}
+                      onChange={handleInputChange}
                       rows={4}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                       placeholder="Tell us about your specific needs, location, or any questions you have..."
@@ -329,9 +355,10 @@ export default function O2BoxT68R() {
                   
                   <button
                     type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                    disabled={isSubmitting}
+                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-3 px-6 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 disabled:cursor-not-allowed"
                   >
-                    Send Inquiry
+                    {isSubmitting ? 'Sending...' : 'Send Inquiry'}
                   </button>
                   
                   <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
