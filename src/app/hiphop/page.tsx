@@ -330,10 +330,27 @@ export default function HipHopBookingPage() {
             </p>
             
             <p>
-              We invite you to take advantage of our advanced health and wellness services—designed 
+              We invite you to take advantage of our advanced health and wellness services—designed
               to help you recharge, recover, and perform at your best.
             </p>
-            
+
+            {/* Video Section */}
+            <div className="my-12 text-center">
+              <div className="relative w-full max-w-4xl mx-auto">
+                <div className="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-2xl">
+                  <video
+                    className="w-full h-full object-cover rounded-xl"
+                    controls
+                    poster="/video-poster.jpg"
+                  >
+                    <source src="/wellness-services-video.mp4" type="video/mp4" />
+                    <source src="/wellness-services-video.webm" type="video/webm" />
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+              </div>
+            </div>
+
             <p className="text-blue-600 dark:text-blue-400 font-semibold">
               👉 Book your session below and begin your journey toward peak health and well-being with us:
             </p>
