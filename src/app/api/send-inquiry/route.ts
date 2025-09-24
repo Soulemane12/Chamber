@@ -24,6 +24,14 @@ export async function POST(request: Request) {
       );
     }
 
+    // Check if email password is configured
+    if (!process.env.EMAIL_PASSWORD) {
+      return NextResponse.json(
+        { success: false, message: 'Email service not configured. Please contact support.' },
+        { status: 500 }
+      );
+    }
+
     // Create a transporter using the same simple configuration as the working app branch
     const transporter = nodemailer.createTransport({
       service: 'gmail',
