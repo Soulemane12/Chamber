@@ -28,20 +28,39 @@ export default function Contact() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
-      // Here you would typically send the form data to your backend
-      // For now, we'll just simulate a successful submission
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setSubmitMessage('Thank you for your inquiry! We will contact you soon.');
-      setFormData({
-        contactType: 'residential',
-        name: '',
-        email: '',
-        phone: '',
-        businessName: ''
+      const response = await fetch('/api/send-inquiry', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          businessName: formData.businessName,
+          contactType: formData.contactType,
+          message: 'General inquiry through contact form'
+        }),
       });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setSubmitMessage('Thank you for your inquiry! We will contact you soon.');
+        setFormData({
+          contactType: 'residential',
+          name: '',
+          email: '',
+          phone: '',
+          businessName: ''
+        });
+      } else {
+        setSubmitMessage('There was an error submitting your form. Please try again.');
+      }
     } catch (error) {
+      console.error('Error submitting contact form:', error);
       setSubmitMessage('There was an error submitting your form. Please try again.');
     } finally {
       setIsSubmitting(false);

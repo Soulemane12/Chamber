@@ -13,6 +13,17 @@ export default function O2BoxT68R() {
   const [deliveryDate, setDeliveryDate] = useState("");
   const [deliveryTime, setDeliveryTime] = useState("");
   const [addressOrZip, setAddressOrZip] = useState("");
+
+  // Inquiry form state
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    interestLevel: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState('');
   const [paymentOption, setPaymentOption] = useState<'half' | 'full' | 'financing'>("full");
 
   interface Accessory {
@@ -35,6 +46,54 @@ export default function O2BoxT68R() {
 
   const handleAccessoryToggle = (accessoryId: string) => {
     setSelectedAccessories(prev => prev.includes(accessoryId) ? prev.filter(id => id !== accessoryId) : [...prev, accessoryId]);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitMessage('');
+
+    try {
+      const response = await fetch('/api/send-inquiry', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          product: 'O2 BOX T68-R (6-8 Persons)',
+          contactType: 'business'
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setSubmitMessage('Thank you for your inquiry! We will contact you within 24 hours.');
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          interestLevel: '',
+          message: ''
+        });
+      } else {
+        setSubmitMessage('There was an error submitting your inquiry. Please try again or contact us directly.');
+      }
+    } catch (error) {
+      console.error('Error submitting inquiry:', error);
+      setSubmitMessage('There was an error submitting your inquiry. Please try again or contact us directly.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handlePurchase = () => {
