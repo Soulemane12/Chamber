@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS hip_hop_bookings (
   last_name TEXT NOT NULL,
   email TEXT NOT NULL,
   phone TEXT NOT NULL,
-  service TEXT NOT NULL CHECK (service IN ('hbot', 'electric-exercise', 'pemf', 'nmr', 'nutrition')),
+  service TEXT NOT NULL CHECK (service IN ('hbot', 'electric-exercise', 'pemf', 'nmr', 'nutrition', 'ifs')),
   preferred_date DATE NOT NULL,
   preferred_time TEXT NOT NULL,
   notes TEXT,
