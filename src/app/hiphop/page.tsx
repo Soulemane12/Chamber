@@ -304,20 +304,6 @@ export default function HipHopBookingPage() {
       <main className="py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <div className="flex justify-center mb-6">
-            <video
-              width={400}
-              height={300}
-              className="rounded-lg shadow-lg"
-              controls
-              autoPlay
-              muted
-              loop
-            >
-              <source src="/hiphop.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
           
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Dear Hip Hop Nominees,
@@ -334,20 +320,21 @@ export default function HipHopBookingPage() {
               to help you recharge, recover, and perform at your best.
             </p>
 
-            {/* Video Section */}
+            {/* Hip Hop Video Section */}
             <div className="my-12 text-center">
-              <div className="relative w-full max-w-4xl mx-auto">
-                <div className="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden shadow-2xl">
-                  <video
-                    className="w-full h-full object-cover rounded-xl"
-                    controls
-                    poster="/video-poster.jpg"
-                  >
-                    <source src="/wellness-services-video.mp4" type="video/mp4" />
-                    <source src="/wellness-services-video.webm" type="video/webm" />
-                    Your browser does not support the video tag.
-                  </video>
-                </div>
+              <div className="flex justify-center">
+                <video
+                  width={400}
+                  height={300}
+                  className="rounded-lg shadow-lg"
+                  controls
+                  autoPlay
+                  muted
+                  loop
+                >
+                  <source src="/hiphop.mp4" type="video/mp4" />
+                  Your browser does not support the video tag.
+                </video>
               </div>
             </div>
 
