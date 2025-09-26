@@ -16,12 +16,12 @@ const hipHopBookingSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   phone: z.string().min(10, "Please enter a valid phone number"),
   services: z.array(z.enum([
-    "hbot",
+    "neuromuscular-reset",
+    "oxygen-boost",
+    "red-light-therapy",
     "electric-exercise",
-    "pemf",
-    "nmr",
-    "nutrition",
-    "ifs"
+    "stress-reset",
+    "ifs-session"
   ])).min(1, "Please select at least one service"),
   preferredDate: z.string().min(1, "Please select a preferred date"),
   preferredTime: z.string().min(1, "Please select a preferred time"),
@@ -32,40 +32,40 @@ type HipHopBookingData = z.infer<typeof hipHopBookingSchema>;
 
 const services = [
   {
-    id: "hbot",
-    title: "Luxury Hyperbaric Oxygen Therapy (HBOT)",
-    description: "3 sessions in our spa-grade O₂ Box to accelerate healing, reduce inflammation, and boost brain function. This is not a capsule but a small room with stadium seats, AC, and a flat screen TV.",
-    icon: "🫁"
-  },
-  {
-    id: "electric-exercise",
-    title: "Electric Exercise",
-    description: "One EMS-powered session per week targeting specific muscle groups delivers the effect of up to 50,000 crunches in just 30 minutes without breaking a sweat.",
-    icon: "⚡"
-  },
-  {
-    id: "pemf",
-    title: "PEMF Therapy",
-    description: "One session per week of Pulsed Electromagnetic Field (PEMF) therapy to accelerate cellular repair, reduce inflammation, and restore physical balance. We use one of the only medical grade strength devices in the industry.",
-    icon: "🧲"
-  },
-  {
-    id: "nmr",
-    title: "Neuromuscular Reeducation (NMR)",
-    description: "One session per week of Neuromuscular Reeducation, designed to reset the nervous system, improve mobility, and address chronic or acute pain through precise nerve activation and feedback.",
+    id: "neuromuscular-reset",
+    title: "⚡ Neuromuscular Reset",
+    description: "Re-train your nervous system to relieve pain, restore mobility, and speed recovery.",
     icon: "🧠"
   },
   {
-    id: "nutrition",
-    title: "Personalized Nutrition & Metabolic Optimization",
-    description: "Complete metabolic assessment including VO₂ Max testing, resting metabolic rate analysis, personalized nutrition plan, and expert consultation for optimal performance.",
-    icon: "🥗"
+    id: "oxygen-boost",
+    title: "🌬️ Oxygen Boost (HBOT)",
+    description: "Breathe pure oxygen under pressure to fuel cells, accelerate healing, and increase energy.",
+    icon: "🫁"
   },
   {
-    id: "ifs",
-    title: "Internal Family Systems (IFS) with Ty Cutner",
-    description: "Ty Cutner offers IFS sessions that help individuals explore and heal the different 'parts' of themselves—inner voices, emotions, and patterns that shape their lives. Through a compassionate, non-judgmental approach, Ty guides clients in building self-awareness, resolving inner conflicts, and accessing their core Self for deeper healing, clarity, and personal growth.",
+    id: "red-light-therapy",
+    title: "💡 Red Light Brain Therapy",
+    description: "Clear brain fog, improve focus, and boost mental clarity.",
+    icon: "💡"
+  },
+  {
+    id: "electric-exercise",
+    title: "💪 Electric Exercise",
+    description: "20 minutes = 5,000 crunches. Build strength and tone without joint stress.",
+    icon: "⚡"
+  },
+  {
+    id: "stress-reset",
+    title: "🧘 Stress Reset Protocol",
+    description: "Shift from 'fight or flight' into deep calm and full-body recovery.",
     icon: "🧘‍♂️"
+  },
+  {
+    id: "ifs-session",
+    title: "🧩 IFS Session with Ty Cutner",
+    description: "Use Internal Family Systems therapy to align mind, emotions, and identity — unlocking clarity, confidence, and deeper purpose.",
+    icon: "🧩"
   }
 ];
 
@@ -150,12 +150,12 @@ export default function HipHopBookingPage() {
               </div>
               
               <h2 className="text-4xl font-bold mb-4">
-                🎉 Booking Request Submitted!
+                🎉 Executive Recovery Session Booked!
               </h2>
               
               <p className="text-xl text-blue-100 max-w-2xl mx-auto leading-relaxed">
                 <strong>Congratulations on your Hip Hop nomination!</strong><br/>
-                Thank you for choosing our wellness services. We'll contact you within 24 hours to confirm your appointment.
+                Thank you for booking your Executive Recovery Session. We'll contact you within 24 hours to confirm your appointment.
               </p>
             </div>
 
@@ -202,7 +202,7 @@ export default function HipHopBookingPage() {
 
                 {/* Selected Services */}
                 <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-4 block">Selected Wellness Services</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-4 block">Selected Recovery Components</label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {selectedServiceObjects.map((service) => (
                       <div key={service.id} className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-700">
@@ -242,7 +242,7 @@ export default function HipHopBookingPage() {
                   <div>
                     <h5 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">💬 Contact</h5>
                     <p className="text-blue-700 dark:text-blue-300">
-                      <strong>Billy Duc</strong><br/>
+                      <strong>Dr. Chuck Morris, Billy Duc & Ty Cutner</strong><br/>
                       Email: billydduc@gmail.com
                     </p>
                   </div>
@@ -263,7 +263,7 @@ export default function HipHopBookingPage() {
                     </div>
                     <div className="flex items-start">
                       <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5">2</span>
-                      <p className="text-green-800 dark:text-green-200">Billy will contact you to confirm your appointment</p>
+                      <p className="text-green-800 dark:text-green-200">Dr. Chuck Morris, Billy Duc & Ty Cutner will contact you to confirm your appointment</p>
                     </div>
                   </div>
                   <div className="space-y-3">
@@ -306,19 +306,28 @@ export default function HipHopBookingPage() {
         <div className="text-center mb-12">
           
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Dear Hip Hop Nominees,
+            🎁 Executive Recovery Session
           </h1>
           
-          <div className="max-w-3xl mx-auto text-lg text-gray-600 dark:text-gray-300 space-y-4">
-            <p>
-              <strong>Congratulations on your nomination! 🎉</strong> As part of this exciting time, 
-              Wellnex02 and Midtown Biohack are pleased to extend an exclusive wellness offer to you.
+          <div className="max-w-4xl mx-auto text-lg text-gray-600 dark:text-gray-300 space-y-4">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-6 mb-6 border border-blue-200 dark:border-blue-700">
+              <p className="text-xl font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                Duration: 2.5 Hours • Led by Dr. Chuck Morris, Billy Duc & Ty Cutner
+              </p>
+              <p className="text-lg text-blue-800 dark:text-blue-200">
+                🔑 Reset • Recharge • Perform
+              </p>
+            </div>
+            
+            <p className="text-lg font-medium text-gray-800 dark:text-gray-200">
+              A luxury, science-based experience to help you feel years younger, sharpen your mind, and unlock peak performance — in just 2.5 hours.
             </p>
             
-            <p>
-              We invite you to take advantage of our advanced health and wellness services—designed
-              to help you recharge, recover, and perform at your best.
-            </p>
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-6 mb-6 border border-green-200 dark:border-green-700">
+              <p className="text-lg font-semibold text-green-900 dark:text-green-100">
+                💎 Value: $2,500.00 • 🎤 Gifted to: Nominees of the Hip Hop Hall of Fame
+              </p>
+            </div>
 
             {/* Hip Hop Video Section */}
             <div className="my-12 text-center">
@@ -338,8 +347,15 @@ export default function HipHopBookingPage() {
               </div>
             </div>
 
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-6 mb-6 border border-purple-200 dark:border-purple-700">
+              <h3 className="text-xl font-bold text-purple-900 dark:text-purple-100 mb-4">🌟 Why It Matters</h3>
+              <p className="text-purple-800 dark:text-purple-200">
+                This is not just recovery — it's a full-system reset. Designed to relieve pain, restore energy, elevate emotional wellness, and sharpen your mental edge so you perform at your highest level.
+              </p>
+            </div>
+            
             <p className="text-blue-600 dark:text-blue-400 font-semibold">
-              👉 Book your session below and begin your journey toward peak health and well-being with us:
+              👉 Book your Executive Recovery Session below and begin your journey toward peak performance:
             </p>
             
             <div className="my-8">
@@ -350,7 +366,7 @@ export default function HipHopBookingPage() {
                 }}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 animate-pulse"
               >
-                🎤 Book Your Wellness Session Now
+                🎤 Book Your Executive Recovery Session Now
               </button>
             </div>
             
@@ -360,7 +376,7 @@ export default function HipHopBookingPage() {
             
             <p className="font-medium">
               Best regards,<br/>
-              <span className="text-blue-600 dark:text-blue-400">Wellnex02 & Midtown Biohack</span>
+              <span className="text-blue-600 dark:text-blue-400">Dr. Chuck Morris, Billy Duc & Ty Cutner</span>
             </p>
           </div>
         </div>
@@ -368,7 +384,7 @@ export default function HipHopBookingPage() {
         {/* Services Section */}
         <div className="mb-12">
           <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-8">
-            Our Services
+            🧠 What You'll Experience
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -389,7 +405,7 @@ export default function HipHopBookingPage() {
         {/* Booking Form */}
         <div id="booking-form" className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
-            Book Your Wellness Session
+            Book Your Executive Recovery Session
           </h2>
           
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -455,7 +471,7 @@ export default function HipHopBookingPage() {
             {/* Service Selection */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                Select Services * (You can choose multiple)
+                Select Recovery Components * (You can choose multiple)
               </label>
               <div className="grid grid-cols-1 gap-3">
                 {services.map((service) => (
@@ -576,7 +592,7 @@ export default function HipHopBookingPage() {
                   e.currentTarget.style.transform = 'scale(1)';
                 }}
               >
-                {isSubmitting ? "🔄 Submitting Your Booking..." : "🎤 BOOK NOW - FREE SESSION"}
+                {isSubmitting ? "🔄 Submitting Your Booking..." : "🎤 BOOK EXECUTIVE RECOVERY SESSION - FREE"}
               </button>
               <p style={{
                 color: '#6b7280',
@@ -584,7 +600,7 @@ export default function HipHopBookingPage() {
                 marginTop: '12px',
                 fontWeight: '500'
               }}>
-                ✨ Free for Hip Hop nominees • Confirmation emails will be sent
+                ✨ Free for Hip Hop nominees • $2,500 value • Confirmation emails will be sent
               </p>
             </div>
           </form>
