@@ -311,15 +311,15 @@ export default function HipHopBookingPage() {
 
             <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-700">
               <p className="text-xl font-semibold text-purple-900 dark:text-purple-100 mb-2">
-                Duration: 2.5 Hours • Led by Dr. Chuck Morris, Billy Duc & Ty Cutner
+                🔑 Reset • Recharge • Perform
               </p>
               <p className="text-lg text-purple-800 dark:text-purple-200">
-                🔑 Reset • Recharge • Perform
+                A luxury, science-based experience to help you feel years younger, sharpen your mind, and unlock peak performance — in just 2.5 hours.
               </p>
             </div>
 
             <p className="text-lg font-medium text-gray-800 dark:text-gray-200">
-              A luxury, science-based experience to help you feel years younger, sharpen your mind, and unlock peak performance — in just 2.5 hours.
+              Duration: 2.5 Hours • Led by Dr. Chuck Morris, Billy Duc & Ty Cutner
             </p>
             
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-6 mb-6 border border-green-200 dark:border-green-700">
