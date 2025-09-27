@@ -15,14 +15,6 @@ const hipHopBookingSchema = z.object({
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Please enter a valid email address"),
   phone: z.string().min(10, "Please enter a valid phone number"),
-  services: z.array(z.enum([
-    "neuromuscular-reset",
-    "oxygen-boost",
-    "red-light-therapy",
-    "electric-exercise",
-    "stress-reset",
-    "ifs-session"
-  ])).min(1, "Please select at least one service"),
   preferredDate: z.string().min(1, "Please select a preferred date"),
   preferredTime: z.string().min(1, "Please select a preferred time"),
   notes: z.string().optional(),
@@ -88,8 +80,6 @@ export default function HipHopBookingPage() {
     resolver: zodResolver(hipHopBookingSchema),
   });
 
-  const selectedServices = watch("services") || [];
-  const selectedServiceObjects = services.filter(s => selectedServices.includes(s.id as any));
 
   const onSubmit = async (data: HipHopBookingData) => {
     setIsSubmitting(true);
@@ -106,7 +96,7 @@ export default function HipHopBookingPage() {
           last_name: data.lastName,
           email: data.email,
           phone: data.phone,
-          services: data.services,
+          service: "hip-hop-executive-recovery",
           preferred_date: data.preferredDate,
           preferred_time: data.preferredTime,
           notes: data.notes || '',
@@ -200,20 +190,17 @@ export default function HipHopBookingPage() {
                   </div>
                 </div>
 
-                {/* Selected Services */}
+                {/* Booked Service */}
                 <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
-                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-4 block">Selected Recovery Components</label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {selectedServiceObjects.map((service) => (
-                      <div key={service.id} className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-700">
-                        <div className="flex items-center">
-                          <span className="text-2xl mr-3">{service.icon}</span>
-                          <div>
-                            <h4 className="font-semibold text-blue-900 dark:text-blue-100 text-sm leading-tight">{service.title}</h4>
-                          </div>
-                        </div>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-4 block">Booked Session</label>
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 rounded-lg border border-blue-200 dark:border-blue-700">
+                    <div className="flex items-center">
+                      <span className="text-3xl mr-4">🎤</span>
+                      <div>
+                        <h4 className="font-bold text-blue-900 dark:text-blue-100 text-lg">Executive Recovery Session</h4>
+                        <p className="text-blue-700 dark:text-blue-300 text-sm mt-1">Complete 2.5-hour wellness experience with Dr. Chuck Morris, Billy Duc & Ty Cutner</p>
                       </div>
-                    ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -480,47 +467,6 @@ export default function HipHopBookingPage() {
               </div>
             </div>
 
-            {/* Service Selection */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                Select Recovery Components * (You can choose multiple)
-              </label>
-              <div className="grid grid-cols-1 gap-3">
-                {services.map((service) => (
-                  <label
-                    key={service.id}
-                    className={`flex items-start p-4 border rounded-lg cursor-pointer transition-all ${
-                      selectedServices.includes(service.id as any)
-                        ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
-                        : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      value={service.id}
-                      {...register("services")}
-                      className="mt-1 mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <div className="text-2xl mr-3">{service.icon}</div>
-                    <div className="flex-1">
-                      <h3 className={`font-medium ${
-                        selectedServices.includes(service.id as any)
-                          ? "text-blue-600 dark:text-blue-400"
-                          : "text-gray-900 dark:text-white"
-                      }`}>
-                        {service.title}
-                      </h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        {service.description}
-                      </p>
-                    </div>
-                  </label>
-                ))}
-              </div>
-              {errors.services && (
-                <p className="text-red-600 text-sm mt-1">{errors.services.message}</p>
-              )}
-            </div>
 
             {/* Date and Time */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
