@@ -304,21 +304,33 @@ export default function HipHopBookingPage() {
       <main className="py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
         {/* Hero Section */}
         <div className="text-center mb-12">
-          
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            🎁 Executive Recovery Session
+
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">
+            Dear Hip Hop Nominees,
           </h1>
-          
-          <div className="max-w-4xl mx-auto text-lg text-gray-600 dark:text-gray-300 space-y-4">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-6 mb-6 border border-blue-200 dark:border-blue-700">
-              <p className="text-xl font-semibold text-blue-900 dark:text-blue-100 mb-2">
+
+          <div className="max-w-4xl mx-auto text-lg text-gray-600 dark:text-gray-300 space-y-6">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-8 border border-blue-200 dark:border-blue-700">
+              <p className="text-xl text-gray-800 dark:text-gray-200 mb-4">
+                <strong>Congratulations on your nomination! 🎉</strong> As part of this exciting time,
+                Wellnex02 and Midtown Biohack are pleased to extend an exclusive wellness offer to you.
+              </p>
+
+              <p className="text-lg text-gray-700 dark:text-gray-300">
+                We invite you to take advantage of our Executive Recovery session—designed
+                to help you recharge, recover, and perform at your best.
+              </p>
+            </div>
+
+            <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-700">
+              <p className="text-xl font-semibold text-purple-900 dark:text-purple-100 mb-2">
                 Duration: 2.5 Hours • Led by Dr. Chuck Morris, Billy Duc & Ty Cutner
               </p>
-              <p className="text-lg text-blue-800 dark:text-blue-200">
+              <p className="text-lg text-purple-800 dark:text-purple-200">
                 🔑 Reset • Recharge • Perform
               </p>
             </div>
-            
+
             <p className="text-lg font-medium text-gray-800 dark:text-gray-200">
               A luxury, science-based experience to help you feel years younger, sharpen your mind, and unlock peak performance — in just 2.5 hours.
             </p>
