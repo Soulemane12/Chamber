@@ -130,20 +130,20 @@ export default function HipHopBookingPage() {
         <Header />
         
         <main className="py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
-          <div className="bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-900/10 rounded-2xl shadow-2xl overflow-hidden">
-            {/* Header with gradient background */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-12 text-center text-white">
-              <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
+            {/* Header */}
+            <div className="bg-gray-100 dark:bg-gray-700 px-8 py-12 text-center">
+              <div className="w-20 h-20 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-gray-700 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
               
-              <h2 className="text-4xl font-bold mb-4">
+              <h2 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
                 🎉 Executive Recovery Session Booked!
               </h2>
               
-              <p className="text-xl text-blue-100 max-w-2xl mx-auto leading-relaxed">
+              <p className="text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
                 <strong>Congratulations on your Hip Hop nomination!</strong><br/>
                 Thank you for booking your Executive Recovery Session. We'll contact you within 24 hours to confirm your appointment.
               </p>
@@ -152,10 +152,10 @@ export default function HipHopBookingPage() {
             {/* Content section */}
             <div className="p-8">
               {/* Booking Details Card */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-blue-100 dark:border-blue-800 p-8 mb-8">
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-xl shadow-lg border border-gray-200 dark:border-gray-600 p-8 mb-8">
                 <div className="flex items-center mb-6">
-                  <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mr-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded-lg flex items-center justify-center mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
@@ -193,12 +193,12 @@ export default function HipHopBookingPage() {
                 {/* Booked Service */}
                 <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
                   <label className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-4 block">Booked Session</label>
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 rounded-lg border border-blue-200 dark:border-blue-700">
+                  <div className="bg-gray-100 dark:bg-gray-600 p-6 rounded-lg border border-gray-200 dark:border-gray-500">
                     <div className="flex items-center">
                       <span className="text-3xl mr-4">🎤</span>
                       <div>
-                        <h4 className="font-bold text-blue-900 dark:text-blue-100 text-lg">Executive Recovery Session</h4>
-                        <p className="text-blue-700 dark:text-blue-300 text-sm mt-1">Complete 2.5-hour wellness experience with Dr. Chuck Morris, Billy Duc & Ty Cutner</p>
+                        <h4 className="font-bold text-gray-900 dark:text-white text-lg">Executive Recovery Session</h4>
+                        <p className="text-gray-700 dark:text-gray-300 text-sm mt-1">Complete 2.5-hour wellness experience with Dr. Chuck Morris, Billy Duc & Ty Cutner</p>
                       </div>
                     </div>
                   </div>
@@ -206,29 +206,29 @@ export default function HipHopBookingPage() {
               </div>
 
               {/* Contact Information Card */}
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-8 mb-8 border border-blue-200 dark:border-blue-700">
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-8 mb-8 border border-gray-200 dark:border-gray-600">
                 <div className="flex items-center mb-6">
-                  <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mr-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded-lg flex items-center justify-center mr-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </div>
-                  <h4 className="text-xl font-bold text-blue-900 dark:text-blue-100">Contact Information</h4>
+                  <h4 className="text-xl font-bold text-gray-900 dark:text-white">Contact Information</h4>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h5 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">📍 Location</h5>
-                    <p className="text-blue-700 dark:text-blue-300">
+                    <h5 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">📍 Location</h5>
+                    <p className="text-gray-700 dark:text-gray-300">
                       <strong>Midtown Biohack</strong><br/>
                       575 Madison Ave, 23rd floor<br/>
                       New York, NY
                     </p>
                   </div>
                   <div>
-                    <h5 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">💬 Contact</h5>
-                    <p className="text-blue-700 dark:text-blue-300">
+                    <h5 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">💬 Contact</h5>
+                    <p className="text-gray-700 dark:text-gray-300">
                       <strong>Dr. Chuck Morris, Billy Duc & Ty Cutner</strong><br/>
                       Email: billydduc@gmail.com
                     </p>
@@ -237,30 +237,30 @@ export default function HipHopBookingPage() {
               </div>
 
               {/* Next Steps */}
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-8 mb-8 border border-green-200 dark:border-green-700">
-                <h4 className="text-xl font-bold text-green-900 dark:text-green-100 mb-4 flex items-center">
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-8 mb-8 border border-gray-200 dark:border-gray-600">
+                <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
                   <span className="mr-3">✨</span>
                   What Happens Next?
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-3">
                     <div className="flex items-start">
-                      <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5">1</span>
-                      <p className="text-green-800 dark:text-green-200">We'll review your request within 24 hours</p>
+                      <span className="w-6 h-6 bg-gray-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5">1</span>
+                      <p className="text-gray-700 dark:text-gray-300">We'll review your request within 24 hours</p>
                     </div>
                     <div className="flex items-start">
-                      <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5">2</span>
-                      <p className="text-green-800 dark:text-green-200">Dr. Chuck Morris, Billy Duc & Ty Cutner will contact you to confirm your appointment</p>
+                      <span className="w-6 h-6 bg-gray-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5">2</span>
+                      <p className="text-gray-700 dark:text-gray-300">Dr. Chuck Morris, Billy Duc & Ty Cutner will contact you to confirm your appointment</p>
                     </div>
                   </div>
                   <div className="space-y-3">
                     <div className="flex items-start">
-                      <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5">3</span>
-                      <p className="text-green-800 dark:text-green-200">You'll receive final details via email</p>
+                      <span className="w-6 h-6 bg-gray-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5">3</span>
+                      <p className="text-gray-700 dark:text-gray-300">You'll receive final details via email</p>
                     </div>
                     <div className="flex items-start">
-                      <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5">4</span>
-                      <p className="text-green-800 dark:text-green-200">Arrive 15 minutes early for your session</p>
+                      <span className="w-6 h-6 bg-gray-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5">4</span>
+                      <p className="text-gray-700 dark:text-gray-300">Arrive 15 minutes early for your session</p>
                     </div>
                   </div>
                 </div>
@@ -270,7 +270,7 @@ export default function HipHopBookingPage() {
               <div className="text-center">
                 <button 
                   onClick={() => window.location.href = '/'}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-12 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="bg-gray-600 hover:bg-gray-700 text-white px-12 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500"
                 >
                   🏠 Return to Home
                 </button>
@@ -297,7 +297,7 @@ export default function HipHopBookingPage() {
           </h1>
 
           <div className="max-w-4xl mx-auto text-lg text-gray-600 dark:text-gray-300 space-y-6">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-8 border border-blue-200 dark:border-blue-700">
+            <div className="p-8">
               <p className="text-xl text-gray-800 dark:text-gray-200 mb-4">
                 <strong>Congratulations on your nomination! 🎉</strong> As part of this exciting time,
                 Wellnex02 and Midtown Biohack are pleased to extend an exclusive wellness offer to you.
@@ -309,23 +309,23 @@ export default function HipHopBookingPage() {
               </p>
             </div>
 
-            <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-6 border border-purple-200 dark:border-purple-700">
-              <p className="text-xl font-semibold text-purple-900 dark:text-purple-100 mb-2">
+            <div className="p-6">
+              <p className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 🎁 Executive Recovery Session
               </p>
-              <p className="text-lg text-purple-800 dark:text-purple-200 mb-4">
+              <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">
                 Duration: 2.5 Hours • Led by Dr. Chuck Morris, Billy Duc & Ty Cutner
               </p>
-              <p className="text-xl font-semibold text-purple-900 dark:text-purple-100 mb-2">
+              <p className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 🔑 Reset • Recharge • Perform
               </p>
-              <p className="text-lg text-purple-800 dark:text-purple-200">
+              <p className="text-lg text-gray-700 dark:text-gray-300">
                 A luxury, science-based experience to help you feel years younger, sharpen your mind, and unlock peak performance — in just 2.5 hours.
               </p>
             </div>
             
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-6 mb-6 border border-green-200 dark:border-green-700">
-              <p className="text-lg font-semibold text-green-900 dark:text-green-100">
+            <div className="p-6 mb-6">
+              <p className="text-lg font-semibold text-gray-900 dark:text-white">
                 💎 Value: $2,500.00 • 🎤 Gifted to: Nominees of the Hip Hop Hall of Fame
               </p>
             </div>
@@ -348,9 +348,9 @@ export default function HipHopBookingPage() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-6 mb-6 border border-purple-200 dark:border-purple-700">
-              <h3 className="text-xl font-bold text-purple-900 dark:text-purple-100 mb-4">🌟 Why It Matters</h3>
-              <p className="text-purple-800 dark:text-purple-200">
+            <div className="p-6 mb-6">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">🌟 Why It Matters</h3>
+              <p className="text-gray-700 dark:text-gray-300">
                 This is not just recovery — it's a full-system reset. Designed to relieve pain, restore energy, elevate emotional wellness, and sharpen your mental edge so you perform at your highest level.
               </p>
             </div>
