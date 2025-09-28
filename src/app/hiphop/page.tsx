@@ -550,7 +550,7 @@ export default function HipHopBookingPage() {
                   e.currentTarget.style.transform = 'scale(1)';
                 }}
               >
-                {isSubmitting ? "🔄 Submitting Your Booking..." : "🎤 BOOK EXECUTIVE RECOVERY SESSION - FREE"}
+                {isSubmitting ? "🔄 Submitting Your Booking..." : "🎤 BOOK EXECUTIVE RECOVERY SESSION"}
               </button>
               <p style={{
                 color: '#6b7280',
