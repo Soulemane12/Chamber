@@ -316,36 +316,15 @@ export default function HipHopBookingPage() {
               <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">
                 Duration: 2.5 Hours • Led by Dr. Chuck Morris, Billy Duc & Ty Cutner
               </p>
+            </div>
+
+            <div className="p-6">
               <p className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 🔑 Reset • Recharge • Perform
               </p>
               <p className="text-lg text-gray-700 dark:text-gray-300">
                 A luxury, science-based experience to help you feel years younger, sharpen your mind, and unlock peak performance — in just 2.5 hours.
               </p>
-            </div>
-            
-            <div className="p-6 mb-6">
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                💎 Value: $2,500.00 • 🎤 Gifted to: Nominees of the Hip Hop Hall of Fame
-              </p>
-            </div>
-
-            {/* Hip Hop Video Section */}
-            <div className="my-12 text-center">
-              <div className="flex justify-center">
-                <video
-                  width={400}
-                  height={300}
-                  className="rounded-lg shadow-lg"
-                  controls
-                  autoPlay
-                  muted
-                  loop
-                >
-                  <source src="/hiphop.mp4" type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
-              </div>
             </div>
 
             <div className="p-6 mb-6">
@@ -354,9 +333,7 @@ export default function HipHopBookingPage() {
                 This is not just recovery — it's a full-system reset. Designed to relieve pain, restore energy, elevate emotional wellness, and sharpen your mental edge so you perform at your highest level.
               </p>
             </div>
-            
-           
-            
+
             <div className="my-8">
               <button
                 onClick={() => {
@@ -368,15 +345,6 @@ export default function HipHopBookingPage() {
                 🎤 Book Your Executive Recovery Session Now
               </button>
             </div>
-            
-            <p className="text-sm">
-              We look forward to supporting your wellness journey.
-            </p>
-            
-            <p className="font-medium">
-              Best regards,<br/>
-              <span className="text-blue-600 dark:text-blue-400">Dr. Chuck Morris, Billy Duc & Ty Cutner</span>
-            </p>
           </div>
         </div>
 
@@ -385,8 +353,8 @@ export default function HipHopBookingPage() {
           <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-8">
             🧠 What You'll Experience
           </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {services.map((service) => (
               <div key={service.id} className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md border border-gray-200 dark:border-gray-700">
                 <div className="text-4xl mb-4">{service.icon}</div>
@@ -398,6 +366,24 @@ export default function HipHopBookingPage() {
                 </p>
               </div>
             ))}
+          </div>
+
+          {/* Hip Hop Video Section */}
+          <div className="my-12 text-center">
+            <div className="flex justify-center">
+              <video
+                width={400}
+                height={300}
+                className="rounded-lg shadow-lg"
+                controls
+                autoPlay
+                muted
+                loop
+              >
+                <source src="/hiphop.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
           </div>
         </div>
 
@@ -563,8 +549,26 @@ export default function HipHopBookingPage() {
             </div>
           </form>
         </div>
+
+        {/* Value and Signature at Bottom */}
+        <div className="mt-12 text-center">
+          <div className="p-6">
+            <p className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              💎 Value: $2,500.00 • 🎤 Gifted to: Nominees of the Hip Hop Hall of Fame
+            </p>
+
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+              We look forward to supporting your wellness journey.
+            </p>
+
+            <p className="font-medium text-gray-900 dark:text-white">
+              Best regards,<br/>
+              <span className="text-blue-600 dark:text-blue-400">Dr. Chuck Morris, Billy Duc & Ty Cutner</span>
+            </p>
+          </div>
+        </div>
       </main>
-      
+
       <Footer />
     </div>
   );
