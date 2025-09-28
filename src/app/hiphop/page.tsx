@@ -198,7 +198,7 @@ export default function HipHopBookingPage() {
                       <span className="text-3xl mr-4">🎤</span>
                       <div>
                         <h4 className="font-bold text-gray-900 dark:text-white text-lg">Executive Recovery Session</h4>
-                        <p className="text-gray-700 dark:text-gray-300 text-sm mt-1">Complete 2.5-hour wellness experience with Dr. Chuck Morris, Billy Duc & Ty Cutner</p>
+                        <p className="text-gray-700 dark:text-gray-300 text-sm mt-1">Complete 2.5-hour wellness experience with Dr. Chuck Morris</p>
                       </div>
                     </div>
                   </div>
@@ -355,9 +355,7 @@ export default function HipHopBookingPage() {
               </p>
             </div>
             
-            <p className="text-blue-600 dark:text-blue-400 font-semibold">
-              👉 Book your Executive Recovery Session below and begin your journey toward peak performance:
-            </p>
+           
             
             <div className="my-8">
               <button
