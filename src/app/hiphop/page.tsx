@@ -300,7 +300,7 @@ export default function HipHopBookingPage() {
             <div className="p-8">
               <p className="text-xl text-gray-800 dark:text-gray-200 mb-4">
                 <strong>Congratulations on your nomination! 🎉</strong> As part of this exciting time,
-                Wellnex02 and Midtown Biohack are pleased to extend an exclusive wellness offer to you.
+                Wellnex02 and Midtown Biohack are pleased to extend an exclusive complimentary wellness offer to you.
               </p>
 
               <p className="text-lg text-gray-700 dark:text-gray-300">
