@@ -311,10 +311,10 @@ export default function HipHopBookingPage() {
 
             <div className="p-6">
               <p className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                🎁 Executive Recovery Session
+                🎁 Executive Recovery Session - Complimentary
               </p>
               <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">
-                Duration: 2.5 Hours • Led by Dr. Chuck Morris, Billy Duc & Ty Cutner
+                Duration: 2.5 Hours • Led by Dr. Chuck Morris
               </p>
             </div>
 
