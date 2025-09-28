@@ -544,7 +544,7 @@ export default function HipHopBookingPage() {
                 marginTop: '12px',
                 fontWeight: '500'
               }}>
-                ✨ Free for Hip Hop nominees • $2,500 value • Confirmation emails will be sent
+                Confirmation emails will be sent
               </p>
             </div>
           </form>
