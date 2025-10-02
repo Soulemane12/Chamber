@@ -316,6 +316,11 @@ export default function HipHopBookingPage() {
               <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">
                 Duration: 2.5 Hours • Led by Dr. Chuck Morris
               </p>
+              <p className="text-lg text-gray-700 dark:text-gray-300 mb-4">
+                Location: Midtown Biohack<br/>
+                575 Madison Ave 23rd floor<br/>
+                New York, NY 10022
+              </p>
             </div>
 
             <div className="p-6">
