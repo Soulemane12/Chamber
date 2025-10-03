@@ -55,7 +55,7 @@ const services = [
   },
   {
     id: "ifs-session",
-    title: "🧩 IFS Session with Ty Cutner",
+    title: "🧩 IFS Session with Ty Cutner (Optional)",
     description: "Use Internal Family Systems therapy to align mind, emotions, and identity — unlocking clarity, confidence, and deeper purpose.",
     icon: "🧩"
   }

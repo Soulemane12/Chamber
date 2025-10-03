@@ -7,6 +7,47 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY as string,
 );
 
+export async function POST() {
+  try {
+    console.log('Running Hip Hop constraint fix...');
+
+    // Drop the existing constraint
+    const { error: dropError } = await supabase.rpc('execute_sql', {
+      sql: 'ALTER TABLE hip_hop_bookings DROP CONSTRAINT IF EXISTS hip_hop_bookings_service_check;'
+    });
+
+    if (dropError) {
+      console.error('Error dropping constraint:', dropError);
+    }
+
+    // Add the new constraint
+    const { error: addError } = await supabase.rpc('execute_sql', {
+      sql: `ALTER TABLE hip_hop_bookings ADD CONSTRAINT hip_hop_bookings_service_check
+            CHECK (service IN ('hbot', 'electric-exercise', 'pemf', 'nmr', 'nutrition', 'ifs', 'hip-hop-executive-recovery'));`
+    });
+
+    if (addError) {
+      console.error('Error adding constraint:', addError);
+      return NextResponse.json({
+        success: false,
+        error: 'Failed to update constraint: ' + addError.message
+      }, { status: 500 });
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Hip Hop booking constraint updated successfully'
+    });
+
+  } catch (error) {
+    console.error('Error updating constraint:', error);
+    return NextResponse.json({
+      success: false,
+      error: 'Failed to update constraint'
+    }, { status: 500 });
+  }
+}
+
 export async function GET() {
   try {
     // Check if the hip_hop_bookings table exists
@@ -27,12 +68,12 @@ export async function GET() {
 -- Drop the existing constraint
 ALTER TABLE hip_hop_bookings DROP CONSTRAINT IF EXISTS hip_hop_bookings_service_check;
 
--- Add the new constraint that includes 'ifs'
-ALTER TABLE hip_hop_bookings ADD CONSTRAINT hip_hop_bookings_service_check 
-CHECK (service IN ('hbot', 'electric-exercise', 'pemf', 'nmr', 'nutrition', 'ifs'));
+-- Add the new constraint that includes 'ifs' and 'hip-hop-executive-recovery'
+ALTER TABLE hip_hop_bookings ADD CONSTRAINT hip_hop_bookings_service_check
+CHECK (service IN ('hbot', 'electric-exercise', 'pemf', 'nmr', 'nutrition', 'ifs', 'hip-hop-executive-recovery'));
 
 -- Update the comment to reflect the new service option
-COMMENT ON COLUMN hip_hop_bookings.service IS 'Type of wellness service requested: hbot, electric-exercise, pemf, nmr, nutrition, or ifs';
+COMMENT ON COLUMN hip_hop_bookings.service IS 'Type of wellness service requested: hbot, electric-exercise, pemf, nmr, nutrition, ifs, or hip-hop-executive-recovery';
     `;
     
     // Return HTML page with instructions
