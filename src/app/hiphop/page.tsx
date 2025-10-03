@@ -144,7 +144,7 @@ export default function HipHopBookingPage() {
               </h2>
               
               <p className="text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                <strong>Congratulations on your Hip Hop nomination!</strong><br/>
+                <strong>Congratulations on your Hip Hop Honorees!</strong><br/>
                 Thank you for booking your Executive Recovery Session. We'll contact you within 24 hours to confirm your appointment.
               </p>
             </div>
@@ -230,7 +230,9 @@ export default function HipHopBookingPage() {
                     <h5 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">💬 Contact</h5>
                     <p className="text-gray-700 dark:text-gray-300">
                       <strong>Dr. Chuck Morris, Billy Duc & Ty Cutner</strong><br/>
-                      Email: billydduc@gmail.com
+                      Email: b.duc@wellnex02.com
+                      <br/>
+                      Phone: 646-262-8794
                     </p>
                   </div>
                 </div>
@@ -299,7 +301,7 @@ export default function HipHopBookingPage() {
           <div className="max-w-4xl mx-auto text-lg text-gray-600 dark:text-gray-300 space-y-6">
             <div className="p-8">
               <p className="text-xl text-gray-800 dark:text-gray-200 mb-4">
-                <strong>Congratulations on your nomination! 🎉</strong> As part of this exciting time,
+                <strong>Congratulations on your Honorees! 🎉</strong> As part of this exciting time,
                 Wellnex02 and Midtown Biohack are pleased to extend an exclusive complimentary wellness offer to you.
               </p>
 
