@@ -144,7 +144,7 @@ export default function HipHopBookingPage() {
               </h2>
               
               <p className="text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                <strong>Congratulations on your Hip Hop Honorees!</strong><br/>
+                <br/>
                 Thank you for booking your Executive Recovery Session. We'll contact you within 24 hours to confirm your appointment.
               </p>
             </div>
@@ -271,7 +271,7 @@ export default function HipHopBookingPage() {
               {/* Action Button */}
               <div className="text-center">
                 <button 
-                  onClick={() => window.location.href = '/'}
+                  onClick={() => window.location.href = '/hiphop'}
                   className="bg-gray-600 hover:bg-gray-700 text-white px-12 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500"
                 >
                   🏠 Return to Home
