@@ -55,9 +55,9 @@ const services = [
   },
   {
     id: "ifs-session",
-    title: "🧩 IFS Session with Ty Cutner ",
+    title: "🧩 IFS Session with Ty Cutner",
     description: "Use Internal Family Systems therapy to align mind, emotions, and identity — unlocking clarity, confidence, and deeper purpose.",
-    icon: "🧩(Optional)"
+    icon: "🧩"
   }
 ];
 
@@ -301,7 +301,7 @@ export default function HipHopBookingPage() {
           <div className="max-w-4xl mx-auto text-lg text-gray-600 dark:text-gray-300 space-y-6">
             <div className="p-8">
               <p className="text-xl text-gray-800 dark:text-gray-200 mb-4">
-                <strong>Congratulations on your Honorees! 🎉</strong> As part of this exciting time,
+                <strong>Congratulations on being Honored by the Hip Hop Museum 🎉</strong> As part of this exciting time,
                 Wellnex02 and Midtown Biohack are pleased to extend an exclusive complimentary wellness offer to you.
               </p>
 
@@ -364,7 +364,14 @@ export default function HipHopBookingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {services.map((service) => (
               <div key={service.id} className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md border border-gray-200 dark:border-gray-700">
-                <div className="text-4xl mb-4">{service.icon}</div>
+                <div className="text-4xl mb-4 flex items-center gap-2">
+                  {service.icon}
+                  {service.id === "ifs-session" && (
+                    <span className="text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded-full">
+                      Optional
+                    </span>
+                  )}
+                </div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
                   {service.title}
                 </h3>
