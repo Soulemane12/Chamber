@@ -323,8 +323,8 @@ export default function HipHopBookingPage() {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
       {/* Congratulations Modal */}
       {showCongratulations && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
-          <div className="bg-white bg-opacity-95 dark:bg-gray-800 dark:bg-opacity-95 rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl transform animate-bounce pointer-events-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-lg flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl transform animate-bounce">
             <div className="text-6xl mb-4">🎉</div>
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
               CONGRATULATIONS!
