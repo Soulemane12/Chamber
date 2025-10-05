@@ -95,7 +95,7 @@ export async function POST(request: Request) {
           <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">Dear ${bookingData.firstName},</p>
           
           <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
-            <strong>Congratulations on being honored by the hip hop museum!</strong> 🎉
+            <strong>Congratulations honoree of the hip hop museum!</strong> 🎉
           </p>
           
           <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
