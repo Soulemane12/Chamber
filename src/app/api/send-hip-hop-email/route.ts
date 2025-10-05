@@ -83,7 +83,7 @@ export async function POST(request: Request) {
     const userMailOptions = {
       from: '"Wellnex02 Hip Hop Program" <billydduc@gmail.com>',
       to: bookingData.email,
-      subject: 'Hip Hop Nominee Wellness Session - Booking Request Received',
+      subject: 'Hip hop Honoree wellness booking request',
       replyTo: 'billydduc@gmail.com',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
           <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">Dear ${bookingData.firstName},</p>
           
           <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
-            <strong>Congratulations on your Hip Hop Honorees!</strong> 🎉
+            <strong>Congratulations on being honored by the hip hop museum!</strong> 🎉
           </p>
           
           <p style="color: #4b5563; font-size: 16px; line-height: 1.6;">
@@ -176,7 +176,7 @@ export async function POST(request: Request) {
     const adminMailOptions = {
       from: '"Wellnex02 Hip Hop Program" <billydduc@gmail.com>',
       to: 'billydduc@gmail.com',
-      subject: 'New Hip Hop Nominee Booking Request',
+      subject: 'Hip hop Honoree wellness booking request',
       replyTo: 'billydduc@gmail.com',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">

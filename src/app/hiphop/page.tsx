@@ -292,13 +292,13 @@ export default function HipHopBookingPage() {
         <div className="text-center mb-12">
 
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">
-            Dear Hip Hop Honorees,
+            Dear Hip Hop Honoree,
           </h1>
 
           <div className="max-w-4xl mx-auto text-lg text-gray-600 dark:text-gray-300 space-y-6">
             <div className="p-8">
               <p className="text-xl text-gray-800 dark:text-gray-200 mb-4">
-                <strong>Congratulations on being Honored by the Hip Hop Museum 🎉</strong> As part of this exciting time,
+                <strong>Congratulations on being honored by the hip hop museum 🎉</strong> As part of this exciting time,
                 Wellnex02 and Midtown Biohack are pleased to extend an exclusive complimentary wellness offer to you.
               </p>
 
