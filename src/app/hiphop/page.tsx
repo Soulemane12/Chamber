@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/Button";
 import { useForm } from "react-hook-form";
@@ -127,7 +126,6 @@ export default function HipHopBookingPage() {
   if (bookingComplete && bookingDetails) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
-        <Header />
         
         <main className="py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl overflow-hidden">
@@ -288,7 +286,6 @@ export default function HipHopBookingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
-      <Header />
       
       <main className="py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
         {/* Hero Section */}
