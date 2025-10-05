@@ -81,42 +81,37 @@ export default function HipHopBookingPage() {
     resolver: zodResolver(hipHopBookingSchema),
   });
 
-  // Congratulations effect on first visit
+  // Congratulations effect on every visit
   useEffect(() => {
-    const hasVisited = localStorage.getItem('hiphop-visited');
-    if (!hasVisited) {
-      // Show congratulations modal after a short delay
+    // Show congratulations modal after a short delay
+    setTimeout(() => {
+      setShowCongratulations(true);
+      // Trigger confetti
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+
+      // Additional confetti bursts
       setTimeout(() => {
-        setShowCongratulations(true);
-        // Trigger confetti
         confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
+          particleCount: 50,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 }
         });
+      }, 250);
 
-        // Additional confetti bursts
-        setTimeout(() => {
-          confetti({
-            particleCount: 50,
-            angle: 60,
-            spread: 55,
-            origin: { x: 0 }
-          });
-        }, 250);
-
-        setTimeout(() => {
-          confetti({
-            particleCount: 50,
-            angle: 120,
-            spread: 55,
-            origin: { x: 1 }
-          });
-        }, 400);
-
-        localStorage.setItem('hiphop-visited', 'true');
-      }, 1000);
-    }
+      setTimeout(() => {
+        confetti({
+          particleCount: 50,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 }
+        });
+      }, 400);
+    }, 1000);
   }, []);
 
 
@@ -328,8 +323,8 @@ export default function HipHopBookingPage() {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
       {/* Congratulations Modal */}
       {showCongratulations && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl transform animate-bounce">
+        <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+          <div className="bg-white bg-opacity-95 dark:bg-gray-800 dark:bg-opacity-95 rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl transform animate-bounce pointer-events-auto">
             <div className="text-6xl mb-4">🎉</div>
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
               CONGRATULATIONS!
