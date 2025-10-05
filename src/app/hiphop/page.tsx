@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/Button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { format } from "date-fns";
+import confetti from "canvas-confetti";
 
 // Form validation schema
 const hipHopBookingSchema = z.object({
@@ -69,6 +70,7 @@ export default function HipHopBookingPage() {
   const [bookingComplete, setBookingComplete] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingDetails, setBookingDetails] = useState<HipHopBookingData | null>(null);
+  const [showCongratulations, setShowCongratulations] = useState(false);
 
   const {
     register,
@@ -78,6 +80,44 @@ export default function HipHopBookingPage() {
   } = useForm<HipHopBookingData>({
     resolver: zodResolver(hipHopBookingSchema),
   });
+
+  // Congratulations effect on first visit
+  useEffect(() => {
+    const hasVisited = localStorage.getItem('hiphop-visited');
+    if (!hasVisited) {
+      // Show congratulations modal after a short delay
+      setTimeout(() => {
+        setShowCongratulations(true);
+        // Trigger confetti
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+
+        // Additional confetti bursts
+        setTimeout(() => {
+          confetti({
+            particleCount: 50,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 }
+          });
+        }, 250);
+
+        setTimeout(() => {
+          confetti({
+            particleCount: 50,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 }
+          });
+        }, 400);
+
+        localStorage.setItem('hiphop-visited', 'true');
+      }, 1000);
+    }
+  }, []);
 
 
   const onSubmit = async (data: HipHopBookingData) => {
@@ -286,7 +326,30 @@ export default function HipHopBookingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
-      
+      {/* Congratulations Modal */}
+      {showCongratulations && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl transform animate-bounce">
+            <div className="text-6xl mb-4">🎉</div>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+              CONGRATULATIONS!
+            </h2>
+            <p className="text-lg text-gray-700 dark:text-gray-300 mb-6">
+              You've been honored by the Hip Hop Museum!
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+              🌟 You deserve this amazing wellness experience! 🌟
+            </p>
+            <button
+              onClick={() => setShowCongratulations(false)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            >
+              Let's Get Started! 🚀
+            </button>
+          </div>
+        </div>
+      )}
+
       <main className="py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
         {/* Hero Section */}
         <div className="text-center mb-12">
