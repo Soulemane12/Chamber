@@ -88,7 +88,7 @@ export async function POST(request: Request) {
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
           <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #7c3aed; text-align: center; margin-bottom: 10px;">🎤 Hip Hop Nominee Wellness Booking</h1>
+            <h1 style="color: #7c3aed; text-align: center; margin-bottom: 10px;">🎤 Wellness Booking</h1>
             <div style="width: 50px; height: 3px; background: linear-gradient(90deg, #7c3aed, #a855f7); margin: 0 auto;"></div>
           </div>
           
