@@ -285,7 +285,7 @@ export default function HipHopBookingPage() {
                     </div>
                     <div className="flex items-start">
                       <span className="w-6 h-6 bg-gray-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3 mt-0.5">2</span>
-                      <p className="text-gray-700 dark:text-gray-300">Dr. Chuck Morris, Billy Duc & Ty Cutner will contact you to confirm your appointment</p>
+                      <p className="text-gray-700 dark:text-gray-300">A team member will contact you to confirm your appointment</p>
                     </div>
                   </div>
                   <div className="space-y-3">
