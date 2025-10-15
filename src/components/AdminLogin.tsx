@@ -57,7 +57,7 @@ export default function AdminLogin({ onLogin }: AdminLoginProps) {
                 Logging in...
               </>
             ) : (
-              "Login"
+              "Continue"
             )}
           </button>
         </form>
