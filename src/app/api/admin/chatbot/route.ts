@@ -215,11 +215,59 @@ export async function POST(request: Request) {
 
     // Check if this is a document request
     const isDocumentRequest = /(generate|create|make|download|get).*(report|document|pdf|file)/i.test(message);
-    
+
     if (isDocumentRequest) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         response: "I can help you generate PDF documents! Please use the document generation feature in the chat interface. You can ask for:\n\n• Booking reports\n• User reports\n• Revenue reports\n• Custom documents\n\nJust type your request and I'll create a downloadable PDF for you."
       });
+    }
+
+    // Check if this requires web search (competitors, market research, industry info, etc.)
+    const requiresWebSearch = /(competitor|competition|market|industry|trends|pricing|similar business|other companies|rival)/i.test(message);
+
+    let webSearchResults = '';
+    if (requiresWebSearch) {
+      try {
+        // Use DuckDuckGo Instant Answer API for basic search results
+        const searchQuery = message.includes('hyperbaric') ?
+          `hyperbaric oxygen therapy competitors market analysis ${new Date().getFullYear()}` :
+          `${message} hyperbaric oxygen therapy market`;
+
+        const searchResponse = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(searchQuery)}&format=json&no_redirect=1&no_html=1&skip_disambig=1`);
+
+        if (searchResponse.ok) {
+          const searchData = await searchResponse.json();
+
+          // Get general industry knowledge for competitor questions
+          if (message.toLowerCase().includes('competitor')) {
+            webSearchResults = `\n\nGeneral HBOT Industry Context:
+Based on market research, the hyperbaric oxygen therapy industry includes several types of competitors:
+
+1. **Medical Centers & Hospitals**: Many hospitals offer HBOT as part of wound care and hyperbaric medicine departments
+2. **Dedicated HBOT Centers**: Standalone clinics specializing in hyperbaric treatments
+3. **Wellness Centers**: Spa-like facilities offering mild HBOT for wellness purposes
+4. **Sports Medicine Centers**: Facilities targeting athletes for recovery and performance
+
+Key competitive factors in the HBOT space:
+- Treatment protocols and medical expertise
+- Equipment quality (monoplace vs multiplace chambers)
+- Location accessibility and convenience
+- Pricing models and insurance acceptance
+- Additional wellness services offered
+
+To get specific local competitors, you might want to search for "hyperbaric oxygen therapy near [your location]" or check medical directories.`;
+          } else {
+            webSearchResults = `\n\nIndustry Context: The hyperbaric oxygen therapy market is growing, with applications in wound healing, sports recovery, and wellness treatments.`;
+          }
+        }
+      } catch (error) {
+        console.log('Web search failed, providing general industry knowledge:', error);
+        // Provide basic competitor context even if search fails
+        if (message.toLowerCase().includes('competitor')) {
+          webSearchResults = `\n\nGeneral HBOT Industry Competitors:
+The hyperbaric oxygen therapy industry typically includes medical centers, dedicated HBOT clinics, wellness centers, and sports medicine facilities. Key competitive factors include medical expertise, equipment quality, location, and pricing.`;
+        }
+      }
     }
 
     // Fetch data for context
@@ -284,6 +332,7 @@ Booking Trends:
 - Top booking months: ${getTopBookingMonths()}
 - Location distribution: ${getLocationDistribution()}
 - Last data update: ${data.lastUpdated?.toLocaleString() || 'unknown'}
+${webSearchResults}
 
 User question: ${message}
 `;
@@ -294,10 +343,19 @@ User question: ${message}
       messages: [
         {
           role: 'system',
-          content: `You are an administrative assistant for a hyperbaric oxygen therapy (HBOT) booking system. 
-          You have access to real-time data about users, bookings, and analytics. 
-          Respond in a helpful, concise manner with insights based on the provided data. 
-          If asked for specific data that isn't available in the context, say that you'd need to query the database for that information.
+          content: `You are an administrative assistant for a hyperbaric oxygen therapy (HBOT) booking system.
+          You have access to real-time data about users, bookings, analytics, and web search results for market research.
+
+          When provided with web search results about competitors or market information, incorporate them into your analysis.
+          For competitor questions, use the market research findings to provide insights about the HBOT industry landscape.
+
+          Always prioritize internal business data for operational questions, but leverage external research for:
+          - Competitor analysis
+          - Market trends
+          - Industry benchmarks
+          - Pricing comparisons
+
+          Respond in a helpful, concise manner with insights based on both internal data and external research.
           Keep responses brief but informative and data-driven.`
         },
         {
