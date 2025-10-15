@@ -30,19 +30,11 @@ export default function AdminDashboard() {
               <AdminStats />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  Recent Bookings
-                </h3>
-                <BookingsTable />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  AI Assistant
-                </h3>
-                <ChatBot />
-              </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Recent Bookings
+              </h3>
+              <BookingsTable />
             </div>
           </div>
         );
