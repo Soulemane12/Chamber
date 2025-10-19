@@ -29,93 +29,30 @@ export default function AdminDashboard() {
     { id: 'chat' as TabType, name: 'AI Assistant', icon: '🤖' },
   ];
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'overview':
-        return (
-          <div className="space-y-8">
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                Dashboard Overview
-              </h2>
-              <AdminStats />
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Recent Bookings
-              </h3>
-              <BookingsTable />
-            </div>
-          </div>
-        );
-      case 'bookings':
-        return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Bookings Management
-              </h2>
-            </div>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-              <BookingsTable />
-            </div>
-          </div>
-        );
-      case 'users':
-        return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Users Management
-              </h2>
-            </div>
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-              <UsersList />
-            </div>
-          </div>
-        );
-      case 'chat':
-        return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                AI Assistant
-              </h2>
-            </div>
-            <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-              <ChatBot />
-            </div>
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
 
   return (
     <div className="space-y-8">
       {/* Summary Statistics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard
-          title="Dashboard"
-          value="Active"
-          subtitle="System operational"
+          title="Total Bookings"
+          value="N/A"
+          subtitle="All time"
         />
         <StatCard
-          title="Total Tabs"
-          value="4"
-          subtitle="Overview, Bookings, Users, Chat"
+          title="Average Booking Value"
+          value="N/A"
+          subtitle="Last updated: N/A"
         />
         <StatCard
-          title="Current Tab"
-          value={tabs.find(tab => tab.id === activeTab)?.name || ""}
-          subtitle="Currently viewing"
+          title="Users"
+          value="N/A"
+          subtitle="Total registered users"
         />
         <StatCard
-          title="Status"
-          value="Online"
-          subtitle="All systems operational"
+          title="Active Sessions"
+          value="0"
+          subtitle="Currently running"
         />
       </div>
 
@@ -152,7 +89,6 @@ export default function AdminDashboard() {
               }`}
               onClick={() => setActiveTab(tab.id)}
             >
-              <span className="mr-2">{tab.icon}</span>
               {tab.name}
             </button>
           ))}
@@ -160,9 +96,62 @@ export default function AdminDashboard() {
       </div>
 
       {/* Tab Content */}
-      <div className="animate-fade-in">
-        {renderTabContent()}
-      </div>
+      {activeTab === 'overview' && (
+        <div className="space-y-8">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              Dashboard Overview
+            </h2>
+            <AdminStats />
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Recent Bookings
+            </h3>
+            <BookingsTable />
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'bookings' && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Bookings Management
+            </h2>
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            <BookingsTable />
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'users' && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              Users Management
+            </h2>
+          </div>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            <UsersList />
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'chat' && (
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              AI Assistant
+            </h2>
+          </div>
+          <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            <ChatBot />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
