@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminStats from "./admin/AdminStats";
 import ChatBot from "./admin/ChatBot";
 import BookingsTable from "./admin/BookingsTable";
 import UsersList from "./admin/UsersList";
+import AdminChatbot from "./AdminChatbot";
 
 // StatCard component for summary statistics
 function StatCard({ title, value, subtitle }: { title: string, value: string | number, subtitle?: string }) {
@@ -21,6 +22,14 @@ type TabType = 'overview' | 'bookings' | 'users' | 'chat';
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
+  const [summaryStats, setSummaryStats] = useState({
+    totalBookings: 0,
+    averageBookingValue: 0,
+    totalUsers: 0,
+    activeSessions: 0
+  });
+  const [loading, setLoading] = useState(true);
+  const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
 
   const tabs = [
     { id: 'overview' as TabType, name: 'Overview', icon: '📊' },
@@ -29,6 +38,59 @@ export default function AdminDashboard() {
     { id: 'chat' as TabType, name: 'AI Assistant', icon: '🤖' },
   ];
 
+  useEffect(() => {
+    fetchSummaryStats();
+  }, []);
+
+  const fetchSummaryStats = async () => {
+    try {
+      setLoading(true);
+
+      // Fetch booking stats
+      const bookingResponse = await fetch('/api/admin/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ type: 'summary' }),
+      });
+
+      let bookingStats = { totalBookings: 0, averageBookingValue: 0 };
+      if (bookingResponse.ok) {
+        const bookingData = await bookingResponse.json();
+        bookingStats = bookingData.data || bookingStats;
+      }
+
+      // Fetch user count
+      const userResponse = await fetch('/api/admin/users');
+      let userCount = 0;
+      if (userResponse.ok) {
+        const userData = await userResponse.json();
+        userCount = Array.isArray(userData) ? userData.length : 0;
+      }
+
+      setSummaryStats({
+        totalBookings: bookingStats.totalBookings,
+        averageBookingValue: bookingStats.averageBookingValue,
+        totalUsers: userCount,
+        activeSessions: 0 // Keep as 0 for now
+      });
+
+      setLastRefreshed(new Date());
+    } catch (error) {
+      console.error('Error fetching summary stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
+  };
+
 
   return (
     <div className="space-y-8">
@@ -36,22 +98,22 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard
           title="Total Bookings"
-          value="N/A"
+          value={loading ? "Loading..." : summaryStats.totalBookings.toLocaleString()}
           subtitle="All time"
         />
         <StatCard
           title="Average Booking Value"
-          value="N/A"
-          subtitle="Last updated: N/A"
+          value={loading ? "Loading..." : formatCurrency(summaryStats.averageBookingValue)}
+          subtitle={`Last updated: ${lastRefreshed.toLocaleTimeString()}`}
         />
         <StatCard
           title="Users"
-          value="N/A"
+          value={loading ? "Loading..." : summaryStats.totalUsers.toLocaleString()}
           subtitle="Total registered users"
         />
         <StatCard
           title="Active Sessions"
-          value="0"
+          value={summaryStats.activeSessions}
           subtitle="Currently running"
         />
       </div>
@@ -152,6 +214,9 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+
+      {/* Floating AI Assistant */}
+      <AdminChatbot mode="floating" />
     </div>
   );
 }
