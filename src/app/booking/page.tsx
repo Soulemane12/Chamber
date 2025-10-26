@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
-import { BookingForm, BookingFormData } from "@/components/BookingForm";
+import { BookingForm, BookingCompletionData } from "@/components/BookingForm";
 import { AssessmentForm, AssessmentFormData } from "@/components/AssessmentForm";
 import { supabase } from "@/lib/supabaseClient";
 import { useLanguage } from "@/lib/LanguageContext";
@@ -47,7 +47,7 @@ const getLocationData = (location: string) => {
 export default function BookingPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
-  const [bookingDetails, setBookingDetails] = useState<BookingFormData | null>(null);
+  const [bookingDetails, setBookingDetails] = useState<BookingCompletionData | null>(null);
   const [showAssessment, setShowAssessment] = useState(false);
   const [assessmentComplete, setAssessmentComplete] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -77,7 +77,7 @@ export default function BookingPage() {
     checkAuth();
   }, []);
 
-  const handleBookingComplete = (data: BookingFormData) => {
+  const handleBookingComplete = (data: BookingCompletionData) => {
     setBookingDetails(data);
     setShowAssessment(true);
     window.scrollTo(0, 0);
@@ -159,6 +159,7 @@ export default function BookingPage() {
               <div className="w-full max-w-4xl mx-auto">
                 <AssessmentForm
                   onAssessmentComplete={handleAssessmentComplete}
+                  bookingId={bookingDetails?.bookingId}
                   autoFillDate={bookingDetails?.date}
                   autoFillTime={bookingDetails?.time}
                   autoFillFirstName={bookingDetails?.firstName}
