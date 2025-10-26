@@ -54,7 +54,7 @@ export async function GET(request: Request) {
       query = query.lte('date', endDate);
     }
     
-    if (location && (location === 'midtown' || location === 'conyers')) {
+    if (location && location === 'atmos') {
       query = query.eq('location', location);
     }
     
@@ -361,12 +361,11 @@ export async function POST(request: Request) {
       
       case 'byLocation': {
         const bookingsByLocation: Record<string, number> = {
-          midtown: 0,
-          conyers: 0
+          atmos: 0
         };
         
         bookings.forEach(booking => {
-          if (booking.location === 'midtown' || booking.location === 'conyers') {
+          if (booking.location === 'atmos') {
             bookingsByLocation[booking.location] += 1;
           }
         });
@@ -416,5 +415,88 @@ export async function POST(request: Request) {
       error: 'Error occurred',
       message: 'Failed to process analytics request'
     }, { status: 500 });
+  }
+}
+
+// Update booking status and chamber assignment
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json();
+    const { id, status, chamber_id, session_notes, cancelled_reason, ...updateData } = body;
+    
+    if (!id) {
+      return NextResponse.json({ error: 'Missing booking ID' }, { status: 400 });
+    }
+    
+    // Prepare update data with timestamps for status changes
+    const finalUpdateData: any = { ...updateData };
+    
+    if (status !== undefined) {
+      finalUpdateData.status = status;
+      
+      // Add timestamps for status changes
+      if (status === 'completed') {
+        finalUpdateData.completed_at = new Date().toISOString();
+      } else if (status === 'cancelled') {
+        finalUpdateData.cancelled_at = new Date().toISOString();
+        if (cancelled_reason) {
+          finalUpdateData.cancelled_reason = cancelled_reason;
+        }
+      }
+    }
+    
+    if (chamber_id !== undefined) {
+      finalUpdateData.chamber_id = chamber_id;
+    }
+    
+    if (session_notes !== undefined) {
+      finalUpdateData.session_notes = session_notes;
+    }
+    
+    const { data, error } = await supabase
+      .from('bookings')
+      .update(finalUpdateData)
+      .eq('id', id)
+      .select(`
+        *,
+        chambers (
+          id,
+          name,
+          description,
+          status,
+          location,
+          capacity
+        )
+      `)
+      .single();
+    
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    
+    return NextResponse.json({ data });
+  } catch (error) {
+    console.error('Error updating booking:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+// Bulk delete bookings
+export async function DELETE(request: Request) {
+  try {
+    const body = await request.json();
+    const ids: string[] = body.ids;
+    if (!ids || ids.length === 0) {
+      return NextResponse.json({ error: 'No ids provided' }, { status: 400 });
+    }
+    const { error } = await supabase.from('bookings').delete().in('id', ids);
+    if (error) {
+      console.error('Delete error', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: 'Unexpected error' }, { status: 500 });
   }
 } 
