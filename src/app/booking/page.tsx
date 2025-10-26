@@ -159,7 +159,7 @@ export default function BookingPage() {
               <div className="w-full max-w-4xl mx-auto">
                 <AssessmentForm
                   onAssessmentComplete={handleAssessmentComplete}
-                  bookingId={bookingDetails?.bookingId}
+                  bookingId={bookingDetails?.bookingId ?? bookingDetails?.id}
                   autoFillDate={bookingDetails?.date}
                   autoFillTime={bookingDetails?.time}
                   autoFillFirstName={bookingDetails?.firstName}

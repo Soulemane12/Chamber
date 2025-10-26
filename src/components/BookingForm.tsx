@@ -49,6 +49,7 @@ const bookingSchema = z.object({
 export type BookingFormData = z.infer<typeof bookingSchema>;
 export type BookingCompletionData = BookingFormData & {
   bookingId?: string;
+  id?: string;
 };
 
 // Simulated time slots
@@ -506,10 +507,13 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         // Continue with booking even if email fails
       }
       
+      const insertedId = Array.isArray(result) && result[0]?.id ? String(result[0].id) : undefined;
+
       // Complete booking regardless of email success
       onBookingComplete({
         ...data,
-        bookingId: Array.isArray(result) && result[0]?.id ? String(result[0].id) : undefined,
+        bookingId: insertedId,
+        id: insertedId,
       });
     } catch (error) {
       console.error("Booking failed", error);

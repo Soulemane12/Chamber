@@ -41,7 +41,7 @@ export function AssessmentForm({ onAssessmentComplete, bookingId, autoFillDate, 
   // Parse auto-filled time if provided
   const parseAutoFillTime = () => {
     if (!autoFillTime) return { hour: "12", minutes: "00", ampm: "PM" as "AM" | "PM" };
-
+    
     // Parse time like "9:00 AM" or "2:30 PM"
     const timeMatch = autoFillTime.match(/(\d+):(\d+)\s*(AM|PM)/i);
     if (timeMatch) {
@@ -88,7 +88,7 @@ export function AssessmentForm({ onAssessmentComplete, bookingId, autoFillDate, 
     try {
       // Get current user session
       const { data: { session } } = await supabase.auth.getSession();
-
+      
       // Prepare the assessment data
       const assessmentData = {
         user_id: session?.user?.id || null,
