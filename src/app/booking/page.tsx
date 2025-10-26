@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { BookingForm, BookingFormData } from "@/components/BookingForm";
+import { AssessmentForm, AssessmentFormData } from "@/components/AssessmentForm";
 import { supabase } from "@/lib/supabaseClient";
 import { useLanguage } from "@/lib/LanguageContext";
 import { formatCurrency } from "@/lib/utils";
@@ -47,6 +48,8 @@ export default function BookingPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
   const [bookingDetails, setBookingDetails] = useState<BookingFormData | null>(null);
+  const [showAssessment, setShowAssessment] = useState(false);
+  const [assessmentComplete, setAssessmentComplete] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { t } = useLanguage();
 
@@ -76,8 +79,14 @@ export default function BookingPage() {
 
   const handleBookingComplete = (data: BookingFormData) => {
     setBookingDetails(data);
-    setBookingComplete(true);
+    setShowAssessment(true);
     window.scrollTo(0, 0);
+  };
+
+  const handleAssessmentComplete = (data: AssessmentFormData) => {
+    setAssessmentComplete(true);
+    setShowAssessment(false);
+    setBookingComplete(true);
   };
 
   if (isLoading) {
@@ -117,7 +126,7 @@ export default function BookingPage() {
             {t('bookingSubtitle')}
           </p>
           
-          {!isAuthenticated && !bookingComplete && (
+          {!isAuthenticated && !bookingComplete && !showAssessment && (
             <div className="mt-4 p-4 bg-amber-50 border border-amber-200 dark:bg-amber-900/20 dark:border-amber-800 rounded-lg">
               <div className="flex items-start">
                 <div className="flex-shrink-0">
@@ -136,7 +145,29 @@ export default function BookingPage() {
           )}
         </div>
 
-        {bookingComplete ? (
+        {bookingDetails && !bookingComplete ? (
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 mb-8 animate-scale-in">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white animate-fade-in animate-delay-100">Complete Your Assessment</h2>
+              <p className="text-gray-600 dark:text-gray-300 mt-2 animate-fade-in animate-delay-200">
+                Please complete a quick wellness assessment before confirming your booking
+              </p>
+            </div>
+
+            {/* Assessment Form Section */}
+            {showAssessment && !assessmentComplete && (
+              <div className="w-full max-w-4xl mx-auto">
+                <AssessmentForm
+                  onAssessmentComplete={handleAssessmentComplete}
+                  autoFillDate={bookingDetails?.date}
+                  autoFillTime={bookingDetails?.time}
+                  autoFillFirstName={bookingDetails?.firstName}
+                  autoFillLastName={bookingDetails?.lastName}
+                />
+              </div>
+            )}
+          </div>
+        ) : bookingComplete ? (
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-8 mb-8 animate-scale-in">
             <div className="text-center mb-6">
               <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4 animate-scale-in">
