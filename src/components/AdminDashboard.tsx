@@ -221,7 +221,7 @@ export default function AdminDashboard() {
   // State for booking data
   const [bookingsByTime, setBookingsByTime] = useState<Record<string, number>>({});
   const [bookingsByDemographic, setBookingsByDemographic] = useState<Record<string, number>>({});
-  const [averageBookings, setAverageBookings] = useState<{atmos: number}>({atmos: 0});
+  const [averageBookings, setAverageBookings] = useState<{midtown: number, conyers: number}>({midtown: 0, conyers: 0});
 
   
   // -------------------------------------------------
@@ -1044,7 +1044,7 @@ export default function AdminDashboard() {
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Average Bookings by Location</h3>
               <div className="relative">
-                {(!averageBookings || (averageBookings.atmos === 0)) && !bookingsLoading ? (
+                {(!averageBookings || (averageBookings.midtown === 0 && averageBookings.conyers === 0)) && !bookingsLoading ? (
                   <p className="text-center text-gray-500 dark:text-gray-400 py-10">No location data available</p>
                 ) : (
                   <div className={`transition-opacity duration-300 ${averageBookings ? 'opacity-100' : 'opacity-0'}`}>
@@ -1124,7 +1124,8 @@ export default function AdminDashboard() {
                   onChange={(e) => setBookingsLocation(e.target.value)}
                 >
                   <option value="">All Locations</option>
-                  <option value="atmos">ATMOS Hyperbaric</option>
+                  <option value="midtown">Midtown Location</option>
+                  <option value="conyers">Conyers Location</option>
                 </select>
               </div>
 
@@ -1336,8 +1337,14 @@ export default function AdminDashboard() {
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200`}>
-                            ATMOS Hyperbaric
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            booking.location === 'midtown' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                            booking.location === 'conyers' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
+                            'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                          }`}>
+                            {booking.location === 'midtown' ? 'Midtown Location' :
+                             booking.location === 'conyers' ? 'Conyers Location' :
+                             booking.location || 'Unknown Location'}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900 dark:text-white">

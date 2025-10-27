@@ -54,7 +54,7 @@ export async function GET(request: Request) {
       query = query.lte('date', endDate);
     }
     
-    if (location && location === 'atmos') {
+    if (location && (location === 'midtown' || location === 'conyers')) {
       query = query.eq('location', location);
     }
     
@@ -361,15 +361,16 @@ export async function POST(request: Request) {
       
       case 'byLocation': {
         const bookingsByLocation: Record<string, number> = {
-          atmos: 0
+          midtown: 0,
+          conyers: 0
         };
-        
+
         bookings.forEach(booking => {
-          if (booking.location === 'atmos') {
+          if (booking.location === 'midtown' || booking.location === 'conyers') {
             bookingsByLocation[booking.location] += 1;
           }
         });
-        
+
         return NextResponse.json({ data: bookingsByLocation });
       }
       
