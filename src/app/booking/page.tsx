@@ -188,7 +188,7 @@ export default function BookingPage() {
             <div className="flex justify-center mb-6 animate-fade-in animate-delay-200">
               <div className="relative w-full max-w-md h-48 md:h-64 overflow-hidden rounded-lg">
                 <Image
-                  src={bookingDetails?.location === "midtown" ? "/HBOT.jpg" : "/People_HBOT.jpg"}
+                  src={bookingDetails?.location === "midtown" ? "/HBOT.png" : "/People_HBOT.png"}
                   alt="Hyperbaric Chamber"
                   fill
                   className="object-cover"

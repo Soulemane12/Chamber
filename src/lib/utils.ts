@@ -60,7 +60,7 @@ export const locationData = {
       saturday: "10:00 AM - 4:00 PM",
       sunday: "Closed"
     },
-    imageUrl: "/HBOT.jpg"
+    imageUrl: "/HBOT.png"
   },
   conyers: {
     name: "Platinum Wellness Spa",
@@ -85,7 +85,7 @@ export const locationData = {
       saturday: "10:00 AM - 4:00 PM",
       sunday: "Closed"
     },
-    imageUrl: "/People_HBOT.jpg"
+    imageUrl: "/People_HBOT.png"
   }
 };
 
