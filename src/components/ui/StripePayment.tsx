@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import {
   Elements,
@@ -9,10 +9,7 @@ import {
   useElements
 } from '@stripe/react-stripe-js';
 import { Button } from './Button';
-
-const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
-  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
-  : null;
+import { useStripePublishableKey } from '@/hooks/useStripeConfig';
 
 interface PaymentFormProps {
   clientSecret: string;
@@ -71,7 +68,6 @@ function PaymentForm({ clientSecret, onPaymentSuccess, onPaymentError, amount, c
       allButtons.forEach((button) => {
         const element = button as HTMLElement;
         const text = element.textContent || '';
-        const innerHTML = element.innerHTML || '';
         
         // VERY SPECIFIC targeting - only remove if it has the exact unwanted text
         const hasExactCompleteBooking = text.includes('Complete Booking') && text.includes('$');
@@ -388,6 +384,14 @@ export function StripePayment({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Get location-specific publishable key
+  const publishableKey = useStripePublishableKey(location);
+
+  // Create location-specific Stripe promise
+  const stripePromise = useMemo(() => {
+    return publishableKey ? loadStripe(publishableKey) : null;
+  }, [publishableKey]);
+
   useEffect(() => {
     // Create PaymentIntent as soon as the page loads
     fetch('/api/stripe/create-payment-intent', {
@@ -442,7 +446,7 @@ export function StripePayment({
   if (!stripePromise) {
     return (
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p className="text-red-700">Stripe is not configured. Please contact support.</p>
+        <p className="text-red-700">Stripe is not configured for location: {location}. Please contact support.</p>
       </div>
     );
   }

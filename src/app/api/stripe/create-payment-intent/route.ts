@@ -1,21 +1,6 @@
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
 import { isPromotionActive, getPromotionPricing } from '@/lib/utils';
-
-// Initialize Stripe only when needed
-const getStripe = () => {
-  // Try to get the secret key from environment or use a fallback
-  const secretKey = process.env.STRIPE_SECRET_KEY;
-  
-  if (!secretKey) {
-    console.error('STRIPE_SECRET_KEY is not configured. Available env vars:', Object.keys(process.env).filter(key => key.includes('STRIPE')));
-    throw new Error('STRIPE_SECRET_KEY is not configured');
-  }
-  
-  return new Stripe(secretKey, {
-    apiVersion: '2025-08-27.basil',
-  });
-};
+import { getStripeInstance, getStripeConfig } from '@/lib/stripeConfig';
 
 // Group size multipliers (discount for groups) - same as in BookingForm.tsx
 const groupSizeMultipliers = {
@@ -28,13 +13,6 @@ const groupSizeMultipliers = {
 export async function POST(request: Request) {
   try {
     console.log('Creating payment intent...');
-    console.log('Environment check:', {
-      hasStripeSecret: !!process.env.STRIPE_SECRET_KEY,
-      hasStripePublishable: !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-      hasWebhookSecret: !!process.env.STRIPE_WEBHOOK_SECRET,
-      stripeSecretLength: process.env.STRIPE_SECRET_KEY?.length || 0,
-      stripeSecretPrefix: process.env.STRIPE_SECRET_KEY?.substring(0, 10) || 'undefined'
-    });
     
     const { 
       amount, 
@@ -56,6 +34,17 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    // Get location-specific Stripe configuration
+    const stripeConfig = getStripeConfig(location);
+    console.log('Location-based Stripe config check:', {
+      location,
+      hasStripeSecret: !!stripeConfig.secretKey,
+      hasStripePublishable: !!stripeConfig.publishableKey,
+      hasWebhookSecret: !!stripeConfig.webhookSecret,
+      stripeSecretLength: stripeConfig.secretKey?.length || 0,
+      stripeSecretPrefix: stripeConfig.secretKey?.substring(0, 10) || 'undefined'
+    });
 
     // Calculate price based on duration and promotions
     const prices: Record<string, number> = {
@@ -94,15 +83,15 @@ export async function POST(request: Request) {
     }
 
     // Create a PaymentIntent with the order amount and currency
-    console.log('Initializing Stripe...');
+    console.log(`Initializing Stripe for location: ${location}...`);
     let stripe;
     try {
-      stripe = getStripe();
-      console.log('Stripe initialized successfully');
+      stripe = getStripeInstance(location);
+      console.log(`Stripe initialized successfully for location: ${location}`);
     } catch (stripeError) {
-      console.error('Stripe initialization failed:', stripeError);
+      console.error(`Stripe initialization failed for location ${location}:`, stripeError);
       return NextResponse.json(
-        { error: 'Stripe is not configured properly' },
+        { error: `Stripe is not configured properly for location: ${location}` },
         { status: 503 }
       );
     }
