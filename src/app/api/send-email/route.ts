@@ -87,24 +87,16 @@ export async function POST(request: Request) {
       }
     }
     
-    // Location details
-    const locationName = bookingData.location === 'midtown' ? 'Midtown Biohack' : 'Platinum Wellness Spa';
-    const locationAddress = bookingData.location === 'midtown' 
-      ? '575 Madison Ave, 23rd floor, New York, NY' 
-      : '1900 Parker Rd SE, Conyers, GA 30094';
+    // Location details - Platinum branch only supports Conyers
+    const locationName = 'Platinum Wellness Spa';
+    const locationAddress = '1900 Parker Rd SE, Conyers, GA 30094';
     
-    // Contact information based on location
-    const contactInfo = bookingData.location === 'midtown' 
-      ? {
-          owner: 'Billy Duc',
-          phone: '',
-          email: 'b.duc@wellnex02.com'
-        }
-      : {
-          owner: 'Rebecca Davis & Don Davis',
-          phone: '7708007500',
-          email: 'rdavis@platinumbbs.com'
-        };
+    // Contact information - Platinum branch only supports Conyers
+    const contactInfo = {
+      owner: 'Rebecca Davis & Don Davis',
+      phone: '7708007500',
+      email: 'rdavis@platinumbbs.com'
+    };
 
     // Group discount info - only show when not in promotion
     let discountInfo = '';

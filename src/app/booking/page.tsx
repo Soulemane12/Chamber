@@ -27,21 +27,13 @@ const getGoogleMapsUrl = (address: string) => {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 };
 
-// Function to get location contact data
+// Function to get location contact data - Platinum branch only supports Conyers
 const getLocationData = (location: string) => {
-  if (location === "midtown") {
-    return {
-      owner: "Billy Duc",
-      phone: "",
-      email: "b.duc@wellnex02.com"
-    };
-  } else {
-    return {
-      owner: "Rebecca Davis & Don Davis",
-      phone: "7708007500",
-      email: "rdavis@platinumbbs.com"
-    };
-  }
+  return {
+    owner: "Rebecca Davis & Don Davis",
+    phone: "7708007500",
+    email: "rdavis@platinumbbs.com"
+  };
 };
 
 export default function BookingPage() {
@@ -188,7 +180,7 @@ export default function BookingPage() {
             <div className="flex justify-center mb-6 animate-fade-in animate-delay-200">
               <div className="relative w-full max-w-md h-48 md:h-64 overflow-hidden rounded-lg">
                 <Image
-                  src={bookingDetails?.location === "midtown" ? "/HBOT.png" : "/People_HBOT.png"}
+                  src="/People_HBOT.png"
                   alt="Hyperbaric Chamber"
                   fill
                   className="object-cover"
@@ -224,27 +216,21 @@ export default function BookingPage() {
                   <div className="animate-slide-in-left animate-delay-400">
                     <p className="text-sm text-gray-500 dark:text-gray-400">{t('location')}</p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {bookingDetails.location === "midtown" ? "Midtown Biohack" : "Platinum Wellness Spa"}
+                      "Platinum Wellness Spa"
                     </p>
                   </div>
                   <div className="animate-slide-in-right animate-delay-500 md:col-span-2">
                     <p className="text-sm text-gray-500 dark:text-gray-400">{t('address')}</p>
                     <div className="flex flex-col">
                       <p className="font-medium text-gray-900 dark:text-white break-words">
-                        {bookingDetails.location === "midtown" 
-                          ? "575 Madison Ave, 23rd floor, New York, NY" 
-                          : "1900 Parker Rd SE, Conyers, GA 30094"}
+                        "1900 Parker Rd SE, Conyers, GA 30094"
                       </p>
                       {bookingDetails.location && (
                         <div className="flex flex-col gap-2 mt-1">
                           <p className="text-xs text-gray-500 dark:text-gray-400">{t('rideShare')}:</p>
                           <div className="flex flex-wrap gap-2">
                           <a 
-                            href={getGoogleMapsUrl(
-                              bookingDetails.location === "midtown" 
-                                ? "575 Madison Ave, 23rd floor, New York, NY" 
-                                : "1900 Parker Rd SE, Conyers, GA 30094"
-                            )}
+                            href={getGoogleMapsUrl("1900 Parker Rd SE, Conyers, GA 30094")}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-600 dark:text-blue-400 text-sm hover:underline flex items-center"
@@ -257,11 +243,7 @@ export default function BookingPage() {
                           </a>
                           
                           <a 
-                            href={`https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=${encodeURIComponent(
-                              bookingDetails.location === "midtown" 
-                                ? "575 Madison Ave, 23rd floor, New York, NY" 
-                                : "1900 Parker Rd SE, Conyers, GA 30094"
-                            )}`}
+                            href={`https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=${encodeURIComponent("1900 Parker Rd SE, Conyers, GA 30094")}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-black dark:text-white text-sm hover:underline flex items-center bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-md"
@@ -273,11 +255,7 @@ export default function BookingPage() {
                           </a>
                           
                           <a 
-                            href={`https://ride.lyft.com/ridetype?q=${encodeURIComponent(
-                              bookingDetails.location === "midtown" 
-                                ? "575 Madison Ave, 23rd floor, New York, NY" 
-                                : "1900 Parker Rd SE, Conyers, GA 30094"
-                            )}`}
+                            href={`https://ride.lyft.com/ridetype?q=${encodeURIComponent("1900 Parker Rd SE, Conyers, GA 30094")}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-[#FF00BF] dark:text-[#FF00BF] text-sm hover:underline flex items-center bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-md"
@@ -306,7 +284,7 @@ export default function BookingPage() {
               {bookingDetails?.location && (
                 <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg w-full max-w-md mx-auto animate-fade-in">
                   <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-2">
-                    {bookingDetails.location === "midtown" ? "Midtown Biohack Contact" : "Platinum Wellness Spa Contact"}
+                    "Platinum Wellness Spa Contact"
                   </h4>
                   <div className="flex items-center mb-2">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
