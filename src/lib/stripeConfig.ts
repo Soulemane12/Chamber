@@ -13,9 +13,9 @@ export function getStripeConfig(location: string): StripeConfig {
 
   if (normalizedLocation === 'midtown') {
     return {
-      secretKey: process.env.MID_STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY || '',
-      publishableKey: process.env.MID_NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
-      webhookSecret: process.env.MID_STRIPE_WEBHOOK_SECRET || process.env.STRIPE_WEBHOOK_SECRET || '',
+      secretKey: process.env.MID_STRIPE_SECRET_KEY || '',
+      publishableKey: process.env.MID_NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
+      webhookSecret: process.env.MID_STRIPE_WEBHOOK_SECRET || '',
     };
   } else if (normalizedLocation === 'conyers') {
     return {
@@ -25,11 +25,11 @@ export function getStripeConfig(location: string): StripeConfig {
     };
   }
 
-  // Fallback to default (midtown) configuration
+  // Fallback to midtown configuration (strict MID_ variables only)
   return {
-    secretKey: process.env.MID_STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY || '',
-    publishableKey: process.env.MID_NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
-    webhookSecret: process.env.MID_STRIPE_WEBHOOK_SECRET || process.env.STRIPE_WEBHOOK_SECRET || '',
+    secretKey: process.env.MID_STRIPE_SECRET_KEY || '',
+    publishableKey: process.env.MID_NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
+    webhookSecret: process.env.MID_STRIPE_WEBHOOK_SECRET || '',
   };
 }
 

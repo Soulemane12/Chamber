@@ -100,11 +100,13 @@ curl "http://localhost:3000/api/test-stripe-config?location=conyers"
 2. **Webhooks**: Both locations can use the same webhook URL (`https://app.wellnex.com/api/stripe/webhook`)
 3. **Testing**: Use the test endpoint to verify configuration before deployment
 
-## Fallback Behavior
+## Strict Location-Based Configuration
 
-- **Midtown**: Uses `MID_*` variables, falls back to default `STRIPE_*` variables
-- **Conyers**: Uses default `STRIPE_*` variables directly
-- **Default**: Midtown configuration if location is unspecified or unrecognized
+- **Midtown**: Uses ONLY `MID_*` variables (no fallbacks)
+- **Conyers**: Uses ONLY `STRIPE_*` variables (no fallbacks)
+- **No Cross-Location Fallbacks**: Each location requires its own complete set of variables
+
+**Important**: If the required environment variables for a location are not set, the system will throw an error rather than fall back to another location's credentials.
 
 ## Security Considerations
 
