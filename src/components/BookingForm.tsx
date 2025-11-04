@@ -25,7 +25,7 @@ const bookingSchema = z.object({
   time: z.string({
     required_error: "Please select a time",
   }),
-  duration: z.enum(["0", "45", "60", "90", "120"], {
+  duration: z.enum(["0", "20", "45", "60", "90", "120"], {
     required_error: "Please select a duration",
   }),
   location: z.enum(["midtown", "conyers"], {
@@ -68,6 +68,7 @@ const timeSlots = [
 // Pricing for different durations
 const pricingOptions = {
   "0": 0,      // Demo session option
+  "20": 1,     // $1 test option
   "60": 150,
   "90": 200,
   "120": 250,
@@ -1316,6 +1317,42 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                       </div>
                     </label>
 
+                    {/* $1 Test Session */}
+                    <label
+                      className={`
+                        relative flex items-center p-4 border rounded-lg cursor-pointer
+                        ${
+                          watch("duration") === "20"
+                            ? "bg-yellow-50 border-yellow-500 dark:bg-yellow-900/30 dark:border-yellow-400"
+                            : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
+                        }
+                      `}
+                    >
+                      <input
+                        type="radio"
+                        value="20"
+                        {...register("duration")}
+                        className="sr-only"
+                      />
+                      <div className="flex-1">
+                        <h3 className={`font-medium ${
+                          watch("duration") === "20"
+                            ? "text-yellow-600 dark:text-yellow-400"
+                            : "text-gray-900 dark:text-white"
+                        }`}>
+                          20 Minute Test Session
+                        </h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Payment test • Stripe integration testing</p>
+                      </div>
+                      <div className={`text-lg font-bold ${
+                        watch("duration") === "20"
+                          ? "text-yellow-600 dark:text-yellow-400"
+                          : "text-gray-900 dark:text-white"
+                      }`}>
+                        {formatCurrency(pricingOptions["20"])}
+                        <span className="text-yellow-600 dark:text-yellow-400 ml-2">TEST</span>
+                      </div>
+                    </label>
 
                     {/* 60 Minute Session */}
                     <label
