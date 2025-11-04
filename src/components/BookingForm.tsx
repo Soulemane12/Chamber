@@ -28,7 +28,7 @@ const bookingSchema = z.object({
   duration: z.enum(["0", "20", "45", "60", "90", "120"], {
     required_error: "Please select a duration",
   }),
-  location: z.enum(["midtown", "conyers"], {
+  location: z.enum(["midtown"], {
     required_error: "Please select a location",
   }),
   groupSize: z.enum(["1", "2", "3", "4"]),
@@ -974,33 +974,6 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                   </div>
                 </label>
 
-                <label
-                  className={`
-                    relative flex items-center p-4 border rounded-lg cursor-pointer transition-all-300
-                    ${
-                      watch("location") === "conyers"
-                        ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
-                        : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
-                    }
-                  `}
-                >
-                  <input
-                    type="radio"
-                    value="conyers"
-                    {...register("location")}
-                    className="sr-only"
-                  />
-                  <div className="flex-1">
-                    <h3 className={`font-medium ${
-                      watch("location") === "conyers"
-                        ? "text-blue-600 dark:text-blue-400"
-                        : "text-gray-900 dark:text-white"
-                    }`}>
-                      Platinum Wellness Spa
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">1900 Parker Rd SE, Conyers, GA 30094</p>
-                  </div>
-                </label>
               </div>
               {errors.location && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.location.message}</p>
