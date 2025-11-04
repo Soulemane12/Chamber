@@ -61,6 +61,8 @@ export const locationData = {
       sunday: "Closed"
     },
     imageUrl: "/HBOT.jpg"
+
+    
   },
   conyers: {
     name: "Platinum Wellness Spa",
