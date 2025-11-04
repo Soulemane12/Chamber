@@ -5,12 +5,12 @@ export function useStripePublishableKey(location: string): string {
     const normalizedLocation = location?.toLowerCase();
 
     if (normalizedLocation === 'midtown') {
-      return process.env.NEXT_PUBLIC_MID_STRIPE_PUBLISHABLE_KEY || '';
+      return process.env.MID_NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '';
     } else if (normalizedLocation === 'conyers') {
       return process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '';
     }
 
     // Fallback to midtown configuration (strict MID_ variables only)
-    return process.env.NEXT_PUBLIC_MID_STRIPE_PUBLISHABLE_KEY || '';
+    return process.env.MID_NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '';
   }, [location]);
 }
