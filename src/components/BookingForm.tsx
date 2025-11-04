@@ -28,7 +28,7 @@ const bookingSchema = z.object({
   duration: z.enum(["0", "20", "45", "60", "90", "120"], {
     required_error: "Please select a duration",
   }),
-  location: z.enum(["midtown", "conyers"], {
+  location: z.enum(["conyers"], {
     required_error: "Please select a location",
   }),
   groupSize: z.enum(["1", "2", "3", "4"]),
@@ -138,7 +138,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       notes: "",
       bookingReason: "",
       duration: "60",
-      location: "midtown",
+      location: "conyers",
       groupSize: "1",
       uploadedFiles: []
     },
@@ -946,35 +946,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
 
             <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 shadow-sm border border-gray-200 dark:border-gray-700" data-error={errors.location ? "true" : "false"}>
               <div className="grid grid-cols-1 gap-4 mb-4 sm:mb-6">
-                <label
-                  className={`
-                    relative flex items-center p-4 border rounded-lg cursor-pointer transition-all-300
-                    ${
-                      watch("location") === "midtown"
-                        ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
-                        : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
-                    }
-                  `}
-                >
-                  <input
-                    type="radio"
-                    value="midtown"
-                    {...register("location")}
-                    className="sr-only"
-                  />
-                  <div className="flex-1">
-                    <h3 className={`font-medium ${
-                      watch("location") === "midtown"
-                        ? "text-blue-600 dark:text-blue-400"
-                        : "text-gray-900 dark:text-white"
-                    }`}>
-                      Midtown Biohack
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">575 Madison Ave, 23rd floor, NY, NY</p>
-                  </div>
-                </label>
-
-                <label
+<label
                   className={`
                     relative flex items-center p-4 border rounded-lg cursor-pointer transition-all-300
                     ${
