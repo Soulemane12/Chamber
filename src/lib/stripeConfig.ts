@@ -11,6 +11,7 @@ export function getStripeConfig(location: string): StripeConfig {
   // Default to Midtown configuration if location not specified or unrecognized
   const normalizedLocation = location?.toLowerCase();
 
+  
   if (normalizedLocation === 'midtown') {
     return {
       secretKey: process.env.MID_STRIPE_SECRET_KEY || '',
