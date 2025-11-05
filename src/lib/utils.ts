@@ -140,4 +140,33 @@ export function isPromotionActive(location: string, date: Date): boolean {
 export function getPromotionPricing(duration: string): number | null {
   if (!promotionConfig.isActive) return null;
   return promotionConfig.pricing[duration as keyof typeof promotionConfig.pricing] ?? null;
+}
+
+/**
+ * Get current branch location based on deployment configuration
+ * This determines which location this instance serves
+ */
+export function getCurrentBranch(): 'midtown' | 'conyers' {
+  // Check environment variable first (for production deployments)
+  const envBranch = process.env.NEXT_PUBLIC_BRANCH_LOCATION as 'midtown' | 'conyers';
+  if (envBranch === 'midtown' || envBranch === 'conyers') {
+    return envBranch;
+  }
+
+  // Fallback: Try to detect from URL or configuration
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+
+    // Check for specific branch hostnames/subdomains
+    if (hostname.includes('midtown') || hostname.includes('manhattan')) {
+      return 'midtown';
+    }
+    if (hostname.includes('conyers') || hostname.includes('platinum')) {
+      return 'conyers';
+    }
+  }
+
+  // Default based on the current branch deployment pattern
+  // This instance appears to be midtown branch serving midtown
+  return 'midtown';
 } 

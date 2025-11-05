@@ -5,19 +5,65 @@ import Image from "next/image";
 import { Header } from "@/components/Header";
 import { useLanguage } from "@/lib/LanguageContext";
 import { Footer } from "@/components/Footer";
+import { getCurrentBranch, getLocationData } from "@/lib/utils";
 
 export default function Home() {
   const { t } = useLanguage();
-  
+
+  // Get current branch location data
+  const currentBranch = getCurrentBranch();
+  const locationData = getLocationData(currentBranch);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
       <Header currentPage="home" />
+
+      {/* Location Banner */}
+      {locationData && (
+        <div className="bg-blue-600 dark:bg-blue-700 text-white py-3 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span className="font-medium">
+                  <span className="hidden sm:inline">Now serving </span>
+                  <span className="font-bold">{locationData.name}</span>
+                  <span className="hidden sm:inline"> - {locationData.address}</span>
+                </span>
+              </div>
+              <div className="mt-2 sm:mt-0 flex items-center">
+                {locationData.phone && (
+                  <a href={`tel:${locationData.phone}`} className="text-blue-100 hover:text-white transition-colors mr-4">
+                    📞 {locationData.phone}
+                  </a>
+                )}
+                <a href={`mailto:${locationData.email}`} className="text-blue-100 hover:text-white transition-colors">
+                  ✉️ {locationData.email}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <main className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center mb-12 sm:mb-16 animate-fade-in">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 animate-slide-in-up">
             {t('heroTitle')}
           </h1>
+          {locationData && (
+            <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg inline-block">
+              <p className="text-lg font-semibold text-blue-800 dark:text-blue-200">
+                📍 Available at {locationData.name}
+              </p>
+              <p className="text-sm text-blue-600 dark:text-blue-300">
+                {locationData.address}
+              </p>
+            </div>
+          )}
           <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto animate-slide-in-up animate-delay-200 px-2 sm:px-0">
             {t('heroSubtitle')}
           </p>
