@@ -8,6 +8,7 @@ import BookingDetailsModal, { GuestBookingInfo } from "./ui/BookingDetailsModal"
 import CalendarView from "./ui/CalendarView";
 import ChamberManagement from "./ui/ChamberManagement";
 import { AdminAssessmentDashboard } from "./AdminAssessmentDashboard";
+import { getCurrentBranch, getLocationData } from "@/lib/utils";
 
 // Simple chart component using div heights
 function BarChart({ data, title, maxHeight = 200 }: { data: Record<string, number>, title: string, maxHeight?: number }) {
@@ -157,6 +158,10 @@ export default function AdminDashboard() {
   const [timePeriod, setTimePeriod] = useState<'day' | 'month' | 'quarter' | 'year'>('month');
   const [demographic, setDemographic] = useState<'age' | 'gender' | 'race' | 'education' | 'profession'>('age');
 
+  // Get current branch location
+  const currentBranch = getCurrentBranch();
+  const currentLocationData = getLocationData(currentBranch);
+
   const [profiles, setProfiles] = useState<UserProfile[]>([]);
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -221,7 +226,7 @@ export default function AdminDashboard() {
   // State for booking data
   const [bookingsByTime, setBookingsByTime] = useState<Record<string, number>>({});
   const [bookingsByDemographic, setBookingsByDemographic] = useState<Record<string, number>>({});
-  const [averageBookings, setAverageBookings] = useState<{midtown: number, conyers: number}>({midtown: 0, conyers: 0});
+  const [averageBookings, setAverageBookings] = useState<number>(0);
 
   
   // -------------------------------------------------
@@ -279,7 +284,7 @@ export default function AdminDashboard() {
     startDate: '',
     endDate: ''
   });
-  const [bookingsLocation, setBookingsLocation] = useState<string>('');
+  const [bookingsLocation, setBookingsLocation] = useState<string>(currentBranch);
   const [bookingsSortBy, setBookingsSortBy] = useState<string>('date');
   const [bookingsSortOrder, setBookingsSortOrder] = useState<'asc' | 'desc'>('desc');
 
@@ -331,7 +336,8 @@ export default function AdminDashboard() {
       if (bookingsSearchQuery) params.append('search', bookingsSearchQuery);
       if (bookingsDateRange.startDate) params.append('startDate', bookingsDateRange.startDate);
       if (bookingsDateRange.endDate) params.append('endDate', bookingsDateRange.endDate);
-      if (bookingsLocation) params.append('location', bookingsLocation);
+      // Always filter by current branch location
+      params.append('location', currentBranch);
       if (bookingsSortBy) params.append('sortBy', bookingsSortBy);
       if (bookingsSortOrder) params.append('sortOrder', bookingsSortOrder);
       params.append('page', bookingsPage.toString());
@@ -436,20 +442,21 @@ export default function AdminDashboard() {
       // Set initial view
       setBookingsByDemographic(demographicData[demographic] || {});
       
-      // Get location data
+      // Get location data for current branch only
       const locationResponse = await fetch('/api/admin/bookings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          type: 'byLocation'
+        body: JSON.stringify({
+          type: 'byLocation',
+          location: currentBranch
         }),
       });
-      
+
       if (locationResponse.ok) {
         const { data } = await locationResponse.json();
-        setAverageBookings(data);
+        setAverageBookings(data[currentBranch] || 0);
       }
       
 
@@ -1040,18 +1047,18 @@ export default function AdminDashboard() {
           </div>
             </div>
 
-            {/* Average Bookings by Location */}
+            {/* Current Location Summary */}
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Average Bookings by Location</h3>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">{currentLocationData?.name} Bookings</h3>
               <div className="relative">
-                {(!averageBookings || (averageBookings.midtown === 0 && averageBookings.conyers === 0)) && !bookingsLoading ? (
-                  <p className="text-center text-gray-500 dark:text-gray-400 py-10">No location data available</p>
+                {averageBookings === 0 && !bookingsLoading ? (
+                  <p className="text-center text-gray-500 dark:text-gray-400 py-10">No booking data available</p>
                 ) : (
-                  <div className={`transition-opacity duration-300 ${averageBookings ? 'opacity-100' : 'opacity-0'}`}>
-                    <BarChart
-                      data={averageBookings}
-                      title="Average Bookings"
-                      maxHeight={150}
+                  <div className={`transition-opacity duration-300 ${averageBookings > 0 ? 'opacity-100' : 'opacity-0'}`}>
+                    <StatCard
+                      title="Total Bookings"
+                      value={averageBookings}
+                      subtitle={`${currentLocationData?.name}`}
                     />
             </div>
                 )}
@@ -1118,15 +1125,9 @@ export default function AdminDashboard() {
 
               <div>
                 <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Location</label>
-                <select
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                  value={bookingsLocation}
-                  onChange={(e) => setBookingsLocation(e.target.value)}
-                >
-                  <option value="">All Locations</option>
-                  <option value="midtown">Midtown Location</option>
-                  <option value="conyers">Conyers Location</option>
-                </select>
+                <div className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
+                  {currentLocationData?.name} (Current Branch)
+                </div>
               </div>
 
               <div className="flex space-x-2 items-end col-span-1 md:col-span-4 lg:col-span-2">
@@ -1141,7 +1142,6 @@ export default function AdminDashboard() {
                   onClick={() => {
                     setBookingsSearchQuery('');
                     setBookingsDateRange({ startDate: '', endDate: '' });
-                    setBookingsLocation('');
                     setBookingsSortBy('date');
                     setBookingsSortOrder('desc');
                     setBookingsPage(1);
@@ -1337,14 +1337,8 @@ export default function AdminDashboard() {
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            booking.location === 'midtown' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                            booking.location === 'conyers' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
-                            'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                          }`}>
-                            {booking.location === 'midtown' ? 'Midtown Location' :
-                             booking.location === 'conyers' ? 'Conyers Location' :
-                             booking.location || 'Unknown Location'}
+                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                            {currentLocationData?.name}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900 dark:text-white">
