@@ -114,11 +114,10 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
-  // Update step definitions - Remove seating step
+  // Update step definitions - Removed location step for single location branch
   const isPersonalInfoStep = isGuest && currentStep === 1;
-  const isLocationStep = isGuest ? currentStep === 2 : currentStep === 1;
-  const isBookingDetailsStep = isGuest ? currentStep === 3 : currentStep === 2;
-  const isPaymentStep = isGuest ? currentStep === 4 : currentStep === 3; // One less step now
+  const isBookingDetailsStep = isGuest ? currentStep === 2 : currentStep === 1;
+  const isPaymentStep = isGuest ? currentStep === 3 : currentStep === 2;
 
   const {
     register,
@@ -535,19 +534,16 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       if (isPersonalInfoStep) {
         // Validate personal info for guest users
         isValid = await trigger([
-          "firstName", 
-          "lastName", 
-          "email", 
-          "phone", 
-          "gender", 
-          "age", 
-          "race", 
-          "education", 
+          "firstName",
+          "lastName",
+          "email",
+          "phone",
+          "gender",
+          "age",
+          "race",
+          "education",
           "profession"
         ]);
-      } else if (isLocationStep) {
-        // Validate location
-        isValid = await trigger(["location"]);
       } else if (isBookingDetailsStep) {
         // Validate booking details
         isValid = await trigger(["date", "time", "duration"]);
@@ -619,7 +615,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         {/* Mobile step indicator */}
         <div className="flex sm:hidden justify-center py-3">
           <div className="flex items-center space-x-2">
-            {[1, 2, 3, ...(isGuest ? [4] : [])].map((step) => (
+            {[1, 2, ...(isGuest ? [3] : [])].map((step) => (
               <div key={step} className="flex items-center">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
@@ -632,7 +628,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                 >
                   {step < currentStep ? "✓" : step}
                 </div>
-                {step < (isGuest ? 4 : 3) && (
+                {step < (isGuest ? 3 : 2) && (
                   <div
                     className={`w-6 h-0.5 mx-1 ${
                       step < currentStep ? "bg-green-500" : "bg-gray-200 dark:bg-gray-700"
@@ -655,7 +651,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
             disabled={currentStep === 1}
             type="button"
           >
-            <span className="block">1. {isGuest ? "Your Information" : "Select Location"}</span>
+            <span className="block">1. {isGuest ? "Your Information" : "Booking Details"}</span>
           </button>
           <button
             className={`flex-1 py-4 text-center transition-all-300 text-sm md:text-base ${
@@ -666,30 +662,19 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
             disabled={isGuest && currentStep < 2}
             type="button"
           >
-            <span className="block">2. {isGuest ? "Select Location" : "Booking Details"}</span>
-          </button>
-          <button
-            className={`flex-1 py-4 text-center transition-all-300 text-sm md:text-base ${
-              currentStep === 3
-                ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
-                : "text-gray-500 dark:text-gray-400"
-            } ${currentStep < 3 ? 'opacity-50 cursor-not-allowed' : ''}`}
-            disabled={currentStep < 3}
-            type="button"
-          >
-            <span className="block">3. {isGuest ? "Booking Details" : "Payment"}</span>
+            <span className="block">2. {isGuest ? "Booking Details" : "Payment"}</span>
           </button>
           {isGuest && (
             <button
               className={`flex-1 py-4 text-center transition-all-300 text-sm md:text-base ${
-                currentStep === 4
+                currentStep === 3
                   ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
                   : "text-gray-500 dark:text-gray-400"
-              } ${currentStep < 4 ? 'opacity-50 cursor-not-allowed' : ''}`}
-              disabled={currentStep < 4}
+              } ${currentStep < 3 ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={currentStep < 3}
               type="button"
             >
-              <span className="block">4. Payment</span>
+              <span className="block">3. Payment</span>
             </button>
           )}
         </div>
@@ -930,147 +915,8 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
           </div>
         )}
         
-        {/* Location Selection Step */}
-        {isLocationStep && (
-          <div className="space-y-4 sm:space-y-6 animate-fade-in">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">Select Location</h2>
-
-            {isGuest && (
-              <div className="space-y-4 animate-slide-in-up">
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-3 sm:p-4 rounded-lg">
-                  <h3 className="font-medium text-blue-800 dark:text-blue-200 text-sm sm:text-base">Booking as: {watch('firstName')} {watch('lastName')}</h3>
-                  <p className="text-sm text-blue-700 dark:text-blue-300">{watch('email')} • {watch('phone')}</p>
-                </div>
-              </div>
-            )}
-
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 shadow-sm border border-gray-200 dark:border-gray-700" data-error={errors.location ? "true" : "false"}>
-              <div className="grid grid-cols-1 gap-4 mb-4 sm:mb-6">
-                <label
-                  className={`
-                    relative flex items-center p-4 border rounded-lg cursor-pointer transition-all-300
-                    ${
-                      watch("location") === "midtown"
-                        ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
-                        : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
-                    }
-                  `}
-                >
-                  <input
-                    type="radio"
-                    value="midtown"
-                    {...register("location")}
-                    className="sr-only"
-                  />
-                  <div className="flex-1">
-                    <h3 className={`font-medium ${
-                      watch("location") === "midtown"
-                        ? "text-blue-600 dark:text-blue-400"
-                        : "text-gray-900 dark:text-white"
-                    }`}>
-                      Midtown Biohack
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">575 Madison Ave, 23rd floor, NY, NY</p>
-                  </div>
-                </label>
-
-              </div>
-              {errors.location && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.location.message}</p>
-              )}
-              
-              {/* Location-specific information section */}
-              {watch("location") && (
-                <div className="mt-6 mb-6 p-4 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-100 dark:border-blue-800 animate-fade-in">
-                  <h3 className="font-medium text-lg text-blue-800 dark:text-blue-300 mb-2">
-                    {getLocationData(watch("location"))?.name} Information
-                  </h3>
-                  
-                  <div className="space-y-3">
-                    <p className="text-sm text-gray-700 dark:text-gray-300">
-                      {getLocationData(watch("location"))?.description}
-                    </p>
-                    <ul className="list-disc list-inside text-sm text-gray-700 dark:text-gray-300 space-y-1">
-                      {getLocationData(watch("location"))?.features.map((feature, index) => (
-                        <li key={index}>{feature}</li>
-                      ))}
-                    </ul>
-                    <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mt-2">
-                      Note: {getLocationData(watch("location"))?.note}
-                    </p>
-                  </div>
-
-                  {/* Business Hours Section */}
-                  <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-800">
-                    <h4 className="font-medium text-blue-800 dark:text-blue-300 mb-2">Business Hours</h4>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                      <div className="flex justify-between">
-                        <span className="font-medium text-gray-700 dark:text-gray-300">Monday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.monday}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium text-gray-700 dark:text-gray-300">Tuesday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.tuesday}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium text-gray-700 dark:text-gray-300">Wednesday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.wednesday}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium text-gray-700 dark:text-gray-300">Thursday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.thursday}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium text-gray-700 dark:text-gray-300">Friday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.friday}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium text-gray-700 dark:text-gray-300">Saturday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.saturday}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium text-gray-700 dark:text-gray-300">Sunday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.sunday}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Add an image of the location */}
-                  <div className="mt-4 rounded-lg overflow-hidden">
-                    <img 
-                      src={getLocationData(watch("location"))?.imageUrl}
-                      alt={`${getLocationData(watch("location"))?.name} facility`}
-                      className="w-full h-48 object-cover rounded-lg"
-                    />
-                  </div>
-                </div>
-              )}
-
-              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between gap-3 sm:gap-0">
-                {isGuest && (
-                  <Button
-                    type="button"
-                    onClick={prevStep}
-                    variant="outline"
-                    isLoading={isStepLoading}
-                    className="w-full sm:w-auto order-2 sm:order-1"
-                  >
-                    Back
-                  </Button>
-                )}
-                <Button
-                  type="button"
-                  onClick={nextStep}
-                  isLoading={isStepLoading}
-                  className={`w-full sm:w-auto ${isGuest ? 'sm:ml-auto order-1 sm:order-2' : ''}`}
-                  disabled={!watch("location") || isStepLoading}
-                >
-                  Continue to Booking Details
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Hidden Location Field - Midtown branch defaults to midtown */}
+        <input type="hidden" {...register("location")} value="midtown" />
         
         {/* Booking Details Step */}
         {isBookingDetailsStep && (
@@ -1574,7 +1420,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                 isLoading={isStepLoading}
                 className="w-full sm:w-auto order-2 sm:order-1"
               >
-                Back to Location
+                Back
               </Button>
               <Button
                 type="button"
