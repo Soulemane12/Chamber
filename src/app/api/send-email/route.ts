@@ -180,10 +180,17 @@ export async function POST(request: Request) {
       `
     };
 
-    // Admin notification email
+    // Admin notification email - include additional recipients based on location
+    const adminRecipients = ['billydduc@gmail.com'];
+
+    // Add location-specific email recipients
+    if (bookingData.location === 'midtown') {
+      adminRecipients.push('contact@midtownbiohack.com');
+    }
+
     const adminMailOptions = {
       from: '"Wellnex02 Booking" <billydduc@gmail.com>',
-      to: 'billydduc@gmail.com',
+      to: adminRecipients.join(', '),
       subject: totalPrice === 0 ? 'New Demo Session Booking' : 'New Hyperbaric Chamber Booking',
       replyTo: 'billydduc@gmail.com',
       html: `
@@ -242,7 +249,7 @@ export async function POST(request: Request) {
       });
       
       // Send admin notification email
-      console.log('Sending admin notification email to: billydduc@gmail.com');
+      console.log('Sending admin notification email to:', adminRecipients.join(', '));
       const adminResult = await transporter.sendMail(adminMailOptions);
       console.log('Admin notification email sent successfully:', adminResult.messageId);
       
