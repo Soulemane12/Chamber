@@ -1,5 +1,6 @@
 export type Language = 'en' | 'fr' | 'es' | 'zh' | 'ja' | 'it';
 
+
 export const translations = {
   en: {
     // Navigation
