@@ -8,6 +8,7 @@ export const translations = {
     bookNow: "Book Now",
     contact: "Contact",
     
+    
     // Homepage
     heroTitle: "Experience the Benefits of Hyperbaric Oxygen Therapy (HBOT)",
     heroSubtitle: "Enhance your recovery, boost performance, and improve overall wellness with our state-of-the-art hyperbaric chambers.",
