@@ -20,8 +20,7 @@ export function getStripeInstance(): Stripe {
   const config = getStripeConfig();
 
   if (!config.secretKey) {
-    console.error('MID_STRIPE_SECRET_KEY is not configured. Available env vars:',
-      Object.keys(process.env).filter(key => key.includes('STRIPE')));
+    console.error('MID_STRIPE_SECRET_KEY is not configured for Midtown');
     throw new Error('Stripe secret key is not configured for Midtown');
   }
 
