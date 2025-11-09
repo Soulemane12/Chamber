@@ -1,32 +1,14 @@
 import Stripe from 'stripe';
 
-// Stripe configuration based on location
+// Midtown-only Stripe configuration
 export interface StripeConfig {
   secretKey: string;
   publishableKey: string;
   webhookSecret: string;
 }
 
-export function getStripeConfig(location: string): StripeConfig {
-  // Default to Midtown configuration if location not specified or unrecognized
-  const normalizedLocation = location?.toLowerCase();
-
-  
-  if (normalizedLocation === 'midtown') {
-    return {
-      secretKey: process.env.MID_STRIPE_SECRET_KEY || '',
-      publishableKey: process.env.NEXT_PUBLIC_MID_STRIPE_PUBLISHABLE_KEY || '',
-      webhookSecret: process.env.MID_STRIPE_WEBHOOK_SECRET || '',
-    };
-  } else if (normalizedLocation === 'conyers') {
-    return {
-      secretKey: process.env.STRIPE_SECRET_KEY || '',
-      publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
-      webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
-    };
-  }
-
-  // Fallback to midtown configuration (strict MID_ variables only)
+export function getStripeConfig(): StripeConfig {
+  // Always return Midtown configuration - this domain serves Midtown only
   return {
     secretKey: process.env.MID_STRIPE_SECRET_KEY || '',
     publishableKey: process.env.NEXT_PUBLIC_MID_STRIPE_PUBLISHABLE_KEY || '',
@@ -34,14 +16,13 @@ export function getStripeConfig(location: string): StripeConfig {
   };
 }
 
-export function getStripeInstance(location: string): Stripe {
-  const config = getStripeConfig(location);
+export function getStripeInstance(): Stripe {
+  const config = getStripeConfig();
 
   if (!config.secretKey) {
-    const locationPrefix = location?.toLowerCase() === 'conyers' ? '' : 'MID_';
-    console.error(`${locationPrefix}STRIPE_SECRET_KEY is not configured for location: ${location}. Available env vars:`,
+    console.error('MID_STRIPE_SECRET_KEY is not configured. Available env vars:',
       Object.keys(process.env).filter(key => key.includes('STRIPE')));
-    throw new Error(`Stripe secret key is not configured for location: ${location}`);
+    throw new Error('Stripe secret key is not configured for Midtown');
   }
 
   return new Stripe(config.secretKey, {
@@ -49,7 +30,7 @@ export function getStripeInstance(location: string): Stripe {
   });
 }
 
-export function getPublishableKey(location: string): string {
-  const config = getStripeConfig(location);
+export function getPublishableKey(): string {
+  const config = getStripeConfig();
   return config.publishableKey;
 }

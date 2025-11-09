@@ -1,16 +1,8 @@
 import { useMemo } from 'react';
 
-export function useStripePublishableKey(location: string): string {
+export function useStripePublishableKey(): string {
   return useMemo(() => {
-    const normalizedLocation = location?.toLowerCase();
-
-    if (normalizedLocation === 'midtown') {
-      return process.env.NEXT_PUBLIC_MID_STRIPE_PUBLISHABLE_KEY || '';
-    } else if (normalizedLocation === 'conyers') {
-      return process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '';
-    }
-
-    // Fallback to midtown configuration (strict MID_ variables only)
+    // Always return Midtown publishable key - this domain serves Midtown only
     return process.env.NEXT_PUBLIC_MID_STRIPE_PUBLISHABLE_KEY || '';
-  }, [location]);
+  }, []);
 }

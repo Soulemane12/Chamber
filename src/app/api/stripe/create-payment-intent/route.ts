@@ -26,19 +26,18 @@ export async function POST(request: Request) {
 
     console.log('Payment intent data:', { amount, duration, groupSize, location, date });
 
-    // Validate required fields
-    if (!amount || !duration || !groupSize || !location || !date) {
-      console.error('Missing required fields:', { amount, duration, groupSize, location, date });
+    // Validate required fields (location no longer required since this is Midtown-only)
+    if (!amount || !duration || !groupSize || !date) {
+      console.error('Missing required fields:', { amount, duration, groupSize, date });
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
     }
 
-    // Get location-specific Stripe configuration
-    const stripeConfig = getStripeConfig(location);
-    console.log('Location-based Stripe config check:', {
-      location,
+    // Get Midtown Stripe configuration
+    const stripeConfig = getStripeConfig();
+    console.log('Midtown Stripe config check:', {
       hasStripeSecret: !!stripeConfig.secretKey,
       hasStripePublishable: !!stripeConfig.publishableKey,
       hasWebhookSecret: !!stripeConfig.webhookSecret,
@@ -54,8 +53,8 @@ export async function POST(request: Request) {
       '120': 250
     };
 
-    // Check if promotion is active
-    const isPromoActive = isPromotionActive(location, new Date(date));
+    // Check if promotion is active (always use 'midtown' for this domain)
+    const isPromoActive = isPromotionActive('midtown', new Date(date));
     let calculatedAmount: number;
 
     if (isPromoActive) {
@@ -83,15 +82,15 @@ export async function POST(request: Request) {
     }
 
     // Create a PaymentIntent with the order amount and currency
-    console.log(`Initializing Stripe for location: ${location}...`);
+    console.log('Initializing Stripe for Midtown...');
     let stripe;
     try {
-      stripe = getStripeInstance(location);
-      console.log(`Stripe initialized successfully for location: ${location}`);
+      stripe = getStripeInstance();
+      console.log('Stripe initialized successfully for Midtown');
     } catch (stripeError) {
-      console.error(`Stripe initialization failed for location ${location}:`, stripeError);
+      console.error('Stripe initialization failed for Midtown:', stripeError);
       return NextResponse.json(
-        { error: `Stripe is not configured properly for location: ${location}` },
+        { error: 'Stripe is not configured properly for Midtown' },
         { status: 503 }
       );
     }
@@ -108,7 +107,7 @@ export async function POST(request: Request) {
         metadata: {
           duration,
           groupSize,
-          location,
+          location: 'midtown',
           date,
           customerEmail: customerInfo?.email || '',
           customerName: `${customerInfo?.firstName || ''} ${customerInfo?.lastName || ''}`.trim(),

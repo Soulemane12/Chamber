@@ -3,17 +3,15 @@ import Stripe from 'stripe';
 import { supabase } from '@/lib/supabaseClient';
 import { getStripeInstance, getStripeConfig } from '@/lib/stripeConfig';
 
-// Get Stripe instance based on location from payment intent metadata
-const getStripeForWebhook = (location?: string) => {
-  // If no location provided, try default configuration (midtown)
-  const locationToUse = location || 'midtown';
-  return getStripeInstance(locationToUse);
+// Get Stripe instance for Midtown (this domain serves Midtown only)
+const getStripeForWebhook = () => {
+  return getStripeInstance();
 };
 
-const getEndpointSecret = (location?: string) => {
-  const config = getStripeConfig(location || 'midtown');
+const getEndpointSecret = () => {
+  const config = getStripeConfig();
   if (!config.webhookSecret) {
-    throw new Error(`STRIPE_WEBHOOK_SECRET is not configured for location: ${location || 'default'}`);
+    throw new Error('MID_STRIPE_WEBHOOK_SECRET is not configured for Midtown');
   }
   return config.webhookSecret;
 };
@@ -25,37 +23,12 @@ export async function POST(req: NextRequest) {
   let event: Stripe.Event;
 
   try {
-    // For webhook verification, we need to try all possible webhook secrets
-    // since we don't know the location beforehand
-    let stripe: Stripe;
-    let endpointSecret: string;
-    let verificationError: Error | null = null;
-
-    // Try midtown configuration first (default)
-    try {
-      stripe = getStripeForWebhook('midtown');
-      endpointSecret = getEndpointSecret('midtown');
-      event = stripe.webhooks.constructEvent(body, sig, endpointSecret);
-    } catch (midtownError) {
-      verificationError = midtownError as Error;
-
-      // Try conyers configuration
-      try {
-        stripe = getStripeForWebhook('conyers');
-        endpointSecret = getEndpointSecret('conyers');
-        event = stripe.webhooks.constructEvent(body, sig, endpointSecret);
-        verificationError = null; // Reset error if successful
-      } catch {
-        // If both fail, throw the original error
-        throw verificationError;
-      }
-    }
-
-    if (verificationError) {
-      throw verificationError;
-    }
+    // Verify webhook signature using Midtown configuration only
+    const stripe = getStripeForWebhook();
+    const endpointSecret = getEndpointSecret();
+    event = stripe.webhooks.constructEvent(body, sig, endpointSecret);
   } catch (err) {
-    console.error('Webhook signature verification failed for all locations:', err);
+    console.error('Webhook signature verification failed:', err);
     return NextResponse.json({ error: 'Webhook signature verification failed' }, { status: 400 });
   }
 

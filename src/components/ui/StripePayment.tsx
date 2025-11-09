@@ -384,8 +384,8 @@ export function StripePayment({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Get location-specific publishable key
-  const publishableKey = useStripePublishableKey(location);
+  // Get Midtown publishable key
+  const publishableKey = useStripePublishableKey();
 
   // Create location-specific Stripe promise
   const stripePromise = useMemo(() => {
