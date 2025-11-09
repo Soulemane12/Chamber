@@ -15,7 +15,7 @@ export function getStripeConfig(location: string): StripeConfig {
   if (normalizedLocation === 'midtown') {
     return {
       secretKey: process.env.MID_STRIPE_SECRET_KEY || '',
-      publishableKey: process.env.MID_NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
+      publishableKey: process.env.NEXT_PUBLIC_MID_STRIPE_PUBLISHABLE_KEY || '',
       webhookSecret: process.env.MID_STRIPE_WEBHOOK_SECRET || '',
     };
   } else if (normalizedLocation === 'conyers') {
@@ -29,7 +29,7 @@ export function getStripeConfig(location: string): StripeConfig {
   // Fallback to midtown configuration (strict MID_ variables only)
   return {
     secretKey: process.env.MID_STRIPE_SECRET_KEY || '',
-    publishableKey: process.env.MID_NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
+    publishableKey: process.env.NEXT_PUBLIC_MID_STRIPE_PUBLISHABLE_KEY || '',
     webhookSecret: process.env.MID_STRIPE_WEBHOOK_SECRET || '',
   };
 }
