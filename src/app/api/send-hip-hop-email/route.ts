@@ -175,7 +175,7 @@ export async function POST(request: Request) {
     // Admin notification email
     const adminMailOptions = {
       from: '"Wellnex02 Hip Hop Program" <billydduc@gmail.com>',
-      to: 'billydduc@gmail.com',
+      to: 'billydduc@gmail.com, contact@MidtownBiohack.com',
       subject: 'Hip hop Honoree wellness booking request',
       replyTo: 'billydduc@gmail.com',
       html: `
@@ -268,7 +268,7 @@ export async function POST(request: Request) {
       }
 
       // Send admin notification email
-      console.log('Sending Hip Hop admin notification email to: billydduc@gmail.com');
+      console.log('Sending Hip Hop admin notification email to: billydduc@gmail.com, contact@MidtownBiohack.com');
       const adminResult = await transporter.sendMail(adminMailOptions);
       console.log('Hip Hop admin notification email sent successfully:', adminResult.messageId);
       console.log('Hip Hop admin email result details:', {

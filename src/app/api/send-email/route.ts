@@ -180,13 +180,10 @@ export async function POST(request: Request) {
       `
     };
 
-    // Admin notification email - include additional recipients based on location
-    const adminRecipients = ['billydduc@gmail.com'];
+    // Admin notification email - include all admin recipients
+    const adminRecipients = ['billydduc@gmail.com', 'contact@MidtownBiohack.com'];
 
-    // Add location-specific email recipients
-    if (bookingData.location === 'midtown') {
-      adminRecipients.push('contact@midtownbiohack.com');
-    }
+    // Note: Dr. Chuck (contact@MidtownBiohack.com) receives all booking notifications
 
     const adminMailOptions = {
       from: '"Wellnex02 Booking" <billydduc@gmail.com>',
