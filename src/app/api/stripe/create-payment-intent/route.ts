@@ -47,7 +47,9 @@ export async function POST(request: Request) {
 
     // Calculate price based on duration and promotions
     const prices: Record<string, number> = {
+      '0': 0,      // Demo session
       '20': 1,     // $1 test option
+      '45': 100,   // Promotion pricing
       '60': 150,
       '90': 200,
       '120': 250
@@ -60,10 +62,10 @@ export async function POST(request: Request) {
     if (isPromoActive) {
       // Use promotion pricing - no group discounts during promotion
       const promoPrice = getPromotionPricing(duration);
-      calculatedAmount = promoPrice !== null ? promoPrice : (prices[duration] || 150);
+      calculatedAmount = promoPrice !== null ? promoPrice : (prices[duration] || 1);
     } else {
       // Regular pricing with group discounts
-      const basePrice = prices[duration] || 150;
+      const basePrice = prices[duration] || 1;
       const multiplier = groupSizeMultipliers[groupSize as keyof typeof groupSizeMultipliers] || 1.0;
       calculatedAmount = basePrice * multiplier;
     }

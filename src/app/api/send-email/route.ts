@@ -77,10 +77,10 @@ export async function POST(request: Request) {
       if (isPromoActive) {
         // Use promotion pricing - no group discounts during promotion
         const promoPrice = getPromotionPricing(bookingData.duration);
-        totalPrice = promoPrice !== null ? promoPrice : (prices[bookingData.duration] || 150);
+        totalPrice = promoPrice !== null ? promoPrice : (prices[bookingData.duration] || 1);
       } else {
         // Regular pricing with group discounts
-        const basePrice = prices[bookingData.duration] || 150;
+        const basePrice = prices[bookingData.duration] || 1;
         const groupSize = bookingData.groupSize || "1";
         const multiplier = groupSizeMultipliers[groupSize as keyof typeof groupSizeMultipliers] || 1.0;
         totalPrice = basePrice * multiplier;
@@ -125,7 +125,7 @@ export async function POST(request: Request) {
     if (isPromoActive) {
       const promoPrice = getPromotionPricing(bookingData.duration);
       if (promoPrice !== null) {
-        const regularPrice = prices[bookingData.duration] || 150;
+        const regularPrice = prices[bookingData.duration] || 1;
         if (promoPrice < regularPrice) {
           const savings = regularPrice - promoPrice;
           promotionInfo = `
