@@ -20,15 +20,15 @@ export default function Home() {
 
       {/* Location Banner */}
       {locationData && (
-        <div className="bg-blue-600 dark:bg-blue-700 text-white py-3 px-4 sm:px-6 lg:px-8">
+        <div className="py-3 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 flex-shrink-0 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span className="font-medium">
+                <span className="font-medium text-gray-700 dark:text-gray-300">
                   <span className="hidden sm:inline">Now serving </span>
                   <span className="font-bold">{locationData.name}</span>
                   <span className="hidden sm:inline"> - {locationData.address}</span>
@@ -36,11 +36,11 @@ export default function Home() {
               </div>
               <div className="mt-2 sm:mt-0 flex items-center">
                 {locationData.phone && (
-                  <a href={`tel:${locationData.phone}`} className="text-blue-100 hover:text-white transition-colors mr-4">
+                  <a href={`tel:${locationData.phone}`} className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors mr-4">
                     📞 {locationData.phone}
                   </a>
                 )}
-                <a href={`mailto:${locationData.email}`} className="text-blue-100 hover:text-white transition-colors">
+                <a href={`mailto:${locationData.email}`} className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                   ✉️ {locationData.email}
                 </a>
               </div>
