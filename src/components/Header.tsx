@@ -41,14 +41,22 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
   return (
     <header className="py-4 sm:py-6 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center">
       <div className="flex items-center mb-3 sm:mb-0">
-        <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
+        <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
           <span className="sr-only">Home</span>
+          <Image
+            src="/logo.png"
+            alt="WellNex02 Logo"
+            width={200}
+            height={200}
+            className="h-20 w-20 sm:h-24 sm:w-24 lg:h-32 lg:w-32"
+            priority
+          />
           <Image
             src="/midtown_logo.png"
             alt="Midtown Biohack Logo"
             width={200}
             height={200}
-            className="h-24 w-24 sm:h-32 sm:w-32 lg:h-48 lg:w-48"
+            className="h-20 w-20 sm:h-24 sm:w-24 lg:h-32 lg:w-32"
             priority
           />
         </Link>
