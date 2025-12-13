@@ -263,7 +263,7 @@ export default function HipHopBookingPage() {
                     <h5 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">💬 Contact</h5>
                     <p className="text-gray-700 dark:text-gray-300">
                       <strong>Billy Duc</strong><br/>
-                      Email: b.duc@wellnex02.com
+                      Email: contact@midtownbiohack.com
                       <br/>
                       Phone: 646-262-8794
                     </p>

@@ -16,6 +16,8 @@ interface HipHopBookingData {
   time: string;
 }
 
+const DEFAULT_CONTACT_EMAIL = 'contact@midtownbiohack.com';
+
 const serviceNames = {
   'hbot': 'Luxury Hyperbaric Oxygen Therapy (HBOT)',
   'electric-exercise': 'Electric Exercise (EMS)',
@@ -81,10 +83,10 @@ export async function POST(request: Request) {
     
     // User confirmation email
     const userMailOptions = {
-      from: '"Wellnex02 Hip Hop Program" <billydduc@gmail.com>',
+      from: `"Wellnex02 Hip Hop Program" <${DEFAULT_CONTACT_EMAIL}>`,
       to: bookingData.email,
       subject: 'Hip hop Honoree wellness booking request',
-      replyTo: 'billydduc@gmail.com',
+      replyTo: DEFAULT_CONTACT_EMAIL,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
           <div style="text-align: center; margin-bottom: 30px;">
@@ -138,8 +140,8 @@ export async function POST(request: Request) {
             <h3 style="color: #1e40af; font-size: 18px; margin-bottom: 15px; text-align: center;">📍 Midtown Biohack Location</h3>
             <div style="text-align: center;">
               <p style="margin: 5px 0; color: #1e40af;"><strong>Address:</strong> 575 Madison Ave, 23rd floor, New York, NY</p>
-              <p style="margin: 5px 0; color: #1e40af;"><strong>Contact:</strong> Billy Duc</p>
-              <p style="margin: 5px 0; color: #1e40af;"><strong>Email:</strong> billydduc@gmail.com</p>
+              <p style="margin: 5px 0; color: #1e40af;"><strong>Contact:</strong> Midtown Biohack Team</p>
+              <p style="margin: 5px 0; color: #1e40af;"><strong>Email:</strong> ${DEFAULT_CONTACT_EMAIL}</p>
             </div>
           </div>
           
@@ -174,10 +176,10 @@ export async function POST(request: Request) {
 
     // Admin notification email
     const adminMailOptions = {
-      from: '"Wellnex02 Hip Hop Program" <billydduc@gmail.com>',
-      to: 'billydduc@gmail.com',
+      from: `"Wellnex02 Hip Hop Program" <${DEFAULT_CONTACT_EMAIL}>`,
+      to: DEFAULT_CONTACT_EMAIL,
       subject: 'Hip hop Honoree wellness booking request',
-      replyTo: 'billydduc@gmail.com',
+      replyTo: DEFAULT_CONTACT_EMAIL,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
           <div style="text-align: center; margin-bottom: 30px;">
@@ -268,7 +270,7 @@ export async function POST(request: Request) {
       }
 
       // Send admin notification email
-      console.log('Sending Hip Hop admin notification email to: billydduc@gmail.com');
+      console.log('Sending Hip Hop admin notification email to:', DEFAULT_CONTACT_EMAIL);
       const adminResult = await transporter.sendMail(adminMailOptions);
       console.log('Hip Hop admin notification email sent successfully:', adminResult.messageId);
       console.log('Hip Hop admin email result details:', {

@@ -41,7 +41,7 @@ export const locationData = {
     name: "Midtown Biohack",
     address: "575 Madison Ave, 23rd floor, New York, NY",
     phone: "",
-    email: "b.duc@wellnex02.com",
+    email: "contact@midtownbiohack.com",
     owner: "Billy Duc",
     features: [
       "Free parking validation available",

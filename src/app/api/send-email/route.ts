@@ -1,17 +1,11 @@
 import { NextResponse } from 'next/server';
 import * as nodemailer from 'nodemailer';
 import { BookingFormData } from '@/components/BookingForm';
-import { formatCurrency, isPromotionActive, getPromotionPricing } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils';
 import { format } from 'date-fns';
+import { getServiceById } from '@/lib/services';
 
-// Group size multipliers (discount for groups) - same as in BookingForm.tsx
-const groupSizeMultipliers = {
-  "1": 1.0,    // No discount for single guest
-  "2": 1.8,    // 10% discount per guest
-  "3": 2.55,   // 15% discount per guest
-  "4": 3.2,    // 20% discount per guest
-  "5": 3.75,   // 25% discount per guest
-};
+const DEFAULT_CONTACT_EMAIL = 'contact@midtownbiohack.com';
 
 export async function POST(request: Request) {
   try {
@@ -56,36 +50,9 @@ export async function POST(request: Request) {
       : new Date(bookingData.date);
     const formattedDate = format(dateToFormat, 'MMMM d, yyyy');
     
-    // Calculate price based on duration
-    const prices: Record<string, number> = {
-      '0': 0,      // Demo session
-      '20': 1,     // $1 test option
-      '45': 100,   // Promotion pricing
-      '60': 150,
-      '90': 200,
-      '120': 250
-    };
-    
-    // Use the amount from booking data if available, otherwise calculate price
-    let totalPrice: number;
-    if (bookingData.amount !== undefined && bookingData.amount !== null) {
-      // Use the amount that was already calculated in the booking form
-      totalPrice = bookingData.amount;
-    } else {
-      // Fallback to price calculation (for backwards compatibility)
-      const isPromoActive = isPromotionActive(bookingData.location, bookingData.date);
-      if (isPromoActive) {
-        // Use promotion pricing - no group discounts during promotion
-        const promoPrice = getPromotionPricing(bookingData.duration);
-        totalPrice = promoPrice !== null ? promoPrice : (prices[bookingData.duration] || 150);
-      } else {
-        // Regular pricing with group discounts
-        const basePrice = prices[bookingData.duration] || 150;
-        const groupSize = bookingData.groupSize || "1";
-        const multiplier = groupSizeMultipliers[groupSize as keyof typeof groupSizeMultipliers] || 1.0;
-        totalPrice = basePrice * multiplier;
-      }
-    }
+    // Calculate price based on selected service
+    const selectedService = getServiceById((bookingData as any).service);
+    const totalPrice = bookingData.amount ?? selectedService?.price ?? 0;
     
     // Location details
     const locationName = bookingData.location === 'midtown' ? 'Midtown Biohack' : 'Platinum Wellness Spa';
@@ -96,9 +63,9 @@ export async function POST(request: Request) {
     // Contact information based on location
     const contactInfo = bookingData.location === 'midtown' 
       ? {
-          owner: 'Billy Duc',
+          owner: 'Midtown Biohack',
           phone: '',
-          email: 'b.duc@wellnex02.com'
+          email: DEFAULT_CONTACT_EMAIL
         }
       : {
           owner: 'Rebecca Davis & Don Davis',
@@ -106,46 +73,16 @@ export async function POST(request: Request) {
           email: 'rdavis@platinumbbs.com'
         };
 
-    // Group discount info - only show when not in promotion
-    let discountInfo = '';
     const groupSize = bookingData.groupSize || "1";
-    const isPromoActive = isPromotionActive(bookingData.location, bookingData.date);
-    if (!isPromoActive && groupSize !== "1") {
-      const discountPercentages = {
-        "2": "10%",
-        "3": "15%",
-        "4": "20%",
-        "5": "25%"
-      };
-      discountInfo = `<p><strong>Group Discount:</strong> ${discountPercentages[groupSize as "2" | "3" | "4" | "5"]} off per guest</p>`;
-    }
-    
-    // Promotion info
-    let promotionInfo = '';
-    if (isPromoActive) {
-      const promoPrice = getPromotionPricing(bookingData.duration);
-      if (promoPrice !== null) {
-        const regularPrice = prices[bookingData.duration] || 150;
-        if (promoPrice < regularPrice) {
-          const savings = regularPrice - promoPrice;
-          promotionInfo = `
-            <div style="margin: 15px 0; padding: 15px; background-color: #fef3c7; border-radius: 5px; border-left: 4px solid #f59e0b;">
-              <h4 style="color: #92400e; font-size: 16px; margin-bottom: 10px;">🌟 Special Promotion Applied!</h4>
-              <p style="color: #92400e; margin: 5px 0;"><strong>Regular Price:</strong> ${formatCurrency(regularPrice)}</p>
-              <p style="color: #92400e; margin: 5px 0;"><strong>Promotion Price:</strong> ${formatCurrency(promoPrice)}</p>
-              <p style="color: #92400e; margin: 5px 0;"><strong>You Saved:</strong> ${formatCurrency(savings)}</p>
-            </div>
-          `;
-        }
-      }
-    }
+    const discountInfo = '';
+    const promotionInfo = '';
 
     // User confirmation email
     const userMailOptions = {
-      from: '"Wellnex02 Booking" <billydduc@gmail.com>',
+      from: `"Wellnex02 Booking" <${DEFAULT_CONTACT_EMAIL}>`,
       to: bookingData.email,
-      subject: 'Your Hyperbaric Chamber Session Confirmation',
-      replyTo: 'billydduc@gmail.com',
+      subject: selectedService ? `Booking Confirmation: ${selectedService.name}` : 'Your Hyperbaric Chamber Session Confirmation',
+      replyTo: DEFAULT_CONTACT_EMAIL,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
           <h1 style="color: #3b82f6; text-align: center;">Booking Confirmed!</h1>
@@ -157,7 +94,7 @@ export async function POST(request: Request) {
             <p><strong>Name:</strong> ${bookingData.firstName} ${bookingData.lastName}</p>
             <p><strong>Email:</strong> ${bookingData.email}</p>
             <p><strong>Date & Time:</strong> ${formattedDate} at ${bookingData.time}</p>
-            <p><strong>Duration:</strong> ${bookingData.duration === '0' ? 'Demo Session' : `${bookingData.duration} minutes`}</p>
+            ${selectedService ? `<p><strong>Service:</strong> ${selectedService.name}</p>` : ''}
             <p><strong>Location:</strong> ${locationName}</p>
             <p><strong>Address:</strong> ${locationAddress}</p>
             <p><strong>Group Size:</strong> ${groupSize} ${parseInt(groupSize) > 1 ? 'guests' : 'guest'}</p>
@@ -182,10 +119,12 @@ export async function POST(request: Request) {
 
     // Admin notification email
     const adminMailOptions = {
-      from: '"Wellnex02 Booking" <billydduc@gmail.com>',
-      to: 'billydduc@gmail.com',
-      subject: totalPrice === 0 ? 'New Demo Session Booking' : 'New Hyperbaric Chamber Booking',
-      replyTo: 'billydduc@gmail.com',
+      from: `"Wellnex02 Booking" <${DEFAULT_CONTACT_EMAIL}>`,
+      to: DEFAULT_CONTACT_EMAIL,
+      subject: selectedService
+        ? `New Booking: ${selectedService.name}`
+        : totalPrice === 0 ? 'New Demo Session Booking' : 'New Hyperbaric Chamber Booking',
+      replyTo: DEFAULT_CONTACT_EMAIL,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
           <h1 style="color: #3b82f6; text-align: center;">${totalPrice === 0 ? 'New Demo Session Received!' : 'New Booking Received!'}</h1>
@@ -197,10 +136,10 @@ export async function POST(request: Request) {
             <p><strong>Name:</strong> ${bookingData.firstName} ${bookingData.lastName}</p>
             <p><strong>Email:</strong> ${bookingData.email}</p>
             <p><strong>Date & Time:</strong> ${formattedDate} at ${bookingData.time}</p>
-            <p><strong>Duration:</strong> ${bookingData.duration === '0' ? 'Demo Session' : `${bookingData.duration} minutes`}</p>
-            <p><strong>Location:</strong> ${locationName}</p>
-            <p><strong>Address:</strong> ${locationAddress}</p>
-            <p><strong>Group Size:</strong> ${groupSize} ${parseInt(groupSize) > 1 ? 'guests' : 'guest'}</p>
+            ${selectedService ? `<p><strong>Service:</strong> ${selectedService.name}</p>` : ''}
+          <p><strong>Location:</strong> ${locationName}</p>
+          <p><strong>Address:</strong> ${locationAddress}</p>
+          <p><strong>Group Size:</strong> ${groupSize} ${parseInt(groupSize) > 1 ? 'guests' : 'guest'}</p>
             ${discountInfo}
             ${promotionInfo}
             <p><strong>Total Amount:</strong> ${totalPrice === 0 ? 'Demo Session - FREE' : formatCurrency(totalPrice)}</p>
@@ -242,7 +181,7 @@ export async function POST(request: Request) {
       });
       
       // Send admin notification email
-      console.log('Sending admin notification email to: billydduc@gmail.com');
+      console.log('Sending admin notification email to:', DEFAULT_CONTACT_EMAIL);
       const adminResult = await transporter.sendMail(adminMailOptions);
       console.log('Admin notification email sent successfully:', adminResult.messageId);
       
