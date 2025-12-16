@@ -18,8 +18,8 @@ export default function SignupPage() {
     race: "",
     education: "",
     profession: "",
-    age: "",
   });
+  const [creditPack, setCreditPack] = useState<string>("");
   
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -28,12 +28,55 @@ export default function SignupPage() {
   const [emailSent, setEmailSent] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
 
+  const calculateAge = (dob: string): number | null => {
+    if (!dob) return null;
+    const birthDate = new Date(dob);
+    if (Number.isNaN(birthDate.getTime())) return null;
+
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age -= 1;
+    }
+    return age >= 0 ? age : null;
+  };
+
+  const getAgeGroupFromDob = (dob: string): string | null => {
+    const age = calculateAge(dob);
+    if (age === null) return null;
+    if (age < 18) return "Under 18";
+    if (age < 25) return "18-24";
+    if (age < 35) return "25-34";
+    if (age < 45) return "35-44";
+    if (age < 55) return "45-54";
+    if (age < 65) return "55-64";
+    return "65+";
+  };
+
+  const getSiteUrl = () => {
+    if (typeof window !== "undefined" && window.location?.origin) {
+      return window.location.origin;
+    }
+    if (process.env.NEXT_PUBLIC_SITE_URL) {
+      return process.env.NEXT_PUBLIC_SITE_URL;
+    }
+    if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+      return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
+    }
+    return "http://localhost:3000";
+  };
+  
+  const derivedAge = calculateAge(form.dob);
+  const derivedAgeGroup = getAgeGroupFromDob(form.dob);
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     
     if (form.password !== form.confirmPassword) {
       setError("Passwords do not match");
@@ -43,12 +86,29 @@ export default function SignupPage() {
     setLoading(true);
     
     try {
-      // Get the site URL for redirects
-      const siteUrl = process.env.NEXT_PUBLIC_VERCEL_URL 
-        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` 
-        : 'http://localhost:3000';
+      const siteUrl = getSiteUrl();
+      const ageGroup = getAgeGroupFromDob(form.dob);
         
       // Sign up with email
+      const initialCredits = (() => {
+        switch (creditPack) {
+          case "gray-matter":
+            return [{ type: "gray_matter", balance: 4 }];
+          case "optimal-wellness":
+            return [{ type: "optimal_wellness", balance: 4 }];
+          case "hbot-1":
+            return [{ type: "hbot", balance: 1 }];
+          case "hbot-4":
+            return [{ type: "hbot", balance: 4 }];
+          case "hbot-10":
+            return [{ type: "hbot", balance: 10 }];
+          case "challenge-12":
+            return [{ type: "challenge", balance: 12 }];
+          default:
+            return [];
+        }
+      })();
+
       const { error: signUpError } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
@@ -63,7 +123,8 @@ export default function SignupPage() {
             education: form.education,
             profession: form.profession,
             email: form.email,
-            age: form.age,
+            age: ageGroup,
+            credits: initialCredits
           },
           emailRedirectTo: `${siteUrl}/login`,
         }
@@ -81,6 +142,7 @@ export default function SignupPage() {
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "An error occurred during signup";
       setError(errorMessage);
+    } finally {
       setLoading(false);
     }
   };
@@ -327,26 +389,12 @@ export default function SignupPage() {
                     required 
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" 
                   />
-                </div>
-                <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Age Group *</label>
-                  <select
-                    name="age"
-                    value={form.age}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                  >
-                    <option value="">Select age group</option>
-                    <option value="Under 18">Under 18</option>
-                    <option value="18-24">18-24</option>
-                    <option value="25-34">25-34</option>
-                    <option value="35-44">35-44</option>
-                    <option value="45-54">45-54</option>
-                    <option value="55-64">55-64</option>
-                    <option value="65+">65+</option>
-                  </select>
-                  {form.age === "Under 18" && (
+                  {derivedAgeGroup && (
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                      Age group will be set to <span className="font-medium text-gray-900 dark:text-white">{derivedAgeGroup}</span> based on your date of birth.
+                    </p>
+                  )}
+                  {derivedAge !== null && derivedAge < 18 && (
                     <div className="mt-2 p-3 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-lg">
                       <div className="flex items-start">
                         <svg className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -458,6 +506,55 @@ export default function SignupPage() {
                     <option value="Other">Other</option>
                   </select>
                 </div>
+              </div>
+
+              <div className="space-y-3 border rounded-lg border-gray-200 dark:border-gray-700 p-4">
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white">Optional: Purchase Credits</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Choose a credit pack to start with. You can add more later.</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {[
+                    { value: "gray-matter", label: "Gray Matter Session Pack", helper: "4 credits (1 per week)" },
+                    { value: "optimal-wellness", label: "Optimal Wellness Session Pack", helper: "4 credits (1 per week)" },
+                    { value: "hbot-1", label: "HBOT Single", helper: "1 session" },
+                    { value: "hbot-4", label: "HBOT 4-Pack", helper: "4 sessions" },
+                    { value: "hbot-10", label: "HBOT 10-Pack", helper: "10 sessions" },
+                    { value: "challenge-12", label: "12 Week Challenge", helper: "12 credits (1 per week)" },
+                  ].map((option) => (
+                    <label
+                      key={option.value}
+                      className={`border rounded-lg p-3 cursor-pointer transition ${
+                        creditPack === option.value
+                          ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30"
+                          : "border-gray-300 dark:border-gray-700"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="creditPack"
+                        value={option.value}
+                        className="sr-only"
+                        checked={creditPack === option.value}
+                        onChange={(e) => setCreditPack(e.target.value)}
+                      />
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white">{option.label}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">{option.helper}</p>
+                        </div>
+                        {creditPack === option.value && (
+                          <span className="text-blue-600 dark:text-blue-300 font-semibold">Selected</span>
+                        )}
+                      </div>
+                    </label>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  className="text-sm text-blue-600 dark:text-blue-400 underline"
+                  onClick={() => setCreditPack("")}
+                >
+                  Skip credits
+                </button>
               </div>
               
               <div className="flex justify-between">

@@ -7,10 +7,11 @@ import { z } from "zod";
 import { format, isBefore, startOfDay } from "date-fns";
 import { DatePickerField } from "@/components/ui/DatePickerField";
 import { Button } from "@/components/ui/Button";
-import { formatCurrency, getLocationData, isPromotionActive, getPromotionPricing, promotionConfig } from "@/lib/utils";
+import { formatCurrency, getLocationData } from "@/lib/utils";
 import { supabase } from "@/lib/supabaseClient";
 import { FileUpload } from "@/components/ui/FileUpload";
 import { StripePayment } from "@/components/ui/StripePayment";
+import { getServiceById, serviceOptions, ServiceId } from "@/lib/services";
 
 // Define the form schema with zod validation
 const bookingSchema = z.object({
@@ -25,10 +26,11 @@ const bookingSchema = z.object({
   time: z.string({
     required_error: "Please select a time",
   }),
-  duration: z.enum(["0", "20", "45", "60", "90", "120"], {
-    required_error: "Please select a duration",
-  }),
-  location: z.enum(["midtown"], {
+  service: z.enum(
+    serviceOptions.map((s) => s.id) as [ServiceId, ...ServiceId[]],
+    { required_error: "Please select a service" }
+  ),
+  location: z.enum(["midtown", "conyers"], {
     required_error: "Please select a location",
   }),
   groupSize: z.enum(["1", "2", "3", "4"]),
@@ -48,8 +50,11 @@ const bookingSchema = z.object({
 
 export type BookingFormData = z.infer<typeof bookingSchema>;
 export type BookingCompletionData = BookingFormData & {
+  amount?: number;
+  serviceName?: string;
   bookingId?: string;
   id?: string;
+  creditApplied?: boolean;
 };
 
 // Simulated time slots
@@ -65,23 +70,6 @@ const timeSlots = [
   "5:00 PM",
 ];
 
-// Pricing for different durations
-const pricingOptions = {
-  "0": 0,      // Demo session option
-  "20": 1,     // $1 test option
-  "60": 150,
-  "90": 200,
-  "120": 250,
-};
-
-// Group size multipliers (discount for groups)
-const groupSizeMultipliers = {
-  "1": 1.0,    // No discount for single guest
-  "2": 1.8,    // 10% discount per guest
-  "3": 2.55,   // 15% discount per guest
-  "4": 3.2,    // 20% discount per guest
-};
-
 interface BookingFormProps {
   onBookingComplete: (data: BookingCompletionData) => void;
   isAuthenticated: boolean;
@@ -92,6 +80,8 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [availableCredits, setAvailableCredits] = useState<Record<string, number>>({});
+  const [useCredit, setUseCredit] = useState(false);
   
   const [userProfile, setUserProfile] = useState<{
     firstName: string;
@@ -114,10 +104,11 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
-  // Update step definitions - Removed location step for single location branch
+  // Update step definitions - Remove seating step
   const isPersonalInfoStep = isGuest && currentStep === 1;
-  const isBookingDetailsStep = isGuest ? currentStep === 2 : currentStep === 1;
-  const isPaymentStep = isGuest ? currentStep === 3 : currentStep === 2;
+  const isLocationStep = isGuest ? currentStep === 2 : currentStep === 1;
+  const isBookingDetailsStep = isGuest ? currentStep === 3 : currentStep === 2;
+  const isPaymentStep = isGuest ? currentStep === 4 : currentStep === 3; // One less step now
 
   const {
     register,
@@ -136,7 +127,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       phone: "",
       notes: "",
       bookingReason: "",
-      duration: "60",
+      service: serviceOptions[0].id,
       location: "midtown",
       groupSize: "1",
       uploadedFiles: []
@@ -153,6 +144,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
   const handleGroupSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newSize = e.target.value as "1" | "2" | "3" | "4";
     setValue('groupSize', newSize);
+    setUseCredit(false);
   };
 
   // Fetch user profile on component mount (only if authenticated)
@@ -173,6 +165,16 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
           // Get user details from auth
           const { data: userAuth } = await supabase.auth.getUser();
           
+          // Load credits from user metadata
+          const creditsMeta = (userAuth?.user?.user_metadata as any)?.credits || [];
+          const creditMap: Record<string, number> = {};
+          creditsMeta.forEach((c: any) => {
+            if (c?.type) {
+              creditMap[c.type] = (creditMap[c.type] || 0) + (Number(c.balance) || 0);
+            }
+          });
+          setAvailableCredits(creditMap);
+
           // Get profile from profiles table
           const { data: profileData } = await supabase
             .from('profiles')
@@ -241,28 +243,31 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
   }, [setValue, isAuthenticated]);
 
   const selectedDate = watch("date");
-  const selectedDuration = watch("duration");
+  const selectedServiceId = watch("service");
+  const selectedService = getServiceById(selectedServiceId);
   const selectedGroupSize = watch("groupSize");
   const selectedLocation = watch("location");
+  const creditTypeForService: Record<ServiceId, string | null> = {
+    "morris-12-week": "challenge",
+    "wellness-consult": null,
+    "sample-day-pass": null,
+    "gray-matter-recovery-single": "gray_matter",
+    "gray-matter-recovery-4mo": "gray_matter",
+    "executive-recovery-single": "gray_matter",
+    "optimal-wellness-6mo": "optimal_wellness",
+    "optimal-wellness-12mo": "optimal_wellness",
+    "revitalize-wellness-6mo": "optimal_wellness",
+    "revitalize-wellness-12mo": "optimal_wellness",
+    "o2-hbot": "hbot",
+    "jet-lag-recovery": "optimal_wellness",
+    "business-client-recovery": "optimal_wellness",
+    "gray-matter-performance-assessment": "gray_matter",
+    "laboratory-session": null,
+  };
 
   const calculateTotal = () => {
-    // Check if promotion is active for the selected location and date
-    const isPromoActive = selectedDate && selectedLocation ? isPromotionActive(selectedLocation, selectedDate) : false;
-    
-    let basePrice: number;
-    if (isPromoActive) {
-      // Use promotion pricing for 45, 60 minutes during promotion
-      const promoPrice = getPromotionPricing(selectedDuration);
-      basePrice = promoPrice !== null ? promoPrice : (pricingOptions[selectedDuration as keyof typeof pricingOptions] || 0);
-      // No group discounts during promotion - return flat promotion price
-      return basePrice;
-    } else {
-      // Regular pricing for 60, 90, 120 minutes
-      basePrice = pricingOptions[selectedDuration as keyof typeof pricingOptions] || 0;
-      // Apply group discounts for regular pricing
-      const multiplier = groupSizeMultipliers[selectedGroupSize as keyof typeof groupSizeMultipliers] || 1.0;
-      return basePrice * multiplier;
-    }
+    if (useCredit) return 0;
+    return selectedService?.price ?? 0;
   };
 
   const isDateDisabled = (date: Date) => {
@@ -298,21 +303,9 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
   const createBooking = async (data: BookingFormData, providedPaymentId?: string) => {
     setIsSubmitting(true);
     try {
-      // Calculate booking amount
-      const isPromoActive = isPromotionActive(data.location, data.date);
-      let amount: number;
-      if (isPromoActive) {
-        // Use promotion pricing for 45, 60 minutes during promotion
-        const promoPrice = getPromotionPricing(data.duration);
-        amount = promoPrice !== null ? promoPrice : (pricingOptions[data.duration as keyof typeof pricingOptions] || 0);
-        // No group discounts during promotion - use flat promotion price
-      } else {
-        // Regular pricing for 60, 90, 120 minutes
-        const basePrice = pricingOptions[data.duration as keyof typeof pricingOptions] || 0;
-        // Apply group discounts for regular pricing
-        const multiplier = groupSizeMultipliers[data.groupSize as keyof typeof groupSizeMultipliers] || 1.0;
-        amount = basePrice * multiplier;
-      }
+      // Calculate booking amount based on selected service
+      const selectedServiceForBooking = getServiceById(data.service);
+      const amount = useCredit ? 0 : (selectedServiceForBooking?.price ?? 0);
       
       // Get user ID if authenticated
       const { data: { session } } = await supabase.auth.getSession();
@@ -357,7 +350,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         phone: data.phone,
         date: data.date.toISOString().split('T')[0],
         time: data.time,
-        duration: data.duration,
+        duration: "60",
         location: data.location,
         group_size: parseInt(data.groupSize),
         amount,
@@ -371,9 +364,9 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         profession: data.profession || null,
         age: data.age || null,
         notes: data.notes || null,
-        booking_reason: data.bookingReason || null,
+        booking_reason: data.bookingReason || selectedServiceForBooking?.name || null,
         // Payment tracking - booking only created after successful payment
-        payment_status: amount > 0 ? 'completed' : 'demo',
+        payment_status: amount > 0 ? 'completed' : 'credit',
         stripe_payment_intent_id: amount > 0 ? actualPaymentId : null
       };
       
@@ -478,6 +471,30 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       
       console.log('Booking saved successfully:', result);
       
+      // Deduct credit if used
+      if (useCredit) {
+        const creditType = creditTypeForService[data.service];
+        if (creditType && availableCredits[creditType] > 0) {
+          const updatedCredits = { ...availableCredits, [creditType]: availableCredits[creditType] - 1 };
+          try {
+            const { error: updateErr } = await supabase.auth.updateUser({
+              data: {
+                credits: Object.entries(updatedCredits)
+                  .filter(([, balance]) => balance > 0)
+                  .map(([type, balance]) => ({ type, balance }))
+              }
+            });
+            if (updateErr) {
+              console.error('Error updating credits:', updateErr);
+            } else {
+              setAvailableCredits(updatedCredits);
+            }
+          } catch (creditErr) {
+            console.error('Failed to deduct credit:', creditErr);
+          }
+        }
+      }
+      
       // Send confirmation email via API route - wrap this in a try/catch to prevent it from blocking the booking completion
       try {
         console.log('Sending booking confirmation email...');
@@ -489,7 +506,11 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
           },
           body: JSON.stringify({
             action: 'send-email',
-            data: data
+            data: {
+              ...data,
+              amount,
+              serviceName: selectedServiceForBooking?.name
+            }
           }),
         });
 
@@ -512,6 +533,9 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       // Complete booking regardless of email success
       onBookingComplete({
         ...data,
+        amount,
+        serviceName: selectedServiceForBooking?.name,
+        creditApplied: useCredit,
         bookingId: insertedId,
         id: insertedId,
       });
@@ -534,19 +558,22 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       if (isPersonalInfoStep) {
         // Validate personal info for guest users
         isValid = await trigger([
-          "firstName",
-          "lastName",
-          "email",
-          "phone",
-          "gender",
-          "age",
-          "race",
-          "education",
+          "firstName", 
+          "lastName", 
+          "email", 
+          "phone", 
+          "gender", 
+          "age", 
+          "race", 
+          "education", 
           "profession"
         ]);
+      } else if (isLocationStep) {
+        // Validate location
+        isValid = await trigger(["location"]);
       } else if (isBookingDetailsStep) {
         // Validate booking details
-        isValid = await trigger(["date", "time", "duration"]);
+        isValid = await trigger(["date", "time", "service"]);
       }
       
       if (!isValid) {
@@ -615,7 +642,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         {/* Mobile step indicator */}
         <div className="flex sm:hidden justify-center py-3">
           <div className="flex items-center space-x-2">
-            {[1, 2, ...(isGuest ? [3] : [])].map((step) => (
+            {[1, 2, 3, ...(isGuest ? [4] : [])].map((step) => (
               <div key={step} className="flex items-center">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
@@ -628,7 +655,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                 >
                   {step < currentStep ? "✓" : step}
                 </div>
-                {step < (isGuest ? 3 : 2) && (
+                {step < (isGuest ? 4 : 3) && (
                   <div
                     className={`w-6 h-0.5 mx-1 ${
                       step < currentStep ? "bg-green-500" : "bg-gray-200 dark:bg-gray-700"
@@ -651,7 +678,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
             disabled={currentStep === 1}
             type="button"
           >
-            <span className="block">1. {isGuest ? "Your Information" : "Booking Details"}</span>
+            <span className="block">1. {isGuest ? "Your Information" : "Select Location"}</span>
           </button>
           <button
             className={`flex-1 py-4 text-center transition-all-300 text-sm md:text-base ${
@@ -662,19 +689,30 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
             disabled={isGuest && currentStep < 2}
             type="button"
           >
-            <span className="block">2. {isGuest ? "Booking Details" : "Payment"}</span>
+            <span className="block">2. {isGuest ? "Select Location" : "Booking Details"}</span>
+          </button>
+          <button
+            className={`flex-1 py-4 text-center transition-all-300 text-sm md:text-base ${
+              currentStep === 3
+                ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
+                : "text-gray-500 dark:text-gray-400"
+            } ${currentStep < 3 ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={currentStep < 3}
+            type="button"
+          >
+            <span className="block">3. {isGuest ? "Booking Details" : "Payment"}</span>
           </button>
           {isGuest && (
             <button
               className={`flex-1 py-4 text-center transition-all-300 text-sm md:text-base ${
-                currentStep === 3
+                currentStep === 4
                   ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium"
                   : "text-gray-500 dark:text-gray-400"
-              } ${currentStep < 3 ? 'opacity-50 cursor-not-allowed' : ''}`}
-              disabled={currentStep < 3}
+              } ${currentStep < 4 ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={currentStep < 4}
               type="button"
             >
-              <span className="block">3. Payment</span>
+              <span className="block">4. Payment</span>
             </button>
           )}
         </div>
@@ -915,8 +953,174 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
           </div>
         )}
         
-        {/* Hidden Location Field - Midtown branch defaults to midtown */}
-        <input type="hidden" {...register("location")} value="midtown" />
+        {/* Location Selection Step */}
+        {isLocationStep && (
+          <div className="space-y-4 sm:space-y-6 animate-fade-in">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">Select Location</h2>
+
+            {isGuest && (
+              <div className="space-y-4 animate-slide-in-up">
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-3 sm:p-4 rounded-lg">
+                  <h3 className="font-medium text-blue-800 dark:text-blue-200 text-sm sm:text-base">Booking as: {watch('firstName')} {watch('lastName')}</h3>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">{watch('email')} • {watch('phone')}</p>
+                </div>
+              </div>
+            )}
+
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 shadow-sm border border-gray-200 dark:border-gray-700" data-error={errors.location ? "true" : "false"}>
+              <div className="grid grid-cols-1 gap-4 mb-4 sm:mb-6">
+                <label
+                  className={`
+                    relative flex items-center p-4 border rounded-lg cursor-pointer transition-all-300
+                    ${
+                      watch("location") === "midtown"
+                        ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
+                        : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
+                    }
+                  `}
+                >
+                  <input
+                    type="radio"
+                    value="midtown"
+                    {...register("location")}
+                    className="sr-only"
+                  />
+                  <div className="flex-1">
+                    <h3 className={`font-medium ${
+                      watch("location") === "midtown"
+                        ? "text-blue-600 dark:text-blue-400"
+                        : "text-gray-900 dark:text-white"
+                    }`}>
+                      Midtown Biohack
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">575 Madison Ave, 23rd floor, NY, NY</p>
+                  </div>
+                </label>
+
+                <label
+                  className={`
+                    relative flex items-center p-4 border rounded-lg cursor-pointer transition-all-300
+                    ${
+                      watch("location") === "conyers"
+                        ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
+                        : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
+                    }
+                  `}
+                >
+                  <input
+                    type="radio"
+                    value="conyers"
+                    {...register("location")}
+                    className="sr-only"
+                  />
+                  <div className="flex-1">
+                    <h3 className={`font-medium ${
+                      watch("location") === "conyers"
+                        ? "text-blue-600 dark:text-blue-400"
+                        : "text-gray-900 dark:text-white"
+                    }`}>
+                      Platinum Wellness Spa
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">1900 Parker Rd SE, Conyers, GA 30094</p>
+                  </div>
+                </label>
+              </div>
+              {errors.location && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.location.message}</p>
+              )}
+              
+              {/* Location-specific information section */}
+              {watch("location") && (
+                <div className="mt-6 mb-6 p-4 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-100 dark:border-blue-800 animate-fade-in">
+                  <h3 className="font-medium text-lg text-blue-800 dark:text-blue-300 mb-2">
+                    {getLocationData(watch("location"))?.name} Information
+                  </h3>
+                  
+                  <div className="space-y-3">
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      {getLocationData(watch("location"))?.description}
+                    </p>
+                    <ul className="list-disc list-inside text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                      {getLocationData(watch("location"))?.features.map((feature, index) => (
+                        <li key={index}>{feature}</li>
+                      ))}
+                    </ul>
+                    <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mt-2">
+                      Note: {getLocationData(watch("location"))?.note}
+                    </p>
+                  </div>
+
+                  {/* Business Hours Section */}
+                  <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-800">
+                    <h4 className="font-medium text-blue-800 dark:text-blue-300 mb-2">Business Hours</h4>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                      <div className="flex justify-between">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">Monday:</span>
+                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.monday}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">Tuesday:</span>
+                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.tuesday}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">Wednesday:</span>
+                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.wednesday}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">Thursday:</span>
+                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.thursday}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">Friday:</span>
+                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.friday}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">Saturday:</span>
+                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.saturday}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-medium text-gray-700 dark:text-gray-300">Sunday:</span>
+                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.sunday}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Add an image of the location */}
+                  <div className="mt-4 rounded-lg overflow-hidden">
+                    <img 
+                      src={getLocationData(watch("location"))?.imageUrl}
+                      alt={`${getLocationData(watch("location"))?.name} facility`}
+                      className="w-full h-48 object-cover rounded-lg"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between gap-3 sm:gap-0">
+                {isGuest && (
+                  <Button
+                    type="button"
+                    onClick={prevStep}
+                    variant="outline"
+                    isLoading={isStepLoading}
+                    className="w-full sm:w-auto order-2 sm:order-1"
+                  >
+                    Back
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  onClick={nextStep}
+                  isLoading={isStepLoading}
+                  className={`w-full sm:w-auto ${isGuest ? 'sm:ml-auto order-1 sm:order-2' : ''}`}
+                  disabled={!watch("location") || isStepLoading}
+                >
+                  Continue to Booking Details
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* Booking Details Step */}
         {isBookingDetailsStep && (
@@ -1001,291 +1205,52 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               </div>
             </div>
 
-            <div className="animate-slide-in-up animate-delay-300" data-error={errors.duration ? "true" : "false"}>
+            <div className="animate-slide-in-up animate-delay-300" data-error={errors.service ? "true" : "false"}>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Session Duration *
+                Select Service *
               </label>
-              
-              {/* Promotion Banner */}
-              {selectedDate && selectedLocation && isPromotionActive(selectedLocation, selectedDate) && (
-                <div className="mb-4 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg">
-                  <div className="flex items-center">
-                    <span className="text-2xl mr-2">🌟</span>
-                    <div>
-                      <h4 className="font-semibold text-yellow-800 dark:text-yellow-200">Special Promotion Active!</h4>
-                      <p className="text-sm text-yellow-700 dark:text-yellow-300">{promotionConfig.description}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-              
-              <div className="space-y-3">
-                {/* Show promotion durations when promotion is active */}
-                {selectedDate && selectedLocation && isPromotionActive(selectedLocation, selectedDate) ? (
-                  <>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">Choose the Midtown Biohack service you want to book.</p>
 
-                    {/* 45 Minute Session - $75 during promotion */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {serviceOptions.map((service) => {
+                  const isSelected = watch("service") === service.id;
+                  return (
                     <label
+                      key={service.id}
                       className={`
-                        relative flex items-center p-4 border rounded-lg cursor-pointer
-                        ${
-                          watch("duration") === "45"
-                            ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
-                            : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
-                        }
+                        relative flex flex-col items-start justify-between p-4 border rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md
+                        ${isSelected ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400" : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"}
                       `}
                     >
                       <input
                         type="radio"
-                        value="45"
-                        {...register("duration")}
+                        value={service.id}
+                        {...register("service")}
                         className="sr-only"
                       />
-                      <div className="flex-1">
-                        <h3 className={`font-medium ${
-                          watch("duration") === "45"
-                            ? "text-blue-600 dark:text-blue-400"
-                            : "text-gray-900 dark:text-white"
-                        }`}>
-                          45 Minute Session
-                        </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Extended session</p>
+                      <div className="flex-1 w-full">
+                        <div className="flex items-center justify-between">
+                          <h3 className={`font-semibold ${isSelected ? "text-blue-600 dark:text-blue-300" : "text-gray-900 dark:text-white"}`}>
+                            {service.name}
+                          </h3>
+                          <span className={`text-lg font-bold ${isSelected ? "text-blue-600 dark:text-blue-300" : "text-gray-900 dark:text-white"}`}>
+                            {formatCurrency(service.price)}
+                          </span>
+                        </div>
+                        {service.description && (
+                          <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">{service.description}</p>
+                        )}
                       </div>
-                      <div className={`text-lg font-bold ${
-                        watch("duration") === "45"
-                          ? "text-blue-600 dark:text-blue-400"
-                          : "text-gray-900 dark:text-white"
-                      }`}>
-                        {formatCurrency(75)}
-                      </div>
+                      {isSelected && (
+                        <span className="absolute top-3 right-3 text-blue-500 dark:text-blue-300">✓</span>
+                      )}
                     </label>
-
-                    {/* 60 Minute Session - $90 during promotion */}
-                    <label
-                      className={`
-                        relative flex items-center p-4 border rounded-lg cursor-pointer
-                        ${
-                          watch("duration") === "60"
-                            ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
-                            : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
-                        }
-                      `}
-                    >
-                      <input
-                        type="radio"
-                        value="60"
-                        {...register("duration")}
-                        className="sr-only"
-                      />
-                      <div className="flex-1">
-                        <h3 className={`font-medium ${
-                          watch("duration") === "60"
-                            ? "text-blue-600 dark:text-blue-400"
-                            : "text-gray-900 dark:text-white"
-                        }`}>
-                          60 Minute Session
-                        </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Standard session</p>
-                      </div>
-                      <div className={`text-lg font-bold ${
-                        watch("duration") === "60"
-                          ? "text-blue-600 dark:text-blue-400"
-                          : "text-gray-900 dark:text-white"
-                      }`}>
-                        {formatCurrency(90)}
-                      </div>
-                    </label>
-                  </>
-                ) : (
-                  <>
-                    {/* Regular durations when promotion is not active */}
-                    {/* Demo Session */}
-                    <label
-                      className={`
-                        relative flex items-center p-4 border rounded-lg cursor-pointer
-                        ${
-                          watch("duration") === "0"
-                            ? "bg-green-50 border-green-500 dark:bg-green-900/30 dark:border-green-400"
-                            : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
-                        }
-                      `}
-                    >
-                      <input
-                        type="radio"
-                        value="0"
-                        {...register("duration")}
-                        className="sr-only"
-                      />
-                      <div className="flex-1">
-                        <h3 className={`font-medium ${
-                          watch("duration") === "0"
-                            ? "text-green-600 dark:text-green-400"
-                            : "text-gray-900 dark:text-white"
-                        }`}>
-                          Demo Session
-                        </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">No payment required • Skip directly to confirmation</p>
-                      </div>
-                      <div className={`text-lg font-bold ${
-                        watch("duration") === "0"
-                          ? "text-green-600 dark:text-green-400"
-                          : "text-gray-900 dark:text-white"
-                      }`}>
-                        {formatCurrency(0)}
-                        <span className="text-green-600 dark:text-green-400 ml-2">FREE!</span>
-                      </div>
-                    </label>
-
-                    {/* $1 Test Session */}
-                    <label
-                      className={`
-                        relative flex items-center p-4 border rounded-lg cursor-pointer
-                        ${
-                          watch("duration") === "20"
-                            ? "bg-yellow-50 border-yellow-500 dark:bg-yellow-900/30 dark:border-yellow-400"
-                            : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
-                        }
-                      `}
-                    >
-                      <input
-                        type="radio"
-                        value="20"
-                        {...register("duration")}
-                        className="sr-only"
-                      />
-                      <div className="flex-1">
-                        <h3 className={`font-medium ${
-                          watch("duration") === "20"
-                            ? "text-yellow-600 dark:text-yellow-400"
-                            : "text-gray-900 dark:text-white"
-                        }`}>
-                          20 Minute Test Session
-                        </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Payment test • Stripe integration testing</p>
-                      </div>
-                      <div className={`text-lg font-bold ${
-                        watch("duration") === "20"
-                          ? "text-yellow-600 dark:text-yellow-400"
-                          : "text-gray-900 dark:text-white"
-                      }`}>
-                        {formatCurrency(pricingOptions["20"])}
-                        <span className="text-yellow-600 dark:text-yellow-400 ml-2">TEST</span>
-                      </div>
-                    </label>
-
-                    {/* 60 Minute Session */}
-                    <label
-                      className={`
-                        relative flex items-center p-4 border rounded-lg cursor-pointer
-                        ${
-                          watch("duration") === "60"
-                            ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
-                            : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
-                        }
-                      `}
-                    >
-                      <input
-                        type="radio"
-                        value="60"
-                        {...register("duration")}
-                        className="sr-only"
-                      />
-                      <div className="flex-1">
-                        <h3 className={`font-medium ${
-                          watch("duration") === "60"
-                            ? "text-blue-600 dark:text-blue-400"
-                            : "text-gray-900 dark:text-white"
-                        }`}>
-                          60 Minute Session
-                        </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Standard session</p>
-                      </div>
-                      <div className={`text-lg font-bold ${
-                        watch("duration") === "60"
-                          ? "text-blue-600 dark:text-blue-400"
-                          : "text-gray-900 dark:text-white"
-                      }`}>
-                        {formatCurrency(pricingOptions["60"])}
-                      </div>
-                    </label>
-
-                    {/* 90 Minute Session */}
-                    <label
-                      className={`
-                        relative flex items-center p-4 border rounded-lg cursor-pointer
-                        ${
-                          watch("duration") === "90"
-                            ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
-                            : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
-                        }
-                      `}
-                    >
-                      <input
-                        type="radio"
-                        value="90"
-                        {...register("duration")}
-                        className="sr-only"
-                      />
-                      <div className="flex-1">
-                        <h3 className={`font-medium ${
-                          watch("duration") === "90"
-                            ? "text-blue-600 dark:text-blue-400"
-                            : "text-gray-900 dark:text-white"
-                        }`}>
-                          90 Minute Session
-                        </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Extended session</p>
-                      </div>
-                      <div className={`text-lg font-bold ${
-                        watch("duration") === "90"
-                          ? "text-blue-600 dark:text-blue-400"
-                          : "text-gray-900 dark:text-white"
-                      }`}>
-                        {formatCurrency(pricingOptions["90"])}
-                      </div>
-                    </label>
-
-                    {/* 120 Minute Session */}
-                    <label
-                      className={`
-                        relative flex items-center p-4 border rounded-lg cursor-pointer
-                        ${
-                          watch("duration") === "120"
-                            ? "bg-blue-50 border-blue-500 dark:bg-blue-900/30 dark:border-blue-400"
-                            : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-600"
-                        }
-                      `}
-                    >
-                      <input
-                        type="radio"
-                        value="120"
-                        {...register("duration")}
-                        className="sr-only"
-                      />
-                      <div className="flex-1">
-                        <h3 className={`font-medium ${
-                          watch("duration") === "120"
-                            ? "text-blue-600 dark:text-blue-400"
-                            : "text-gray-900 dark:text-white"
-                        }`}>
-                          120 Minute Session
-                        </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Premium session</p>
-                      </div>
-                      <div className={`text-lg font-bold ${
-                        watch("duration") === "120"
-                          ? "text-blue-600 dark:text-blue-400"
-                          : "text-gray-900 dark:text-white"
-                      }`}>
-                        {formatCurrency(pricingOptions["120"])}
-                      </div>
-                    </label>
-                  </>
-                )}
-
+                  );
+                })}
               </div>
-              {errors.duration && (
-                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.duration.message}</p>
+
+              {errors.service && (
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.service.message}</p>
               )}
             </div>
 
@@ -1324,12 +1289,6 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     <span className="text-sm text-gray-600 dark:text-gray-400">
                       {size === "1" ? "Guest" : "Guests"}
                     </span>
-                    {/* Only show discount badges when NOT in promotion */}
-                    {size !== "1" && !(selectedDate && selectedLocation && isPromotionActive(selectedLocation, selectedDate)) && (
-                      <span className="mt-2 px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full dark:bg-green-900/30 dark:text-green-400">
-                        {size === "2" ? "10%" : size === "3" ? "15%" : "20%"} discount
-                      </span>
-                    )}
                   </label>
                 ))}
               </div>
@@ -1420,7 +1379,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                 isLoading={isStepLoading}
                 className="w-full sm:w-auto order-2 sm:order-1"
               >
-                Back
+                Back to Location
               </Button>
               <Button
                 type="button"
@@ -1452,8 +1411,8 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     <p className="font-medium text-gray-900 dark:text-white">{watch("time")}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Duration</p>
-                    <p className="font-medium text-gray-900 dark:text-white">{watch("duration")} minutes</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Service</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{selectedService?.name}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Location</p>
@@ -1504,23 +1463,44 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               )}
             </div>
 
-            {/* Free test confirmation or payment */}
-            {watch("duration") === "0" ? (
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-6 text-center">
-                  <div className="text-4xl mb-4">🎉</div>
-                  <h3 className="text-lg font-semibold text-green-800 dark:text-green-200 mb-2">Demo Session!</h3>
-                  <p className="text-green-700 dark:text-green-300 mb-4">No payment required. Click confirm to complete your booking.</p>
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-6 animate-slide-in-up animate-delay-200">
+              <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Payment Details</h3>
+
+              {isAuthenticated && selectedService && creditTypeForService[selectedService.id] && availableCredits[creditTypeForService[selectedService.id] as string] > 0 && (
+                <label className="flex items-start space-x-3 p-3 border rounded-lg bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700">
+                  <input
+                    type="checkbox"
+                    checked={useCredit}
+                    onChange={(e) => setUseCredit(e.target.checked)}
+                    className="mt-1 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                  />
+                  <div>
+                    <p className="font-medium text-green-800 dark:text-green-200">Apply 1 credit for this booking</p>
+                    <p className="text-sm text-green-700 dark:text-green-300">
+                      {availableCredits[creditTypeForService[selectedService.id] as string]} credit(s) available.
+                    </p>
+                  </div>
+                </label>
+              )}
+
+              {paymentError && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-700 text-sm">{paymentError}</p>
+                </div>
+              )}
+
+              {useCredit ? (
+                <div className="mt-4">
                   <Button
                     type="button"
                     onClick={async () => {
                       try {
                         setIsSubmitting(true);
                         const formData = watch();
-                        await createBooking(formData, undefined); // No payment ID for demo session
+                        await createBooking(formData, undefined);
                       } catch (error) {
-                        console.error('Error creating demo booking:', error);
-                        setPaymentError('Failed to create booking. Please try again.');
+                        console.error('Error creating credit booking:', error);
+                        setPaymentError('Failed to create booking with credit. Please try again.');
                       } finally {
                         setIsSubmitting(false);
                       }
@@ -1528,23 +1508,13 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     isLoading={isSubmitting}
                     className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
                   >
-                    Confirm Demo Booking
+                    Confirm Using Credit
                   </Button>
                 </div>
-              </div>
-            ) : (
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-6 animate-slide-in-up animate-delay-200">
-                <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Payment Details</h3>
-
-                {paymentError && (
-                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-red-700 text-sm">{paymentError}</p>
-                  </div>
-                )}
-
+              ) : (
                 <StripePayment
                   amount={calculateTotal()}
-                  duration={selectedDuration}
+                  duration="60"
                   groupSize={selectedGroupSize}
                   location={selectedLocation}
                   date={selectedDate}
@@ -1559,7 +1529,6 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     setPaymentError(null);
 
                     try {
-                      // Only create booking after successful payment
                       const formData = watch(); // Get current form data
                       console.log('Creating booking with form data:', formData);
                       await createBooking(formData, paymentId); // Pass payment ID directly to avoid race condition
@@ -1574,8 +1543,8 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     setPaymentIntentId(null);
                   }}
                 />
-              </div>
-            )}
+              )}
+            </div>
 
             <div className="pt-4 flex flex-col sm:flex-row justify-between gap-3 sm:gap-4">
               <Button
@@ -1587,13 +1556,11 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               >
                 Back
               </Button>
-              {watch("duration") !== "0" && (
-                <div className="w-full sm:w-auto order-1 sm:order-2 text-center">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Payment will be processed automatically
-                  </p>
-                </div>
-              )}
+              <div className="w-full sm:w-auto order-1 sm:order-2 text-center">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Payment will be processed automatically
+                </p>
+              </div>
             </div>
           </div>
         )}

@@ -7,20 +7,12 @@ import { AssessmentForm, AssessmentFormData } from "@/components/AssessmentForm"
 import { supabase } from "@/lib/supabaseClient";
 import { useLanguage } from "@/lib/LanguageContext";
 import { formatCurrency } from "@/lib/utils";
+import { getServiceById } from "@/lib/services";
 import { format } from "date-fns";
 import Link from "next/link";
 import Image from "next/image";
 import Head from "next/head";
 import { Footer } from "@/components/Footer";
-
-// Pricing for different durations
-const pricingOptions = {
-  "20": 1,     // $1 test option
-  "45": 100,   // Promotion pricing
-  "60": 150,
-  "90": 200,
-  "120": 250,
-};
 
 // Helper functions
 const getGoogleMapsUrl = (address: string) => {
@@ -33,7 +25,7 @@ const getLocationData = (location: string) => {
     return {
       owner: "Billy Duc",
       phone: "",
-      email: "b.duc@wellnex02.com"
+      email: "contact@midtownbiohack.com"
     };
   } else {
     return {
@@ -51,6 +43,7 @@ export default function BookingPage() {
   const [showAssessment, setShowAssessment] = useState(false);
   const [assessmentComplete, setAssessmentComplete] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const selectedService = bookingDetails ? getServiceById(bookingDetails.service) : null;
   const { t } = useLanguage();
 
   // Check if user is authenticated
@@ -218,8 +211,10 @@ export default function BookingPage() {
                     </p>
                   </div>
                   <div className="animate-slide-in-right animate-delay-500">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('duration')}</p>
-                    <p className="font-medium text-gray-900 dark:text-white">{bookingDetails.duration} {t('minutes')}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Service</p>
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {selectedService?.name || 'Selected service'}
+                    </p>
                   </div>
                   <div className="animate-slide-in-left animate-delay-400">
                     <p className="text-sm text-gray-500 dark:text-gray-400">{t('location')}</p>
@@ -295,7 +290,7 @@ export default function BookingPage() {
                   <div className="animate-slide-in-up animate-delay-500">
                     <p className="text-sm text-gray-500 dark:text-gray-400">{t('totalAmount')}</p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {formatCurrency(pricingOptions[bookingDetails.duration as keyof typeof pricingOptions])}
+                      {formatCurrency(bookingDetails.amount ?? selectedService?.price ?? 0)}
                     </p>
                   </div>
                 </div>
