@@ -263,7 +263,7 @@ export default function HipHopBookingPage() {
                     <h5 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">💬 Contact</h5>
                     <p className="text-gray-700 dark:text-gray-300">
                       <strong>Billy Duc</strong><br/>
-                      Email: b.duc@wellnex02.com
+                      Email: contact@midtownbiohack.com
                       <br/>
                       Phone: 646-262-8794
                     </p>
@@ -357,7 +357,7 @@ export default function HipHopBookingPage() {
             <div className="p-8">
               <p className="text-xl text-gray-800 dark:text-gray-200 mb-4">
                 <strong>Congratulations on being honored by the hip hop museum 🎉</strong> As part of this exciting time,
-                Wellnex02 and Midtown Biohack are pleased to extend an exclusive complimentary wellness offer to you.
+                Midtown Biohack is pleased to extend an exclusive complimentary wellness offer to you.
               </p>
 
               <p className="text-lg text-gray-700 dark:text-gray-300">
