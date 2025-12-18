@@ -55,23 +55,15 @@ export async function POST(request: Request) {
     const totalPrice = bookingData.amount ?? selectedService?.price ?? 0;
     
     // Location details
-    const locationName = bookingData.location === 'midtown' ? 'Midtown Biohack' : 'Platinum Wellness Spa';
-    const locationAddress = bookingData.location === 'midtown' 
-      ? '575 Madison Ave, 23rd floor, New York, NY' 
-      : '1900 Parker Rd SE, Conyers, GA 30094';
-    
-    // Contact information based on location
-    const contactInfo = bookingData.location === 'midtown' 
-      ? {
-          owner: 'Midtown Biohack',
-          phone: '',
-          email: DEFAULT_CONTACT_EMAIL
-        }
-      : {
-          owner: 'Rebecca Davis & Don Davis',
-          phone: '7708007500',
-          email: 'rdavis@platinumbbs.com'
-        };
+    const locationName = 'Midtown Biohack';
+    const locationAddress = '575 Madison Ave, 23rd floor, New York, NY';
+
+    // Contact information
+    const contactInfo = {
+      owner: 'Midtown Biohack',
+      phone: '',
+      email: DEFAULT_CONTACT_EMAIL
+    };
 
     const groupSize = bookingData.groupSize || "1";
     const discountInfo = '';
@@ -79,7 +71,7 @@ export async function POST(request: Request) {
 
     // User confirmation email
     const userMailOptions = {
-      from: `"Wellnex02 Booking" <${DEFAULT_CONTACT_EMAIL}>`,
+      from: `"Midtown Biohack Booking" <${DEFAULT_CONTACT_EMAIL}>`,
       to: bookingData.email,
       subject: selectedService ? `Booking Confirmation: ${selectedService.name}` : 'Your Hyperbaric Chamber Session Confirmation',
       replyTo: DEFAULT_CONTACT_EMAIL,
@@ -119,7 +111,7 @@ export async function POST(request: Request) {
 
     // Admin notification email
     const adminMailOptions = {
-      from: `"Wellnex02 Booking" <${DEFAULT_CONTACT_EMAIL}>`,
+      from: `"Midtown Biohack Booking" <${DEFAULT_CONTACT_EMAIL}>`,
       to: DEFAULT_CONTACT_EMAIL,
       subject: selectedService
         ? `New Booking: ${selectedService.name}`

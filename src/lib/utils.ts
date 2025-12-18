@@ -36,7 +36,7 @@ export function delay(ms: number): Promise<void> {
 /**
  * Get the current branch based on the domain
  */
-export function getCurrentBranch(): 'midtown' | 'conyers' {
+export function getCurrentBranch(): 'midtown' {
   // Always return midtown for this branch
   return 'midtown';
 }
@@ -69,40 +69,15 @@ export const locationData = {
       sunday: "Closed"
     },
     imageUrl: "/HBOT.png"
-  },
-  conyers: {
-    name: "Platinum Wellness Spa",
-    address: "1900 Parker Rd SE, Conyers, GA 30094",
-    phone: "7708007500",
-    email: "rdavis@platinumbbs.com",
-    owner: "Rebecca Davis & Don Davis",
-    features: [
-      "Ample free parking",
-      "Luxury spa amenities",
-      "Additional wellness services available for booking",
-      "Relaxation area with herbal teas"
-    ],
-    description: "Our Conyers location offers a serene spa environment with comprehensive wellness services.",
-    note: "Ask about our package deals when combining with other spa services.",
-    hours: {
-      monday: "9:00 AM - 6:00 PM",
-      tuesday: "9:00 AM - 6:00 PM",
-      wednesday: "9:00 AM - 6:00 PM",
-      thursday: "9:00 AM - 6:00 PM",
-      friday: "9:00 AM - 6:00 PM",
-      saturday: "10:00 AM - 4:00 PM",
-      sunday: "Closed"
-    },
-    imageUrl: "/People_HBOT.png"
   }
 };
 
 /**
  * Get location data by location ID
  */
-export function getLocationData(locationId: 'midtown' | 'conyers' | null) {
+export function getLocationData(locationId: 'midtown' | null) {
   if (!locationId) return null;
-  return locationData[locationId];
+  return locationData.midtown;
 }
 
 /**
@@ -115,17 +90,17 @@ export function getGoogleMapsUrl(address: string): string {
 }
 
 /**
- * Promotion configuration for Platinum Wellness Spa
+ * Promotion configuration (disabled for Midtown)
  */
 export const promotionConfig = {
-  isActive: true,
-  location: 'conyers', // Platinum Wellness Spa
+  isActive: false,
+  location: 'midtown',
   startDate: new Date('2025-09-15'),
   endDate: new Date('2025-10-31'),
   pricing: {
-    '20': 0,    // FREE 20-Minute HBOT Session
-    '45': 75,   // $75 for 45 Minutes
-    '60': 90,   // $90 for 60 Minutes
+    '20': 0,
+    '45': 75,
+    '60': 90,
   },
   description: "🌟 Special Promotion: FREE 20-Minute HBOT Session, $75 for 45 Minutes, $90 for 60 Minutes"
 };

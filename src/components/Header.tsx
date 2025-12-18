@@ -44,14 +44,6 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
         <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
           <span className="sr-only">Home</span>
           <Image
-            src="/logo.png"
-            alt="WellNex02 Logo"
-            width={200}
-            height={200}
-            className="h-20 w-20 sm:h-24 sm:w-24 lg:h-32 lg:w-32"
-            priority
-          />
-          <Image
             src="/midtown_logo.png"
             alt="Midtown Biohack Logo"
             width={200}
