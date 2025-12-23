@@ -9,7 +9,8 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // You can define custom colors here
+        'columbia-blue': '#9BDDFF',
+        'columbia-blue-hover': '#7ECCFF',
       },
     },
   },

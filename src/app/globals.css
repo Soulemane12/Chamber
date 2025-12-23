@@ -40,6 +40,11 @@
   --input: #e5e7eb;
   --card: #ffffff;
   --card-foreground: #171717;
+  --columbia-blue: #9BDDFF;
+  --columbia-blue-hover: #7ECCFF;
+  --black-bg: #000000;
+  --text-light: #F5F5F5;
+  --text-gray: #D1D5DB;
 }
 
 @theme inline {

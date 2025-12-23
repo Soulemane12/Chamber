@@ -3,227 +3,118 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Header } from "@/components/Header";
-import { useLanguage } from "@/lib/LanguageContext";
 import { Footer } from "@/components/Footer";
-import { getCurrentBranch, getLocationData } from "@/lib/utils";
 
 export default function Home() {
-  const { t } = useLanguage();
-
-  // Get current branch location data
-  const currentBranch = getCurrentBranch();
-  const locationData = getLocationData(currentBranch);
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-black flex flex-col">
       <Header currentPage="home" />
 
-      {/* Location Banner */}
-      {locationData && (
-        <div className="py-3 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 flex-shrink-0 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <span className="font-medium text-gray-700 dark:text-gray-300">
-                  <span className="hidden sm:inline">Now serving </span>
-                  <span className="font-bold">{locationData.name}</span>
-                  <span className="hidden sm:inline"> - {locationData.address}</span>
-                </span>
-              </div>
-              <div className="mt-2 sm:mt-0 flex items-center">
-                {locationData.phone && (
-                  <a href={`tel:${locationData.phone}`} className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors mr-4">
-                    📞 {locationData.phone}
-                  </a>
-                )}
-                <a href={`mailto:${locationData.email}`} className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  ✉️ {locationData.email}
-                </a>
-              </div>
-            </div>
-          </div>
+      <main className="flex-1 flex flex-col lg:flex-row items-stretch">
+        {/* Left Column - Guy Image */}
+        <div className="relative w-full h-[50vh] lg:h-auto lg:w-1/2 bg-black animate-slide-in-left">
+          <Image
+            src="/guy.png"
+            alt="Midtown Biohack Character"
+            fill
+            className="object-contain object-center lg:object-left"
+            priority
+            quality={85}
+          />
         </div>
-      )}
 
-      <main className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="text-center mb-12 sm:mb-16 animate-fade-in">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 animate-slide-in-up">
-            {t('heroTitle')}
+        {/* Right Column - Content */}
+        <div className="flex-1 lg:w-1/2 flex flex-col justify-center items-center px-6 sm:px-10 lg:px-12 xl:px-16 py-10 lg:py-12 bg-black">
+          {/* Logo */}
+          <div className="mb-6 lg:mb-8 animate-fade-in">
+            <Image
+              src="/midtown_logo.png"
+              alt="Midtown Biohack Logo"
+              width={150}
+              height={150}
+              className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32"
+              priority
+            />
+          </div>
+
+          {/* Welcome Heading */}
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-4 text-center animate-slide-in-up animate-delay-100">
+            Welcome to Midtown Biohack™
           </h1>
-          {locationData && (
-            <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg inline-block">
-              <p className="text-lg font-semibold text-blue-800 dark:text-blue-200">
-                📍 Available at {locationData.name}
-              </p>
-              <p className="text-sm text-blue-600 dark:text-blue-300">
-                {locationData.address}
-              </p>
-            </div>
-          )}
-          <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto animate-slide-in-up animate-delay-200 px-2 sm:px-0">
-            {t('heroSubtitle')}
+
+          {/* Subheading - Columbia Blue */}
+          <h2 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-semibold mb-5 text-center animate-slide-in-up animate-delay-200" style={{ color: '#9BDDFF' }}>
+            New York's private human performance and recovery Lab
+          </h2>
+
+          {/* Description */}
+          <p className="text-sm sm:text-base lg:text-lg text-gray-300 mb-5 max-w-2xl text-center leading-relaxed animate-fade-in animate-delay-300">
+            This is your access point to our concierge service designed specifically for you to help recover faster, perform better and live with greater clarity and energy
           </p>
-          <div className="mt-8 sm:mt-10 animate-fade-in animate-delay-300">
+
+          {/* CTA Text */}
+          <p className="text-base sm:text-lg lg:text-xl text-white mb-6 font-medium text-center animate-slide-in-up animate-delay-400">
+            Click below to start your Journey
+          </p>
+
+          {/* Button Group */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-8 w-full max-w-md animate-scale-in animate-delay-500">
             <Link
               href="/booking"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-3 rounded-full text-base sm:text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 hover:translate-y-[-3px] active:scale-95 inline-block w-full sm:w-auto text-center"
+              className="flex-1 px-8 py-3 text-base font-bold rounded-lg text-black text-center transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+              style={{
+                backgroundColor: '#9BDDFF',
+                boxShadow: '0 4px 20px rgba(155, 221, 255, 0.5)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#7ECCFF';
+                e.currentTarget.style.boxShadow = '0 6px 30px rgba(155, 221, 255, 0.7)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#9BDDFF';
+                e.currentTarget.style.boxShadow = '0 4px 20px rgba(155, 221, 255, 0.5)';
+              }}
             >
-              {t('bookYourSession')}
+              Book Now
             </Link>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-12 sm:mb-16">
-          <div className="bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-xl shadow-md hover-scale transition-all-300 animate-fade-in animate-delay-100">
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">{t('efficientRecovery')}</h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              {t('efficientRecoveryDesc')}
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md hover-scale transition-all-300 animate-fade-in animate-delay-200">
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600 dark:text-blue-400 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">{t('enhancedPerformance')}</h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              {t('enhancedPerformanceDesc')}
-            </p>
+            <a
+              href="https://midtownbiohack.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 px-8 py-3 text-base font-bold rounded-lg text-center transition-all duration-300 hover:scale-105"
+              style={{
+                border: '2px solid #9BDDFF',
+                color: '#9BDDFF'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#9BDDFF';
+                e.currentTarget.style.color = '#000000';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = '#9BDDFF';
+              }}
+            >
+              Website
+            </a>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-md hover-scale transition-all-300 animate-fade-in animate-delay-300">
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600 dark:text-blue-400 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">{t('wellnessBoost')}</h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              {t('wellnessBoostDesc')}
-            </p>
-          </div>
-        </div>
-
-        {/* HBOT Benefits Section */}
-        <div className="mb-12 sm:mb-16 animate-fade-in">
-          <div className="text-center mb-8 sm:mb-10 px-4 sm:px-0">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-gray-900 dark:text-white">
-              🌿 5 Wellness-Level Benefits of Hyperbaric Oxygen Therapy
-            </h2>
-            <div className="w-16 sm:w-20 h-1 bg-blue-600 mx-auto"></div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover-scale transition-all-300">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Enhanced Immune Function</h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Hyperbaric oxygen therapy boosts white blood cell activity and helps the body fight infections more effectively.
-              </p>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover-scale transition-all-300">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Increased Stem Cell Production</h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                It stimulates the release and activity of stem cells, which are essential for tissue repair and regeneration.
-              </p>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover-scale transition-all-300">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Improved Cognitive Function</h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Some studies suggest hyperbaric oxygen therapy may enhance memory, focus, and mental clarity, especially in aging individuals or those recovering from brain injuries.
-              </p>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover-scale transition-all-300">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Reduced Inflammation</h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                The therapy has anti-inflammatory effects, which can help with chronic pain and inflammatory conditions.
-              </p>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover-scale transition-all-300">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Better Physical Recovery</h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Athletes and active individuals use hyperbaric oxygen therapy to speed up recovery from workouts, injuries, and surgeries by improving oxygen delivery to tissues.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div className="w-full h-px bg-gray-200 dark:bg-gray-700 my-12 sm:my-16"></div>
-        
-        {/* HBOT Conditions Section */}
-        <div className="mb-12 sm:mb-16 animate-fade-in">
-          <div className="text-center mb-8 sm:mb-10 px-4 sm:px-0">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 text-gray-900 dark:text-white">
-              🩺 5 Conditions Commonly Treated with Hyperbaric Oxygen Therapy
-            </h2>
-            <div className="w-16 sm:w-20 h-1 bg-blue-600 mx-auto"></div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-6">
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover-scale transition-all-300">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Chronic Wounds</h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Hyperbaric oxygen therapy promotes healing in wounds that are slow to close due to poor circulation or infection.
-              </p>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover-scale transition-all-300">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Carbon Monoxide Poisoning</h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                It helps displace carbon monoxide from hemoglobin, restoring oxygen delivery to tissues.
-              </p>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover-scale transition-all-300">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Radiation Injuries</h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Used to treat tissue damage caused by radiation therapy, such as in cancer patients.
-              </p>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover-scale transition-all-300">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Decompression Sickness</h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                Common in divers, hyperbaric oxygen therapy helps eliminate nitrogen bubbles from the bloodstream.
-              </p>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover-scale transition-all-300">
-              <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Severe Infections</h3>
-              <p className="text-gray-600 dark:text-gray-300">
-                The high-oxygen environment inhibits the growth of anaerobic bacteria and supports immune systems.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="text-center animate-fade-in animate-delay-400 px-4 sm:px-0">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-gray-900 dark:text-white animate-slide-in-up">{t('readyToExperience')}</h2>
-          <Link
-            href="/booking"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 sm:px-8 py-3 rounded-full text-base sm:text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 hover:translate-y-[-3px] active:scale-95 animate-bounce inline-block w-full sm:w-auto text-center"
-          >
-            {t('bookYourSessionNow')}
-          </Link>
+          {/* Contact Email */}
+          <p className="text-xs sm:text-sm lg:text-base text-gray-400 text-center animate-fade-in animate-delay-500">
+            More information: <a
+              href="mailto:contact@midtownbiohack"
+              className="transition-colors"
+              style={{ color: '#9BDDFF' }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#7ECCFF'}
+              onMouseLeave={(e) => e.currentTarget.style.color = '#9BDDFF'}
+            >
+              contact@midtownbiohack
+            </a>
+          </p>
         </div>
       </main>
 
-      <Footer className="mt-12 sm:mt-16" />
+      <Footer className="bg-black border-t border-gray-800" />
     </div>
   );
 }
