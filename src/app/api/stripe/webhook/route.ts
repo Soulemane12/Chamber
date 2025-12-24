@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { supabase } from '@/lib/supabaseClient';
 import { getStripeInstance, getStripeConfig } from '@/lib/stripeConfig';
+import { getCreditAllocationRule, calculateExpirationDate } from '@/lib/creditRules';
+import { getServiceById } from '@/lib/services';
+import { CreditPackage } from '@/types/credits';
 
 // Get Stripe instance for Midtown (this domain serves Midtown only)
 const getStripeForWebhook = () => {
@@ -37,20 +40,84 @@ export async function POST(req: NextRequest) {
     case 'payment_intent.succeeded':
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
       console.log('PaymentIntent succeeded:', paymentIntent.id);
-      
-      // Update booking status in database
+
+      // Update booking status and allocate credits if applicable
       try {
-        const { error } = await supabase
+        // 1. Get booking details to find service ID
+        const { data: booking, error: bookingError } = await supabase
           .from('bookings')
-          .update({ 
+          .select('*, user_id, booking_reason')
+          .eq('stripe_payment_intent_id', paymentIntent.id)
+          .single();
+
+        if (bookingError || !booking) {
+          console.error('Error finding booking:', bookingError);
+          break;
+        }
+
+        // 2. Update booking payment status
+        const { error: updateError } = await supabase
+          .from('bookings')
+          .update({
             payment_status: 'completed',
-            stripe_payment_intent_id: paymentIntent.id,
             updated_at: new Date().toISOString()
           })
-          .eq('stripe_payment_intent_id', paymentIntent.id);
+          .eq('id', booking.id);
 
-        if (error) {
-          console.error('Error updating booking payment status:', error);
+        if (updateError) {
+          console.error('Error updating booking payment status:', updateError);
+        }
+
+        // 3. Check if this service grants credits
+        const serviceId = booking.booking_reason; // Contains service ID
+        const creditRule = getCreditAllocationRule(serviceId);
+
+        if (creditRule && booking.user_id) {
+          // This is a package purchase - allocate credits
+          console.log(`Allocating ${creditRule.sessions} ${creditRule.creditType} credits to user ${booking.user_id}`);
+
+          // 4. Get current user credits
+          const { data: userData, error: userError } = await supabase.auth.admin.getUserById(booking.user_id);
+
+          if (userError || !userData) {
+            console.error('Error fetching user:', userError);
+            break;
+          }
+
+          // 5. Prepare new credit package
+          const service = getServiceById(serviceId);
+          const expirationDate = calculateExpirationDate(creditRule.expirationDays);
+          const purchaseDate = new Date().toISOString();
+
+          const newCreditPackage: CreditPackage = {
+            type: creditRule.creditType,
+            balance: creditRule.sessions,
+            expiresAt: expirationDate,
+            packageName: service?.name || serviceId,
+            purchasedAt: purchaseDate,
+            originalBalance: creditRule.sessions,
+          };
+
+          // 6. Add to existing credits (maintain old credits for backwards compatibility)
+          const existingCredits = (userData.user.user_metadata?.credits as CreditPackage[]) || [];
+          const updatedCredits = [...existingCredits, newCreditPackage];
+
+          // 7. Update user metadata with new credits
+          const { error: updateUserError } = await supabase.auth.admin.updateUserById(
+            booking.user_id,
+            {
+              user_metadata: {
+                ...userData.user.user_metadata,
+                credits: updatedCredits,
+              }
+            }
+          );
+
+          if (updateUserError) {
+            console.error('Error updating user credits:', updateUserError);
+          } else {
+            console.log(`Successfully allocated credits to user ${booking.user_id}`);
+          }
         }
       } catch (dbError) {
         console.error('Database error:', dbError);

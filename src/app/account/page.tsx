@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Head from "next/head";
+import { CreditsDisplay } from "@/components/CreditsDisplay";
+import { BookingHistory } from "@/components/BookingHistory";
 
 interface Profile {
   id: string;
@@ -552,6 +554,14 @@ export default function AccountPage() {
                   <p className="text-gray-900 dark:text-white">{profile?.profession || "-"}</p>
                 </div>
               </div>
+            </div>
+
+            <div className="mt-8">
+              <CreditsDisplay userId={profile.id} />
+            </div>
+
+            <div className="mt-8">
+              <BookingHistory userId={profile.id} />
             </div>
 
             <div className="mt-8 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6">

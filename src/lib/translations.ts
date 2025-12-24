@@ -24,8 +24,8 @@ export const translations = {
     bookYourSessionNow: "Book Your Session Now",
     
     // Booking Form
-    bookingTitle: "Book Your Hyperbaric Chamber Session",
-    bookingSubtitle: "Fill out the form below to schedule your hyperbaric oxygen therapy session at one of our premium wellness centers.",
+    bookingTitle: "Choose Your Recovery Options",
+    bookingSubtitle: "Choose the package that best fits you",
     personalDetails: "Personal Details",
     details: "Details",
     dateTime: "Date & Time",
@@ -105,8 +105,8 @@ export const translations = {
     bookYourSessionNow: "Réservez votre séance maintenant",
     
     // Booking Form
-    bookingTitle: "Réservez votre séance de chambre hyperbare",
-    bookingSubtitle: "Remplissez le formulaire ci-dessous pour planifier votre séance d'oxygénothérapie hyperbare dans l'un de nos centres de bien-être premium.",
+    bookingTitle: "Choisissez vos options de récupération",
+    bookingSubtitle: "Choisissez le forfait qui vous convient le mieux",
     personalDetails: "Informations personnelles",
     details: "Détails",
     dateTime: "Date et heure",
@@ -186,8 +186,8 @@ export const translations = {
     bookYourSessionNow: "Reserve su sesión ahora",
     
     // Booking Form
-    bookingTitle: "Reserve su sesión de cámara hiperbárica",
-    bookingSubtitle: "Complete el formulario a continuación para programar su sesión de terapia de oxígeno hiperbárico en uno de nuestros centros de bienestar premium.",
+    bookingTitle: "Elija sus opciones de recuperación",
+    bookingSubtitle: "Elija el paquete que mejor se adapte a usted",
     personalDetails: "Datos personales",
     details: "Detalles",
     dateTime: "Fecha y hora",
@@ -267,8 +267,8 @@ export const translations = {
     bookYourSessionNow: "立即预约您的疗程",
     
     // Booking Form
-    bookingTitle: "预约您的高压氧舱疗程",
-    bookingSubtitle: "填写下面的表格，在我们的高级健康中心之一安排您的高压氧疗疗程。",
+    bookingTitle: "选择您的恢复选项",
+    bookingSubtitle: "选择最适合您的套餐",
     personalDetails: "个人信息",
     details: "详情",
     dateTime: "日期和时间",
@@ -348,8 +348,8 @@ export const translations = {
     bookYourSessionNow: "今すぐセッションを予約",
     
     // Booking Form
-    bookingTitle: "高気圧酸素室セッションを予約",
-    bookingSubtitle: "以下のフォームに記入して、私たちのプレミアムウェルネスセンターで高気圧酸素療法セッションを予約してください。",
+    bookingTitle: "リカバリーオプションを選択",
+    bookingSubtitle: "最適なパッケージを選択してください",
     personalDetails: "個人情報",
     details: "詳細",
     dateTime: "日付と時間",
@@ -429,8 +429,8 @@ export const translations = {
     bookYourSessionNow: "Prenota la tua sessione ora",
     
     // Booking Form
-    bookingTitle: "Prenota la tua sessione in camera iperbarica",
-    bookingSubtitle: "Compila il modulo sottostante per programmare la tua sessione di ossigenoterapia iperbarica in uno dei nostri centri benessere premium.",
+    bookingTitle: "Scegli le tue opzioni di recupero",
+    bookingSubtitle: "Scegli il pacchetto più adatto a te",
     personalDetails: "Dati personali",
     details: "Dettagli",
     dateTime: "Data e ora",

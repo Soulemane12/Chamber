@@ -12,6 +12,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { FileUpload } from "@/components/ui/FileUpload";
 import { StripePayment } from "@/components/ui/StripePayment";
 import { getServiceById, serviceOptions, ServiceId } from "@/lib/services";
+import { CreditPackage } from "@/types/credits";
 
 // Define the form schema with zod validation
 const bookingSchema = z.object({
@@ -165,11 +166,23 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
           // Get user details from auth
           const { data: userAuth } = await supabase.auth.getUser();
           
-          // Load credits from user metadata
+          // Load credits from user metadata (with expiration filtering)
           const creditsMeta = (userAuth?.user?.user_metadata as any)?.credits || [];
           const creditMap: Record<string, number> = {};
-          creditsMeta.forEach((c: any) => {
-            if (c?.type) {
+          const now = new Date();
+
+          creditsMeta.forEach((c: CreditPackage) => {
+            if (c?.type && c.balance > 0) {
+              // Check if credit has expired
+              if (c.expiresAt) {
+                const expirationDate = new Date(c.expiresAt);
+                if (expirationDate < now) {
+                  // Credit expired, skip it
+                  return;
+                }
+              }
+
+              // Add non-expired credits to map
               creditMap[c.type] = (creditMap[c.type] || 0) + (Number(c.balance) || 0);
             }
           });
@@ -251,11 +264,13 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
     "morris-12-week": "challenge",
     "wellness-consult": null,
     "sample-day-pass": null,
-    "gray-matter-recovery-single": "gray_matter",
-    "gray-matter-recovery-4mo": "gray_matter",
-    "executive-recovery-single": "gray_matter",
+    "gray-matter-recovery-3mo": "gray_matter",
+    "gray-matter-recovery-6mo": "gray_matter",
+    "gray-matter-recovery-12mo": "gray_matter",
+    "optimal-wellness-3mo": "optimal_wellness",
     "optimal-wellness-6mo": "optimal_wellness",
     "optimal-wellness-12mo": "optimal_wellness",
+    "revitalize-wellness-3mo": "optimal_wellness",
     "revitalize-wellness-6mo": "optimal_wellness",
     "revitalize-wellness-12mo": "optimal_wellness",
     "o2-hbot": "hbot",
@@ -475,19 +490,67 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       if (useCredit) {
         const creditType = creditTypeForService[data.service];
         if (creditType && availableCredits[creditType] > 0) {
-          const updatedCredits = { ...availableCredits, [creditType]: availableCredits[creditType] - 1 };
           try {
+            // Get current user to access full credit packages
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) throw new Error('User not found');
+
+            const creditPackages = (user.user_metadata?.credits as CreditPackage[]) || [];
+
+            // Find first non-expired package of the required type with balance > 0
+            const now = new Date();
+            let deducted = false;
+
+            const updatedPackages = creditPackages.map(pkg => {
+              if (deducted) return pkg;
+
+              // Check if this package matches our needs
+              if (pkg.type === creditType && pkg.balance > 0) {
+                // Check expiration
+                if (pkg.expiresAt) {
+                  const expirationDate = new Date(pkg.expiresAt);
+                  if (expirationDate < now) {
+                    // Package expired, skip it
+                    return pkg;
+                  }
+                }
+
+                // Deduct from this package
+                deducted = true;
+                return {
+                  ...pkg,
+                  balance: pkg.balance - 1,
+                };
+              }
+
+              return pkg;
+            });
+
+            if (!deducted) {
+              console.error('No valid credits found to deduct');
+              throw new Error('No valid credits available');
+            }
+
+            // Update user metadata with new credit balances
             const { error: updateErr } = await supabase.auth.updateUser({
               data: {
-                credits: Object.entries(updatedCredits)
-                  .filter(([, balance]) => balance > 0)
-                  .map(([type, balance]) => ({ type, balance }))
+                credits: updatedPackages.filter(pkg => pkg.balance > 0 || pkg.expiresAt !== null)
               }
             });
+
             if (updateErr) {
               console.error('Error updating credits:', updateErr);
             } else {
-              setAvailableCredits(updatedCredits);
+              // Recalculate available credits for UI
+              const newAvailableCredits: Record<string, number> = {};
+              updatedPackages.forEach(pkg => {
+                if (pkg.expiresAt) {
+                  const expirationDate = new Date(pkg.expiresAt);
+                  if (expirationDate < now) return; // Skip expired
+                }
+                newAvailableCredits[pkg.type] = (newAvailableCredits[pkg.type] || 0) + pkg.balance;
+              });
+              setAvailableCredits(newAvailableCredits);
             }
           } catch (creditErr) {
             console.error('Failed to deduct credit:', creditErr);
@@ -721,10 +784,10 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       <form onSubmit={handleSubmit(onSubmit, scrollToFirstError)} className="p-4 sm:p-6 lg:p-8">
         <div className="mb-8 sm:mb-10">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
-            Book Your Hyperbaric Chamber Session
+            Choose Your Recovery Options
           </h1>
           <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
-            Fill out the form below to schedule your hyperbaric oxygen therapy session at one of our premium wellness centers.
+            Choose the package that best fits you
           </p>
           
           {isGuest && (

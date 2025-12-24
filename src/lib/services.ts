@@ -9,11 +9,13 @@ export type ServiceId =
   | 'morris-12-week'
   | 'wellness-consult'
   | 'sample-day-pass'
-  | 'gray-matter-recovery-single'
-  | 'gray-matter-recovery-4mo'
-  | 'executive-recovery-single'
+  | 'gray-matter-recovery-3mo'
+  | 'gray-matter-recovery-6mo'
+  | 'gray-matter-recovery-12mo'
+  | 'optimal-wellness-3mo'
   | 'optimal-wellness-6mo'
   | 'optimal-wellness-12mo'
+  | 'revitalize-wellness-3mo'
   | 'revitalize-wellness-6mo'
   | 'revitalize-wellness-12mo'
   | 'o2-hbot'
@@ -36,51 +38,69 @@ export const serviceOptions: ServiceOption[] = [
     price: 124,
   },
   {
+    id: 'gray-matter-performance-assessment',
+    name: 'Gray Matter Performance Assessment',
+    description: 'Analysis including VO₂ Max, body scans, workouts, and data-driven report',
+    price: 1200,
+  },
+  {
     id: 'sample-day-pass',
     name: 'Midtown Biohack Sample Day Pass',
     description: 'Use of all equipment and one-on-one with Coach',
     price: 249,
   },
   {
-    id: 'gray-matter-recovery-single',
-    name: 'Gray Matter Recovery (Single Session)',
-    description: 'Includes workout and recovery',
-    price: 649,
+    id: 'gray-matter-recovery-3mo',
+    name: 'Gray Matter Recovery (3-month Commitment)',
+    description: '3 months (12 sessions of recovery and workout)',
+    price: 1499,
   },
   {
-    id: 'gray-matter-recovery-4mo',
-    name: 'Gray Matter Recovery (4-month Commitment)',
-    description: '4 months (16 total sessions)',
-    price: 1999,
+    id: 'gray-matter-recovery-6mo',
+    name: 'Gray Matter Recovery (6-month Commitment)',
+    description: '6 months (16 sessions of recovery and workout)',
+    price: 2900,
   },
   {
-    id: 'executive-recovery-single',
-    name: 'Executive Recovery (Single Session)',
-    description: '2-hour recovery session',
-    price: 1249,
+    id: 'gray-matter-recovery-12mo',
+    name: 'Gray Matter Recovery (12-month Commitment)',
+    description: '12 months (48 sessions of recovery and workout)',
+    price: 5800,
+  },
+  {
+    id: 'optimal-wellness-3mo',
+    name: 'Optimal Wellness (3-month Commitment)',
+    description: '3 months (12 total sessions)',
+    price: 2999,
   },
   {
     id: 'optimal-wellness-6mo',
     name: 'Optimal Wellness (6-month Commitment)',
-    description: '6 months (24 sessions)',
-    price: 5999,
+    description: '6 months (24 total sessions)',
+    price: 5900,
   },
   {
     id: 'optimal-wellness-12mo',
     name: 'Optimal Wellness (12-month Commitment)',
-    description: '12 months (48 sessions)',
-    price: 10799,
+    description: '12 months (48 total sessions)',
+    price: 10500,
+  },
+  {
+    id: 'revitalize-wellness-3mo',
+    name: 'Revitalize Wellness (3-month Commitment)',
+    description: '3 months (12 total sessions)',
+    price: 2099,
   },
   {
     id: 'revitalize-wellness-6mo',
     name: 'Revitalize Wellness (6-month Commitment)',
-    description: '6 months (24 sessions)',
-    price: 4199,
+    description: '6 months (24 total sessions)',
+    price: 4100,
   },
   {
     id: 'revitalize-wellness-12mo',
     name: 'Revitalize Wellness (12-month Commitment)',
-    description: '12 months (48 sessions)',
+    description: '12 months (48 total sessions)',
     price: 7549,
   },
   {
@@ -98,14 +118,8 @@ export const serviceOptions: ServiceOption[] = [
   {
     id: 'business-client-recovery',
     name: 'Business Client Recovery',
-    description: '2-person recovery: Hyperbaric Chamber, red light, and recovery',
+    description: '2-person recovery: recovery, red light, and wellness',
     price: 350,
-  },
-  {
-    id: 'gray-matter-performance-assessment',
-    name: 'Gray Matter Performance Assessment',
-    description: 'Analysis including VO₂ Max, body scans, workouts, and data-driven report',
-    price: 1200,
   },
   {
     id: 'laboratory-session',

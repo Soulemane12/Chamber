@@ -17,7 +17,7 @@ export default function Home() {
             src="/guy.png"
             alt="Midtown Biohack Character"
             fill
-            className="object-contain object-center lg:object-left"
+            className="object-contain object-center lg:object-right"
             priority
             quality={85}
           />
