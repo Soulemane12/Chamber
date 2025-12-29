@@ -15,6 +15,9 @@ interface Booking {
   group_size: number;
   location: string;
   amount: number;
+  booking_reason?: string;
+  notes?: string;
+  payment_status?: string;
   status?: string;
   chamber_id?: string;
   session_notes?: string;
@@ -245,12 +248,57 @@ export default function CalendarView({
                         </span>
                       </div>
                       
-                      <div className="text-sm text-gray-600 dark:text-gray-400">
-                        <p><strong>{booking.first_name} {booking.last_name}</strong></p>
-                        <p>{booking.email}</p>
-                        <p>{booking.phone}</p>
-                        <p>{booking.duration} min • {booking.group_size} people</p>
-        
+                      <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                        <p className="text-base"><strong className="text-gray-900 dark:text-white">{booking.first_name} {booking.last_name}</strong></p>
+                        <p className="flex items-center">
+                          <svg className="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                          {booking.email}
+                        </p>
+                        <p className="flex items-center">
+                          <svg className="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                          </svg>
+                          {booking.phone}
+                        </p>
+                        {booking.booking_reason && (
+                          <p className="flex items-center">
+                            <svg className="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                            <span className="font-medium text-blue-600 dark:text-blue-400">{booking.booking_reason}</span>
+                          </p>
+                        )}
+                        <p className="flex items-center">
+                          <svg className="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          {booking.duration} min • {booking.group_size} people
+                        </p>
+                        <p className="flex items-center">
+                          <svg className="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          <span className="font-semibold text-green-600 dark:text-green-400">${booking.amount}</span>
+                          {booking.payment_status && (
+                            <span className={`ml-2 px-2 py-0.5 text-xs rounded-full ${
+                              booking.payment_status === 'completed'
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                            }`}>
+                              {booking.payment_status}
+                            </span>
+                          )}
+                        </p>
+                        {booking.notes && (
+                          <p className="flex items-start pt-2 border-t border-gray-200 dark:border-gray-700">
+                            <svg className="w-4 h-4 mr-2 mt-0.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                            </svg>
+                            <span className="text-xs italic">{booking.notes}</span>
+                          </p>
+                        )}
                       </div>
                     </div>
                     
@@ -339,16 +387,26 @@ export default function CalendarView({
                         key={booking.id}
                         className="text-xs p-2 bg-blue-50 dark:bg-blue-900/30 rounded cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/50"
                         onClick={() => onBookingClick?.(booking)}
-                        title={`${booking.time} - ${booking.first_name} ${booking.last_name}`}
+                        title={`${booking.time} - ${booking.first_name} ${booking.last_name} - ${booking.booking_reason || 'Service'} - $${booking.amount}`}
                       >
                         <div className="font-medium truncate">
                           {booking.time}
                         </div>
-                        <div className="truncate">
+                        <div className="truncate font-semibold">
                           {booking.first_name} {booking.last_name}
                         </div>
-                        <div className={`inline-block px-1 py-0.5 text-xs rounded ${getStatusColor(booking.status)}`}>
-                          {booking.status || 'pending'}
+                        {booking.booking_reason && (
+                          <div className="truncate text-blue-600 dark:text-blue-400 text-xs">
+                            {booking.booking_reason}
+                          </div>
+                        )}
+                        <div className="flex items-center justify-between mt-1">
+                          <span className={`inline-block px-1 py-0.5 text-xs rounded ${getStatusColor(booking.status)}`}>
+                            {booking.status || 'pending'}
+                          </span>
+                          <span className="text-xs font-semibold text-green-600 dark:text-green-400">
+                            ${booking.amount}
+                          </span>
                         </div>
                         
                         {/* Quick action buttons */}
@@ -444,13 +502,21 @@ export default function CalendarView({
                           key={booking.id}
                           className="text-xs p-1 bg-blue-50 dark:bg-blue-900/30 rounded cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/50"
                           onClick={() => onBookingClick?.(booking)}
-                          title={`${booking.time} - ${booking.first_name} ${booking.last_name}`}
+                          title={`${booking.time} - ${booking.first_name} ${booking.last_name} - ${booking.booking_reason || 'Service'} - $${booking.amount}`}
                         >
                           <div className="font-medium truncate">
                             {booking.time}
                           </div>
-                          <div className="truncate">
+                          <div className="truncate font-semibold">
                             {booking.first_name} {booking.last_name}
+                          </div>
+                          {booking.booking_reason && (
+                            <div className="truncate text-blue-600 dark:text-blue-400 text-xs">
+                              {booking.booking_reason}
+                            </div>
+                          )}
+                          <div className="text-xs font-semibold text-green-600 dark:text-green-400">
+                            ${booking.amount}
                           </div>
                           
                           {/* Quick action buttons */}
