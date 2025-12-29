@@ -164,7 +164,7 @@ export default function AdminDashboard() {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'analytics' | 'users' | 'bookings' | 'calendar' | 'chambers' | 'assessments'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'users' | 'bookings' | 'calendar' | 'chambers' | 'assessments'>('calendar');
   const [calendarView, setCalendarView] = useState<'daily' | 'weekly' | 'monthly'>('daily');
 
   const [dataRefreshInterval] = useState<number>(60000); // 1 minute refresh
@@ -770,7 +770,7 @@ export default function AdminDashboard() {
         </div>
         <div className="grid grid-cols-3 gap-2 mt-2">
           <button
-            className={`py-2 px-3 text-xs font-medium rounded-lg transition-colors ${
+            className={`py-2 px-3 text-xs font-medium rounded-lg transition-colors relative ${
               activeTab === 'calendar'
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -778,6 +778,19 @@ export default function AdminDashboard() {
             onClick={() => setActiveTab('calendar')}
           >
             Calendar
+            {(() => {
+              const today = new Date().toISOString().split('T')[0];
+              const todayBookings = allBookings.filter(b => b.date === today);
+              return todayBookings.length > 0 ? (
+                <span className={`ml-1 px-1.5 py-0.5 text-xs rounded-full ${
+                  activeTab === 'calendar'
+                    ? 'bg-white text-blue-600'
+                    : 'bg-blue-600 text-white'
+                }`}>
+                  {todayBookings.length}
+                </span>
+              ) : null;
+            })()}
           </button>
           <button
             className={`py-2 px-3 text-xs font-medium rounded-lg transition-colors ${
@@ -836,7 +849,7 @@ export default function AdminDashboard() {
             Bookings
           </button>
           <button
-            className={`py-2 px-4 whitespace-nowrap ${
+            className={`py-2 px-4 whitespace-nowrap relative ${
               activeTab === 'calendar'
                 ? 'border-b-2 border-blue-600 font-medium text-blue-600'
                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
@@ -844,6 +857,15 @@ export default function AdminDashboard() {
             onClick={() => setActiveTab('calendar')}
           >
             Calendar
+            {(() => {
+              const today = new Date().toISOString().split('T')[0];
+              const todayBookings = allBookings.filter(b => b.date === today);
+              return todayBookings.length > 0 ? (
+                <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-blue-600 text-white">
+                  {todayBookings.length}
+                </span>
+              ) : null;
+            })()}
           </button>
           <button
             className={`py-2 px-4 whitespace-nowrap ${
