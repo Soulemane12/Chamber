@@ -8,6 +8,7 @@ import BookingDetailsModal, { GuestBookingInfo } from "./ui/BookingDetailsModal"
 import CalendarView from "./ui/CalendarView";
 import ChamberManagement from "./ui/ChamberManagement";
 import { AdminAssessmentDashboard } from "./AdminAssessmentDashboard";
+import SuperAdmin from "./SuperAdmin";
 
 // Simple chart component using div heights
 function BarChart({ data, title, maxHeight = 200 }: { data: Record<string, number>, title: string, maxHeight?: number }) {
@@ -164,7 +165,7 @@ export default function AdminDashboard() {
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'analytics' | 'users' | 'bookings' | 'calendar' | 'chambers' | 'assessments'>('calendar');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'users' | 'bookings' | 'calendar' | 'chambers' | 'assessments' | 'superadmin'>('calendar');
   const [calendarView, setCalendarView] = useState<'daily' | 'weekly' | 'monthly'>('daily');
 
   const [dataRefreshInterval] = useState<number>(60000); // 1 minute refresh
@@ -813,6 +814,18 @@ export default function AdminDashboard() {
             Assessments
           </button>
         </div>
+        <div className="mt-2">
+          <button
+            className={`w-full py-2 px-3 text-xs font-medium rounded-lg transition-colors ${
+              activeTab === 'superadmin'
+                ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
+                : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-900/50'
+            }`}
+            onClick={() => setActiveTab('superadmin')}
+          >
+            ⚡ Super Admin
+          </button>
+        </div>
       </div>
 
       {/* Desktop Tab Navigation */}
@@ -887,8 +900,18 @@ export default function AdminDashboard() {
           >
             Assessments
           </button>
+          <button
+            className={`py-2 px-4 whitespace-nowrap ${
+              activeTab === 'superadmin'
+                ? 'border-b-2 border-purple-600 font-medium text-purple-600'
+                : 'text-purple-500 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300'
+            }`}
+            onClick={() => setActiveTab('superadmin')}
+          >
+            ⚡ Super Admin
+          </button>
         </div>
-        
+
         {/* Desktop Data refresh controls */}
         <div className="hidden md:flex items-center space-x-4 w-full md:w-auto justify-end">
           <div className="flex items-center space-x-2">
@@ -1544,9 +1567,12 @@ export default function AdminDashboard() {
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Assessment Management</h2>
             <p className="text-gray-600 dark:text-gray-400">View and analyze self-assessment submissions</p>
           </div>
-          
+
           <AdminAssessmentDashboard />
         </div>
+      ) : activeTab === 'superadmin' ? (
+        /* Super Admin Tab */
+        <SuperAdmin />
       ) : (
         /* User Management Tab */
         <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-md">
