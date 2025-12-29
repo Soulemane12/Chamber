@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { OperatingHours } from "@/components/OperatingHours";
 
 export default function Home() {
   return (
@@ -111,6 +112,11 @@ export default function Home() {
               contact@midtownbiohack
             </a>
           </p>
+
+          {/* Operating Hours */}
+          <div className="mt-8 w-full max-w-md animate-fade-in animate-delay-600">
+            <OperatingHours />
+          </div>
         </div>
       </main>
 

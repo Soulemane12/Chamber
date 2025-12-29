@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { BookingForm, BookingCompletionData } from "@/components/BookingForm";
 import { AssessmentForm, AssessmentFormData } from "@/components/AssessmentForm";
+import { OperatingHours } from "@/components/OperatingHours";
 import { supabase } from "@/lib/supabaseClient";
 import { useLanguage } from "@/lib/LanguageContext";
 import { formatCurrency } from "@/lib/utils";
@@ -342,9 +343,12 @@ export default function BookingPage() {
             </div>
           </div>
         ) : (
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
-            <BookingForm onBookingComplete={handleBookingComplete} isAuthenticated={isAuthenticated} />
-          </div>
+          <>
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden mb-8">
+              <BookingForm onBookingComplete={handleBookingComplete} isAuthenticated={isAuthenticated} />
+            </div>
+            <OperatingHours />
+          </>
         )}
       </main>
 
