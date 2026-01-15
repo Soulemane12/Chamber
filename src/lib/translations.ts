@@ -25,7 +25,7 @@ export const translations = {
     readMore: "Read More",
     
     // Products
-    productTitle: "Hyperbaric Oxygen Chamber O2 BOX",
+    productTitle: "Hyperbaric Oxygen Chamber",
     o2BoxT2R: "O2 BOX T2-R",
     o2BoxT2RDesc: "Designed for the comfort of 1-2 Persons",
     o2BoxT68R: "O2 BOX T68-R",
