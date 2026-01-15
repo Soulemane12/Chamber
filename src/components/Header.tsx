@@ -99,19 +99,19 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
                     href="/products/o2-box-t2r"
                     className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                   >
-                    Hyperbaric Oxygen Chamber T2-R (1-2 Persons)
+                    O2 BOX T2-R (1-2 Persons)
                   </Link>
                   <Link
                     href="/products/o2-box-t68r"
                     className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                   >
-                    Hyperbaric Oxygen Chamber T68-R (6-8 Persons)
+                    O2 BOX T68-R (6-8 Persons)
                   </Link>
                   <Link
                     href="/products/o2-box-t810r-w2000"
                     className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                   >
-                    Hyperbaric Oxygen Chamber T810-R W2000 (8-10 Persons)
+                    O2 BOX T810-R W2000 (8-10 Persons)
                   </Link>
                   <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
                   <Link
