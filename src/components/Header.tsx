@@ -60,9 +60,8 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
                 {t('oxygenTherapy')}
               </Link>
             </li>
-            <li className="px-3 py-2 sm:p-0 relative"
-                onMouseEnter={() => setIsProductsDropdownOpen(true)}
-                onMouseLeave={() => setIsProductsDropdownOpen(false)}
+            <li
+              className="px-3 py-2 sm:p-0 relative group"
             >
               <button
                 onClick={() => setIsProductsDropdownOpen(!isProductsDropdownOpen)}
@@ -85,38 +84,38 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
 
               {/* Dropdown Menu */}
               <div
-                className={`dropdown-menu absolute top-full left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 transition-all duration-200 ${
+                className={`dropdown-menu absolute top-full left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 transition-all duration-200 sm:group-hover:block ${
                   isProductsDropdownOpen ? 'block opacity-100 visible translate-y-0' : 'hidden opacity-0 invisible -translate-y-2'
                 }`}
               >
                 <div className="py-2">
-                  <Link 
-                    href="/products" 
+                  <Link
+                    href="/products"
                     className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                   >
                     All Products
                   </Link>
-                  <Link 
-                    href="/products/o2-box-t2r" 
+                  <Link
+                    href="/products/o2-box-t2r"
                     className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                   >
-                    O2 BOX T2-R (1-2 Persons)
+                    Hyperbaric Oxygen Chamber T2-R (1-2 Persons)
                   </Link>
-                  <Link 
-                    href="/products/o2-box-t68r" 
+                  <Link
+                    href="/products/o2-box-t68r"
                     className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                   >
-                    O2 BOX T68-R (6-8 Persons)
+                    Hyperbaric Oxygen Chamber T68-R (6-8 Persons)
                   </Link>
-                  <Link 
-                    href="/products/o2-box-t810r-w2000" 
+                  <Link
+                    href="/products/o2-box-t810r-w2000"
                     className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                   >
-                    O2 BOX T810-R W2000 (8-10 Persons)
+                    Hyperbaric Oxygen Chamber T810-R W2000 (8-10 Persons)
                   </Link>
                   <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
-                  <Link 
-                    href="/products/operational-items" 
+                  <Link
+                    href="/products/operational-items"
                     className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                   >
                     Operational Items
