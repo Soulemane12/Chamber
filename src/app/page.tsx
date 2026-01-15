@@ -204,16 +204,15 @@ export default function Home() {
                 <div>
                   {selectedLocation === 'midtown' ? (
                     <div>
-                        <h3 className="text-xl font-bold mb-3 text-white">Midtown Biohack</h3>
-                        <p className="text-gray-300 mb-3 text-sm">
-                          Experience our hyperbaric oxygen chambers in a professional wellness environment. 
+                        <h3 className="text-2xl font-bold mb-3 text-white">Midtown Biohack</h3>
+                        <p className="text-gray-300 mb-3 text-base">
+                          Experience our hyperbaric oxygen chambers in a professional wellness environment.
                           Our Midtown location offers personalized sessions and expert guidance.
                         </p>
-                        <div className="space-y-1 text-gray-300 text-sm">
+                        <div className="space-y-1 text-gray-300 text-base">
                         <p><strong>Address:</strong> 575 Madison Ave, 23rd Floor, New York, NY 10022</p>
                         <p><strong>Hours:</strong> Mon-Fri 9AM-7PM, Sat 10AM-4PM</p>
                         <p><strong>Email:</strong> info@wellnex02.com</p>
-                        <p><strong>Phone:</strong> (555) 123-4567</p>
                       </div>
                       
                       {/* Video Section */}
@@ -237,16 +236,15 @@ export default function Home() {
                     </div>
                   ) : (
                     <div>
-                      <h3 className="text-lg font-bold mb-2 text-white">Platinum Wellness</h3>
-                      <p className="text-gray-300 mb-2 text-xs">
+                      <h3 className="text-2xl font-bold mb-3 text-white">Platinum Wellness</h3>
+                      <p className="text-gray-300 mb-3 text-base">
                         Discover the transformative power of hyperbaric oxygen therapy at our Platinum Wellness center.
                         Multiple locations available for your convenience.
                       </p>
-                      <div className="space-y-0.5 text-gray-300 text-xs">
+                      <div className="space-y-1 text-gray-300 text-base">
                         <p><strong>Locations:</strong> 1990 Parker Rd SE, Conyers, GA 30094</p>
                         <p><strong>Hours:</strong> Mon-Fri 8AM-8PM, Sat-Sun 9AM-6PM</p>
                         <p><strong>Email:</strong> info@wellnex02.com</p>
-                        <p><strong>Phone:</strong> (555) 987-6543</p>
                       </div>
 
                       {/* Image Section */}
