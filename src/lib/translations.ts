@@ -25,12 +25,12 @@ export const translations = {
     readMore: "Read More",
     
     // Products
-    productTitle: "Hyperbaric Oxygen Chamber",
-    o2BoxT2R: "Hyperbaric Oxygen Chamber T2-R",
+    productTitle: "Hyperbaric Oxygen Chamber O2 BOX",
+    o2BoxT2R: "O2 BOX T2-R",
     o2BoxT2RDesc: "Designed for the comfort of 1-2 Persons",
-    o2BoxT68R: "Hyperbaric Oxygen Chamber T68-R",
+    o2BoxT68R: "O2 BOX T68-R",
     o2BoxT68RDesc: "Designed for the comfort of 6-8 Persons",
-    o2BoxT810R: "Hyperbaric Oxygen Chamber T810-R W2000",
+    o2BoxT810R: "O2 BOX T810-R W2000",
     o2BoxT810RDesc: "Designed for the comfort of 8-10 Persons",
     operationalItems: "Operational Items",
     operationalItemsDesc: "Optional accessories for your capsule",
