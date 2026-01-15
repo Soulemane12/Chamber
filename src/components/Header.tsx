@@ -18,12 +18,12 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
     <header className="py-6 px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center relative">
       <div className="flex items-center mb-4 sm:mb-0">
         <Link href="/" className="flex items-center">
-          <Image 
-            src="/logo.png" 
-            alt="Wellnex02 Logo" 
-            width={100} 
-            height={100}
-            className="h-24 w-24"
+          <Image
+            src="/logo.png"
+            alt="Wellnex02 Logo"
+            width={140}
+            height={140}
+            className="h-32 w-32 sm:h-36 sm:w-36"
           />
         </Link>
       </div>
