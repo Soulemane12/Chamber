@@ -210,9 +210,10 @@ export default function Home() {
                           Our Midtown location offers personalized sessions and expert guidance.
                         </p>
                         <div className="space-y-1 text-gray-300 text-sm">
-                        <p><strong>📍 Address:</strong> 575 Madison Ave, 23rd Floor, New York, NY 10022</p>
-                        <p><strong>🕒 Hours:</strong> Mon-Fri 9AM-7PM, Sat 10AM-4PM</p>
-                        <p><strong>📞 Phone:</strong> (555) 123-4567</p>
+                        <p><strong>Address:</strong> 575 Madison Ave, 23rd Floor, New York, NY 10022</p>
+                        <p><strong>Hours:</strong> Mon-Fri 9AM-7PM, Sat 10AM-4PM</p>
+                        <p><strong>Email:</strong> info@wellnex02.com</p>
+                        <p><strong>Phone:</strong> (555) 123-4567</p>
                       </div>
                       
                       {/* Video Section */}
@@ -242,9 +243,10 @@ export default function Home() {
                         Multiple locations available for your convenience.
                       </p>
                       <div className="space-y-0.5 text-gray-300 text-xs">
-                        <p><strong>📍 Locations:</strong> 1990 Parker Rd SE, Conyers, GA 30094</p>
-                        <p><strong>🕒 Hours:</strong> Mon-Fri 8AM-8PM, Sat-Sun 9AM-6PM</p>
-                        <p><strong>📞 Phone:</strong> (555) 987-6543</p>
+                        <p><strong>Locations:</strong> 1990 Parker Rd SE, Conyers, GA 30094</p>
+                        <p><strong>Hours:</strong> Mon-Fri 8AM-8PM, Sat-Sun 9AM-6PM</p>
+                        <p><strong>Email:</strong> info@wellnex02.com</p>
+                        <p><strong>Phone:</strong> (555) 987-6543</p>
                       </div>
                     </div>
                   )}
