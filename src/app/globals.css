@@ -339,19 +339,9 @@ body {
     padding: 1.5rem !important;
   }
 
-  /* Better mobile flex layouts */
-  .flex-col.sm\\:flex-row {
-    flex-direction: column !important;
-  }
-
   /* Mobile-specific adjustments for header */
   header {
     padding: 1rem !important;
-  }
-
-  header .flex-col.sm\\:flex-row {
-    flex-direction: column !important;
-    align-items: center !important;
   }
 
   /* Improve mobile navigation menu */
@@ -369,9 +359,7 @@ body {
 
 /* Medium screens */
 @media (min-width: 641px) and (max-width: 1024px) {
-  .grid-cols-1.md\\:grid-cols-3 {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
+  /* Grid layout adjustments handled by Tailwind */
 }
 
 /* Make footer content responsive */
@@ -409,14 +397,7 @@ body {
     }
   }
 
-  /* Optimize transforms for mobile */
-  .hover\\:scale-110:hover {
-    transform: scale(1.05) !important;
-  }
-
-  .hover\\:scale-105:hover {
-    transform: scale(1.02) !important;
-  }
+  /* Transform optimizations handled by Tailwind */
 }
 
 /* Better mobile focus styles */
