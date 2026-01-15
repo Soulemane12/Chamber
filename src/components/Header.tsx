@@ -60,35 +60,34 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
                 {t('oxygenTherapy')}
               </Link>
             </li>
-            <li className="px-3 py-2 sm:p-0 relative">
-              <button
-                onClick={() => setIsProductsDropdownOpen(!isProductsDropdownOpen)}
+            <li className="px-3 py-2 sm:p-0 relative"
                 onMouseEnter={() => setIsProductsDropdownOpen(true)}
                 onMouseLeave={() => setIsProductsDropdownOpen(false)}
+            >
+              <button
+                onClick={() => setIsProductsDropdownOpen(!isProductsDropdownOpen)}
                 className={`flex items-center justify-center space-x-1 w-full sm:w-auto text-center ${
-                  currentPage === 'products' 
-                    ? "text-blue-400 font-medium" 
+                  currentPage === 'products'
+                    ? "text-blue-400 font-medium"
                     : "text-gray-300 hover:text-blue-400"
                 }`}
               >
                 <span>{t('products')}</span>
-                <svg 
-                  className={`w-4 h-4 transition-transform ${isProductsDropdownOpen ? 'rotate-180' : ''}`} 
-                  fill="none" 
-                  stroke="currentColor" 
+                <svg
+                  className={`w-4 h-4 transition-transform ${isProductsDropdownOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-              
+
               {/* Dropdown Menu */}
               <div
                 className={`dropdown-menu absolute top-full left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 transition-all duration-200 ${
                   isProductsDropdownOpen ? 'block opacity-100 visible translate-y-0' : 'hidden opacity-0 invisible -translate-y-2'
                 }`}
-                onMouseEnter={() => setIsProductsDropdownOpen(true)}
-                onMouseLeave={() => setIsProductsDropdownOpen(false)}
               >
                 <div className="py-2">
                   <Link 

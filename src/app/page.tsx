@@ -239,7 +239,7 @@ export default function Home() {
                     <div>
                       <h3 className="text-lg font-bold mb-2 text-white">Platinum Wellness</h3>
                       <p className="text-gray-300 mb-2 text-xs">
-                        Discover the transformative power of hyperbaric oxygen therapy at our Platinum Wellness center. 
+                        Discover the transformative power of hyperbaric oxygen therapy at our Platinum Wellness center.
                         Multiple locations available for your convenience.
                       </p>
                       <div className="space-y-0.5 text-gray-300 text-xs">
@@ -247,6 +247,21 @@ export default function Home() {
                         <p><strong>Hours:</strong> Mon-Fri 8AM-8PM, Sat-Sun 9AM-6PM</p>
                         <p><strong>Email:</strong> info@wellnex02.com</p>
                         <p><strong>Phone:</strong> (555) 987-6543</p>
+                      </div>
+
+                      {/* Image Section */}
+                      <div className="mt-2">
+                        <h4 className="text-sm font-semibold mb-2 text-white">Our Platinum Wellness Center</h4>
+                        <div className="bg-gray-100 bg-gray-600 p-3 rounded-lg">
+                          <p className="text-xs text-gray-300 mb-2">
+                            Experience wellness at Platinum Wellness
+                          </p>
+                          <img
+                            src="/black_couple.png"
+                            alt="Platinum Wellness facility"
+                            className="w-full max-w-xs h-170 rounded-lg shadow-md object-cover"
+                          />
+                        </div>
                       </div>
                     </div>
                   )}
