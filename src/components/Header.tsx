@@ -48,7 +48,7 @@ export function Header({ currentPage = 'home' }: HeaderProps) {
             alt="Midtown Biohack Logo"
             width={200}
             height={200}
-            className="h-20 w-20 sm:h-24 sm:w-24 lg:h-32 lg:w-32"
+            className="h-20 sm:h-24 lg:h-32 w-auto object-contain"
             priority
           />
         </Link>

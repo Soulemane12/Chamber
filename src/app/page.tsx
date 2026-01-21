@@ -33,7 +33,7 @@ export default function Home() {
               alt="Midtown Biohack Logo"
               width={150}
               height={150}
-              className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32"
+              className="h-24 sm:h-28 lg:h-32 w-auto object-contain"
               priority
             />
           </div>
