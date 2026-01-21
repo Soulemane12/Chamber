@@ -1065,68 +1065,41 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
               )}
               
               {/* Location-specific information section */}
-              {watch("location") && (
+              {watch("location") === "midtown" && (
                 <div className="mt-6 mb-6 p-4 bg-blue-50 dark:bg-blue-900/10 rounded-lg border border-blue-100 dark:border-blue-800 animate-fade-in">
-                  <h3 className="font-medium text-lg text-blue-800 dark:text-blue-300 mb-2">
-                    {getLocationData(watch("location"))?.name} Information
-                  </h3>
-                  
-                  <div className="space-y-3">
-                    <p className="text-sm text-gray-700 dark:text-gray-300">
-                      {getLocationData(watch("location"))?.description}
-                    </p>
-                    <ul className="list-disc list-inside text-sm text-gray-700 dark:text-gray-300 space-y-1">
-                      {getLocationData(watch("location"))?.features.map((feature, index) => (
-                        <li key={index}>{feature}</li>
-                      ))}
-                    </ul>
-                    <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mt-2">
-                      Note: {getLocationData(watch("location"))?.note}
-                    </p>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-medium text-blue-800 dark:text-blue-300">Operating Hours</h4>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Zip: 10022</span>
                   </div>
-
-                  {/* Business Hours Section */}
-                  <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-800">
-                    <h4 className="font-medium text-blue-800 dark:text-blue-300 mb-2">Business Hours</h4>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                      <div className="flex justify-between">
-                        <span className="font-medium text-gray-700 dark:text-gray-300">Monday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.monday}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium text-gray-700 dark:text-gray-300">Tuesday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.tuesday}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium text-gray-700 dark:text-gray-300">Wednesday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.wednesday}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium text-gray-700 dark:text-gray-300">Thursday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.thursday}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium text-gray-700 dark:text-gray-300">Friday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.friday}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium text-gray-700 dark:text-gray-300">Saturday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.saturday}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium text-gray-700 dark:text-gray-300">Sunday:</span>
-                        <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.sunday}</span>
-                      </div>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                    <div className="flex justify-between">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">Monday:</span>
+                      <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.monday}</span>
                     </div>
-                  </div>
-
-                  {/* Add an image of the location */}
-                  <div className="mt-4 rounded-lg overflow-hidden">
-                    <img 
-                      src={getLocationData(watch("location"))?.imageUrl}
-                      alt={`${getLocationData(watch("location"))?.name} facility`}
-                      className="w-full h-48 object-cover rounded-lg"
-                    />
+                    <div className="flex justify-between">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">Tuesday:</span>
+                      <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.tuesday}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">Wednesday:</span>
+                      <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.wednesday}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">Thursday:</span>
+                      <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.thursday}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">Friday:</span>
+                      <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.friday}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">Saturday:</span>
+                      <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.saturday}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">Sunday:</span>
+                      <span className="text-gray-600 dark:text-gray-400">{getLocationData(watch("location"))?.hours.sunday}</span>
+                    </div>
                   </div>
                 </div>
               )}
