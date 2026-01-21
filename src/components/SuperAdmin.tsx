@@ -118,14 +118,37 @@ export default function SuperAdmin() {
         }
       });
 
-      setMessage({ text: `Successfully granted ${creditAmount} ${creditType} credits to ${customerEmail}!`, type: 'success' });
+      // Send confirmation email to customer
+      try {
+        const emailResponse = await fetch('/api/send-credit-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customerEmail,
+            customerName: user.user_metadata?.name || user.user_metadata?.full_name,
+            creditType,
+            creditAmount,
+            expirationDays,
+            notes: creditNotes
+          })
+        });
+
+        if (emailResponse.ok) {
+          setMessage({ text: `Successfully granted ${creditAmount} ${creditType} credits to ${customerEmail}! Confirmation email sent.`, type: 'success' });
+        } else {
+          setMessage({ text: `Credits granted to ${customerEmail}, but email notification failed.`, type: 'success' });
+        }
+      } catch (emailError) {
+        console.error('Error sending confirmation email:', emailError);
+        setMessage({ text: `Credits granted to ${customerEmail}, but email notification failed.`, type: 'success' });
+      }
 
       // Reset form
       setCustomerEmail('');
       setCreditAmount(1);
       setCreditNotes('');
 
-      setTimeout(() => setMessage(null), 3000);
+      setTimeout(() => setMessage(null), 5000);
     } catch (error) {
       console.error('Error granting credits:', error);
       setMessage({ text: 'Failed to grant credits', type: 'error' });
