@@ -50,7 +50,7 @@ export const locationData = {
     address: "575 Madison Ave, 23rd floor, New York, NY 10022",
     phone: "",
     email: "contact@midtownbiohack.com",
-    owner: "Billy Duc",
+    owner: "Dr. Chuck Morris",
     features: [
       "Free parking validation available",
       "Private changing rooms with showers",

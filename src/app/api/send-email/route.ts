@@ -60,7 +60,7 @@ export async function POST(request: Request) {
 
     // Contact information
     const contactInfo = {
-      owner: 'Midtown Biohack',
+      owner: 'Dr. Chuck Morris',
       phone: '',
       email: DEFAULT_CONTACT_EMAIL
     };

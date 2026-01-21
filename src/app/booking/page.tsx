@@ -24,7 +24,7 @@ const getGoogleMapsUrl = (address: string) => {
 const getLocationData = (location: string) => {
   if (location === "midtown") {
     return {
-      owner: "Billy Duc",
+      owner: "Dr. Chuck Morris",
       phone: "",
       email: "contact@midtownbiohack.com"
     };

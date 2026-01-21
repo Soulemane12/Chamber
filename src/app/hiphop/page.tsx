@@ -262,7 +262,7 @@ export default function HipHopBookingPage() {
                   <div>
                     <h5 className="font-semibold text-gray-800 dark:text-gray-200 mb-2">💬 Contact</h5>
                     <p className="text-gray-700 dark:text-gray-300">
-                      <strong>Billy Duc</strong><br/>
+                      <strong>Dr. Chuck Morris</strong><br/>
                       Email: contact@midtownbiohack.com
                       <br/>
                       Phone: 646-262-8794
