@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { serviceOptions } from "@/lib/services";
 
 interface SiteSettings {
   landingPageTitle?: string;
@@ -11,12 +12,14 @@ interface SiteSettings {
   bookingPageSubtitle?: string;
 }
 
-interface UserCredit {
-  userId: string;
-  userName: string;
+interface User {
+  id: string;
   email: string;
-  creditType: string;
-  amount: number;
+  user_metadata?: {
+    name?: string;
+    full_name?: string;
+    credits?: any[];
+  };
 }
 
 export default function SuperAdmin() {
@@ -32,8 +35,10 @@ export default function SuperAdmin() {
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   // Credit management
-  const [customerEmail, setCustomerEmail] = useState<string>('');
-  const [creditType, setCreditType] = useState<'gray_matter' | 'optimal_wellness' | 'challenge' | 'hbot'>('gray_matter');
+  const [users, setUsers] = useState<User[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string>('');
+  const [selectedService, setSelectedService] = useState<string>(serviceOptions[0]?.id || '');
   const [creditAmount, setCreditAmount] = useState<number>(1);
   const [expirationDays, setExpirationDays] = useState<number>(90);
   const [creditNotes, setCreditNotes] = useState<string>('');
@@ -45,6 +50,31 @@ export default function SuperAdmin() {
       setSettings(JSON.parse(savedSettings));
     }
   }, []);
+
+  // Load users when credits tab is active
+  useEffect(() => {
+    if (activeTab === 'credits') {
+      loadUsers();
+    }
+  }, [activeTab]);
+
+  const loadUsers = async () => {
+    setLoadingUsers(true);
+    try {
+      const { data: usersData, error } = await supabase.auth.admin.listUsers();
+      if (error) {
+        console.error('Error loading users:', error);
+        setMessage({ text: 'Failed to load users', type: 'error' });
+        return;
+      }
+      setUsers(usersData.users as User[]);
+    } catch (error) {
+      console.error('Error loading users:', error);
+      setMessage({ text: 'Failed to load users', type: 'error' });
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
 
   const saveSettings = () => {
     setSaving(true);
@@ -60,33 +90,23 @@ export default function SuperAdmin() {
   };
 
   const giveCredits = async () => {
-    if (!customerEmail || creditAmount <= 0) {
-      setMessage({ text: 'Please enter a customer email and valid credit amount', type: 'error' });
-      return;
-    }
-
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(customerEmail)) {
-      setMessage({ text: 'Please enter a valid email address', type: 'error' });
+    if (!selectedUserId || !selectedService || creditAmount <= 0) {
+      setMessage({ text: 'Please select a customer, service, and valid credit amount', type: 'error' });
       return;
     }
 
     try {
       setSaving(true);
 
-      // Look up user by email using admin API
-      const { data: usersData, error: listError } = await supabase.auth.admin.listUsers();
-
-      if (listError) {
-        setMessage({ text: 'Error looking up user', type: 'error' });
+      const user = users.find(u => u.id === selectedUserId);
+      if (!user) {
+        setMessage({ text: 'User not found', type: 'error' });
         return;
       }
 
-      const user = usersData.users.find(u => u.email?.toLowerCase() === customerEmail.toLowerCase());
-
-      if (!user) {
-        setMessage({ text: `No account found for email: ${customerEmail}`, type: 'error' });
+      const service = serviceOptions.find(s => s.id === selectedService);
+      if (!service) {
+        setMessage({ text: 'Service not found', type: 'error' });
         return;
       }
 
@@ -97,10 +117,10 @@ export default function SuperAdmin() {
 
       // Create new credit package
       const newCreditPackage = {
-        type: creditType,
+        type: selectedService,
         balance: creditAmount,
         expiresAt,
-        packageName: `Admin Grant - ${creditType}`,
+        packageName: service.name,
         purchasedAt: new Date().toISOString(),
         originalBalance: creditAmount,
         notes: creditNotes || 'Granted by admin'
@@ -124,27 +144,28 @@ export default function SuperAdmin() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            customerEmail,
+            customerEmail: user.email,
             customerName: user.user_metadata?.name || user.user_metadata?.full_name,
-            creditType,
+            creditType: selectedService,
             creditAmount,
             expirationDays,
-            notes: creditNotes
+            notes: creditNotes,
+            serviceName: service.name
           })
         });
 
         if (emailResponse.ok) {
-          setMessage({ text: `Successfully granted ${creditAmount} ${creditType} credits to ${customerEmail}! Confirmation email sent.`, type: 'success' });
+          setMessage({ text: `Successfully granted ${creditAmount} "${service.name}" credits to ${user.email}! Confirmation email sent.`, type: 'success' });
         } else {
-          setMessage({ text: `Credits granted to ${customerEmail}, but email notification failed.`, type: 'success' });
+          setMessage({ text: `Credits granted to ${user.email}, but email notification failed.`, type: 'success' });
         }
       } catch (emailError) {
         console.error('Error sending confirmation email:', emailError);
-        setMessage({ text: `Credits granted to ${customerEmail}, but email notification failed.`, type: 'success' });
+        setMessage({ text: `Credits granted to ${user.email}, but email notification failed.`, type: 'success' });
       }
 
       // Reset form
-      setCustomerEmail('');
+      setSelectedUserId('');
       setCreditAmount(1);
       setCreditNotes('');
 
@@ -155,6 +176,11 @@ export default function SuperAdmin() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const getSelectedUserEmail = () => {
+    const user = users.find(u => u.id === selectedUserId);
+    return user?.email || '';
   };
 
   return (
@@ -297,37 +323,51 @@ export default function SuperAdmin() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Customer Email
+                  Select Customer
                 </label>
-                <input
-                  type="email"
-                  value={customerEmail}
-                  onChange={(e) => setCustomerEmail(e.target.value)}
-                  placeholder="Enter customer's email address"
+                <select
+                  value={selectedUserId}
+                  onChange={(e) => setSelectedUserId(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
-                />
+                  disabled={loadingUsers}
+                >
+                  <option value="">
+                    {loadingUsers ? 'Loading customers...' : '-- Select a customer --'}
+                  </option>
+                  {users.map(user => (
+                    <option key={user.id} value={user.id}>
+                      {user.email} {user.user_metadata?.name ? `(${user.user_metadata.name})` : user.user_metadata?.full_name ? `(${user.user_metadata.full_name})` : ''}
+                    </option>
+                  ))}
+                </select>
+                {users.length > 0 && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {users.length} customers available
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Service / Credit Type
+                </label>
+                <select
+                  value={selectedService}
+                  onChange={(e) => setSelectedService(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                >
+                  {serviceOptions.map(service => (
+                    <option key={service.id} value={service.id}>
+                      {service.name} (${service.price})
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Credit Type
-                  </label>
-                  <select
-                    value={creditType}
-                    onChange={(e) => setCreditType(e.target.value as any)}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
-                  >
-                    <option value="gray_matter">Gray Matter</option>
-                    <option value="optimal_wellness">Optimal Wellness</option>
-                    <option value="challenge">Challenge</option>
-                    <option value="hbot">HBOT</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Number of Credits
+                    Number of Sessions/Credits
                   </label>
                   <input
                     type="number"
@@ -337,23 +377,23 @@ export default function SuperAdmin() {
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
                   />
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Expiration (days)
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={expirationDays}
-                  onChange={(e) => setExpirationDays(parseInt(e.target.value) || 0)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
-                  placeholder="0 = No expiration"
-                />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Leave as 0 for credits that never expire
-                </p>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Expiration (days)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={expirationDays}
+                    onChange={(e) => setExpirationDays(parseInt(e.target.value) || 0)}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                    placeholder="0 = No expiration"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    0 = Never expires
+                  </p>
+                </div>
               </div>
 
               <div>
@@ -374,7 +414,7 @@ export default function SuperAdmin() {
           <div className="flex justify-end">
             <button
               onClick={giveCredits}
-              disabled={saving || !customerEmail}
+              disabled={saving || !selectedUserId || !selectedService}
               className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? 'Granting Credits...' : 'Grant Credits'}
@@ -383,8 +423,8 @@ export default function SuperAdmin() {
 
           <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
             <p className="text-sm text-green-800 dark:text-green-200">
-              <strong>💡 Tip:</strong> Credits will be immediately available to the client.
-              They can use them when booking services that match the credit type.
+              <strong>Tip:</strong> Credits will be immediately available to the client.
+              They will receive an email confirmation with details about their credits.
             </p>
           </div>
         </div>

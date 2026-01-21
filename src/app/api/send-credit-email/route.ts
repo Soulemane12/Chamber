@@ -10,17 +10,8 @@ interface CreditEmailData {
   creditAmount: number;
   expirationDays: number;
   notes?: string;
+  serviceName?: string;
 }
-
-const getCreditTypeDisplayName = (type: string): string => {
-  const names: Record<string, string> = {
-    'gray_matter': 'Gray Matter Recovery',
-    'optimal_wellness': 'Optimal Wellness',
-    'challenge': 'Challenge Program',
-    'hbot': 'HBOT Session'
-  };
-  return names[type] || type;
-};
 
 export async function POST(request: Request) {
   try {
@@ -49,7 +40,7 @@ export async function POST(request: Request) {
       }
     });
 
-    const creditTypeName = getCreditTypeDisplayName(data.creditType);
+    const serviceName = data.serviceName || data.creditType;
     const expirationText = data.expirationDays > 0
       ? `${data.expirationDays} days from today`
       : 'No expiration';
@@ -58,7 +49,7 @@ export async function POST(request: Request) {
     const customerMailOptions = {
       from: `"Midtown Biohack" <${DEFAULT_CONTACT_EMAIL}>`,
       to: data.customerEmail,
-      subject: `You've Received ${data.creditAmount} ${creditTypeName} Credits!`,
+      subject: `You've Received ${data.creditAmount} ${serviceName} Credits!`,
       replyTo: DEFAULT_CONTACT_EMAIL,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
@@ -68,9 +59,9 @@ export async function POST(request: Request) {
           </div>
 
           <div style="margin: 30px 0; padding: 25px; background: linear-gradient(135deg, #7c3aed 0%, #3b82f6 100%); border-radius: 10px; color: white;">
-            <h2 style="font-size: 24px; margin-bottom: 15px; text-align: center;">${data.creditAmount} ${creditTypeName} Credits</h2>
+            <h2 style="font-size: 24px; margin-bottom: 15px; text-align: center;">${data.creditAmount} ${serviceName} Credits</h2>
             <div style="background: rgba(255,255,255,0.2); padding: 15px; border-radius: 8px;">
-              <p style="margin: 5px 0;"><strong>Credit Type:</strong> ${creditTypeName}</p>
+              <p style="margin: 5px 0;"><strong>Service:</strong> ${serviceName}</p>
               <p style="margin: 5px 0;"><strong>Amount:</strong> ${data.creditAmount} session${data.creditAmount > 1 ? 's' : ''}</p>
               <p style="margin: 5px 0;"><strong>Expires:</strong> ${expirationText}</p>
               ${data.notes ? `<p style="margin: 5px 0;"><strong>Note:</strong> ${data.notes}</p>` : ''}
@@ -82,7 +73,7 @@ export async function POST(request: Request) {
             <ol style="color: #166534; margin: 0; padding-left: 20px;">
               <li style="margin-bottom: 8px;">Visit our booking page at midtownbiohack.com</li>
               <li style="margin-bottom: 8px;">Log in to your account</li>
-              <li style="margin-bottom: 8px;">Select a ${creditTypeName} service</li>
+              <li style="margin-bottom: 8px;">Select "${serviceName}" when booking</li>
               <li style="margin-bottom: 8px;">Your credits will be automatically applied at checkout</li>
             </ol>
           </div>
@@ -103,7 +94,7 @@ export async function POST(request: Request) {
     const adminMailOptions = {
       from: `"Midtown Biohack Admin" <${DEFAULT_CONTACT_EMAIL}>`,
       to: DEFAULT_CONTACT_EMAIL,
-      subject: `Credits Granted: ${data.creditAmount} ${creditTypeName} to ${data.customerEmail}`,
+      subject: `Credits Granted: ${data.creditAmount} ${serviceName} to ${data.customerEmail}`,
       replyTo: DEFAULT_CONTACT_EMAIL,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
@@ -113,7 +104,7 @@ export async function POST(request: Request) {
           <div style="margin: 30px 0; padding: 20px; background-color: #f8fafc; border-radius: 5px;">
             <h2 style="color: #1e3a8a; font-size: 18px; margin-bottom: 15px;">Details</h2>
             <p><strong>Customer Email:</strong> ${data.customerEmail}</p>
-            <p><strong>Credit Type:</strong> ${creditTypeName}</p>
+            <p><strong>Service:</strong> ${serviceName}</p>
             <p><strong>Amount:</strong> ${data.creditAmount} session${data.creditAmount > 1 ? 's' : ''}</p>
             <p><strong>Expiration:</strong> ${expirationText}</p>
             ${data.notes ? `<p><strong>Notes:</strong> ${data.notes}</p>` : ''}
