@@ -22,16 +22,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // By default we will not add the dark class
-  // With darkMode: 'class' in the Tailwind config, this means the site will stay in light mode
-  // regardless of system preferences
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+        <meta name="color-scheme" content="dark" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        style={{ colorScheme: "dark" }}
       >
         <LanguageProvider>
           {children}

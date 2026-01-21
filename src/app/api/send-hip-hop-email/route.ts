@@ -139,7 +139,7 @@ export async function POST(request: Request) {
           <div style="margin: 25px 0; padding: 20px; background: linear-gradient(135deg, #eff6ff, #dbeafe); border-left: 4px solid #3b82f6; border-radius: 5px;">
             <h3 style="color: #1e40af; font-size: 18px; margin-bottom: 15px; text-align: center;">📍 Midtown Biohack Location</h3>
             <div style="text-align: center;">
-              <p style="margin: 5px 0; color: #1e40af;"><strong>Address:</strong> 575 Madison Ave, 23rd floor, New York, NY</p>
+              <p style="margin: 5px 0; color: #1e40af;"><strong>Address:</strong> 575 Madison Ave, 23rd floor, New York, NY 10022</p>
               <p style="margin: 5px 0; color: #1e40af;"><strong>Contact:</strong> Midtown Biohack Team</p>
               <p style="margin: 5px 0; color: #1e40af;"><strong>Email:</strong> ${DEFAULT_CONTACT_EMAIL}</p>
             </div>

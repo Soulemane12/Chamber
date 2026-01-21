@@ -47,7 +47,7 @@ export function getCurrentBranch(): 'midtown' {
 export const locationData = {
   midtown: {
     name: "Midtown Biohack",
-    address: "575 Madison Ave, 23rd floor, New York, NY",
+    address: "575 Madison Ave, 23rd floor, New York, NY 10022",
     phone: "",
     email: "contact@midtownbiohack.com",
     owner: "Billy Duc",

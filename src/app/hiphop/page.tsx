@@ -256,7 +256,7 @@ export default function HipHopBookingPage() {
                     <p className="text-gray-700 dark:text-gray-300">
                       <strong>Midtown Biohack</strong><br/>
                       575 Madison Ave, 23rd floor<br/>
-                      New York, NY
+                      New York, NY 10022
                     </p>
                   </div>
                   <div>

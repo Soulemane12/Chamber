@@ -56,7 +56,7 @@ export async function POST(request: Request) {
     
     // Location details
     const locationName = 'Midtown Biohack';
-    const locationAddress = '575 Madison Ave, 23rd floor, New York, NY';
+    const locationAddress = '575 Madison Ave, 23rd floor, New York, NY 10022';
 
     // Contact information
     const contactInfo = {

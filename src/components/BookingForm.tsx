@@ -1079,7 +1079,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                     }`}>
                       Midtown Biohack
                     </h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">575 Madison Ave, 23rd floor, NY, NY</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">575 Madison Ave, 23rd floor, New York, NY 10022</p>
                   </div>
                 </label>
               </div>
