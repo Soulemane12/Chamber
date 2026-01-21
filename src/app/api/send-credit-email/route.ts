@@ -71,7 +71,7 @@ export async function POST(request: Request) {
           <div style="margin: 20px 0; padding: 20px; background-color: #f0fdf4; border-radius: 8px; border-left: 4px solid #22c55e;">
             <h3 style="color: #166534; font-size: 16px; margin-bottom: 10px;">How to Use Your Credits</h3>
             <ol style="color: #166534; margin: 0; padding-left: 20px;">
-              <li style="margin-bottom: 8px;">Visit our booking page at midtownbiohack.com</li>
+              <li style="margin-bottom: 8px;">Visit our booking page at <a href="https://midtownbiohack.wellnex02.com/booking" style="color: #166534;">midtownbiohack.wellnex02.com</a></li>
               <li style="margin-bottom: 8px;">Log in to your account</li>
               <li style="margin-bottom: 8px;">Select "${serviceName}" when booking</li>
               <li style="margin-bottom: 8px;">Your credits will be automatically applied at checkout</li>
