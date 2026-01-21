@@ -32,8 +32,7 @@ export default function SuperAdmin() {
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   // Credit management
-  const [users, setUsers] = useState<any[]>([]);
-  const [selectedUser, setSelectedUser] = useState<string>('');
+  const [customerEmail, setCustomerEmail] = useState<string>('');
   const [creditType, setCreditType] = useState<'gray_matter' | 'optimal_wellness' | 'challenge' | 'hbot'>('gray_matter');
   const [creditAmount, setCreditAmount] = useState<number>(1);
   const [expirationDays, setExpirationDays] = useState<number>(90);
@@ -46,25 +45,6 @@ export default function SuperAdmin() {
       setSettings(JSON.parse(savedSettings));
     }
   }, []);
-
-  // Load users for credit management
-  useEffect(() => {
-    if (activeTab === 'credits') {
-      loadUsers();
-    }
-  }, [activeTab]);
-
-  const loadUsers = async () => {
-    try {
-      const response = await fetch('/api/admin/users');
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data || []);
-      }
-    } catch (error) {
-      console.error('Error loading users:', error);
-    }
-  };
 
   const saveSettings = () => {
     setSaving(true);
@@ -80,17 +60,33 @@ export default function SuperAdmin() {
   };
 
   const giveCredits = async () => {
-    if (!selectedUser || creditAmount <= 0) {
-      setMessage({ text: 'Please select a user and enter a valid credit amount', type: 'error' });
+    if (!customerEmail || creditAmount <= 0) {
+      setMessage({ text: 'Please enter a customer email and valid credit amount', type: 'error' });
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(customerEmail)) {
+      setMessage({ text: 'Please enter a valid email address', type: 'error' });
       return;
     }
 
     try {
       setSaving(true);
-      const { data: userData } = await supabase.auth.admin.getUserById(selectedUser);
 
-      if (!userData.user) {
-        setMessage({ text: 'User not found', type: 'error' });
+      // Look up user by email using admin API
+      const { data: usersData, error: listError } = await supabase.auth.admin.listUsers();
+
+      if (listError) {
+        setMessage({ text: 'Error looking up user', type: 'error' });
+        return;
+      }
+
+      const user = usersData.users.find(u => u.email?.toLowerCase() === customerEmail.toLowerCase());
+
+      if (!user) {
+        setMessage({ text: `No account found for email: ${customerEmail}`, type: 'error' });
         return;
       }
 
@@ -111,20 +107,21 @@ export default function SuperAdmin() {
       };
 
       // Get existing credits
-      const existingCredits = (userData.user.user_metadata?.credits as any[]) || [];
+      const existingCredits = (user.user_metadata?.credits as any[]) || [];
       const updatedCredits = [...existingCredits, newCreditPackage];
 
       // Update user metadata
-      await supabase.auth.admin.updateUserById(selectedUser, {
+      await supabase.auth.admin.updateUserById(user.id, {
         user_metadata: {
-          ...userData.user.user_metadata,
+          ...user.user_metadata,
           credits: updatedCredits,
         }
       });
 
-      setMessage({ text: `Successfully granted ${creditAmount} ${creditType} credits!`, type: 'success' });
+      setMessage({ text: `Successfully granted ${creditAmount} ${creditType} credits to ${customerEmail}!`, type: 'success' });
 
       // Reset form
+      setCustomerEmail('');
       setCreditAmount(1);
       setCreditNotes('');
 
@@ -277,20 +274,15 @@ export default function SuperAdmin() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Select Client
+                  Customer Email
                 </label>
-                <select
-                  value={selectedUser}
-                  onChange={(e) => setSelectedUser(e.target.value)}
+                <input
+                  type="email"
+                  value={customerEmail}
+                  onChange={(e) => setCustomerEmail(e.target.value)}
+                  placeholder="Enter customer's email address"
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
-                >
-                  <option value="">-- Select a client --</option>
-                  {users.map(user => (
-                    <option key={user.id} value={user.id}>
-                      {user.email} {user.user_metadata?.name ? `(${user.user_metadata.name})` : ''}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -359,7 +351,7 @@ export default function SuperAdmin() {
           <div className="flex justify-end">
             <button
               onClick={giveCredits}
-              disabled={saving || !selectedUser}
+              disabled={saving || !customerEmail}
               className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? 'Granting Credits...' : 'Grant Credits'}
