@@ -280,6 +280,27 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
     "laboratory-session": null,
   };
 
+  // Helper to get available credits for a service (checks both mapped credit type AND direct service ID)
+  const getAvailableCreditsForService = (serviceId: ServiceId): number => {
+    const mappedCreditType = creditTypeForService[serviceId];
+    // Check mapped credit type first, then direct service ID
+    const fromMappedType = mappedCreditType ? (availableCredits[mappedCreditType] || 0) : 0;
+    const fromServiceId = availableCredits[serviceId] || 0;
+    return fromMappedType + fromServiceId;
+  };
+
+  // Helper to get which credit type to use (prefers mapped type, falls back to service ID)
+  const getCreditTypeToUse = (serviceId: ServiceId): string | null => {
+    const mappedCreditType = creditTypeForService[serviceId];
+    if (mappedCreditType && availableCredits[mappedCreditType] > 0) {
+      return mappedCreditType;
+    }
+    if (availableCredits[serviceId] > 0) {
+      return serviceId;
+    }
+    return mappedCreditType;
+  };
+
   const calculateTotal = () => {
     if (useCredit) return 0;
     return selectedService?.price ?? 0;
@@ -488,8 +509,8 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       
       // Deduct credit if used
       if (useCredit) {
-        const creditType = creditTypeForService[data.service];
-        if (creditType && availableCredits[creditType] > 0) {
+        const creditTypeToUse = getCreditTypeToUse(data.service);
+        if (creditTypeToUse && getAvailableCreditsForService(data.service) > 0) {
           try {
             // Get current user to access full credit packages
             const { data: { user } } = await supabase.auth.getUser();
@@ -497,15 +518,17 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
 
             const creditPackages = (user.user_metadata?.credits as CreditPackage[]) || [];
 
-            // Find first non-expired package of the required type with balance > 0
+            // Find first non-expired package matching either the credit type or service ID with balance > 0
             const now = new Date();
             let deducted = false;
+            const mappedCreditType = creditTypeForService[data.service];
 
             const updatedPackages = creditPackages.map(pkg => {
               if (deducted) return pkg;
 
-              // Check if this package matches our needs
-              if (pkg.type === creditType && pkg.balance > 0) {
+              // Check if this package matches our needs (either mapped credit type OR direct service ID)
+              const typeMatches = pkg.type === mappedCreditType || pkg.type === data.service;
+              if (typeMatches && pkg.balance > 0) {
                 // Check expiration
                 if (pkg.expiresAt) {
                   const expirationDate = new Date(pkg.expiresAt);
@@ -1474,7 +1497,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
             <div className="border-t border-gray-200 dark:border-gray-700 pt-6 animate-slide-in-up animate-delay-200">
               <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Payment Details</h3>
 
-              {isAuthenticated && selectedService && creditTypeForService[selectedService.id] && availableCredits[creditTypeForService[selectedService.id] as string] > 0 && (
+              {isAuthenticated && selectedService && getAvailableCreditsForService(selectedService.id) > 0 && (
                 <label className="flex items-start space-x-3 p-3 border rounded-lg bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700">
                   <input
                     type="checkbox"
@@ -1485,7 +1508,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                   <div>
                     <p className="font-medium text-green-800 dark:text-green-200">Apply 1 credit for this booking</p>
                     <p className="text-sm text-green-700 dark:text-green-300">
-                      {availableCredits[creditTypeForService[selectedService.id] as string]} credit(s) available.
+                      {getAvailableCreditsForService(selectedService.id)} credit(s) available.
                     </p>
                   </div>
                 </label>
