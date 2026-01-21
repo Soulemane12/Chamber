@@ -178,7 +178,7 @@ export default function HipHopBookingPage() {
               
               <p className="text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto leading-relaxed">
                 <br/>
-                Thank you for booking your Executive Recovery Session. We'll contact you within 24 hours to confirm your appointment.
+                Thank you for booking.
               </p>
             </div>
 

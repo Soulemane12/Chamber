@@ -78,7 +78,7 @@ export async function POST(request: Request) {
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
           <h1 style="color: #3b82f6; text-align: center;">Booking Confirmed!</h1>
-          <p style="text-align: center;">Thank you for booking your hyperbaric chamber session.</p>
+          <p style="text-align: center;">Thank you for booking.</p>
           
           <div style="margin: 30px 0; padding: 20px; background-color: #f8fafc; border-radius: 5px;">
             <h2 style="color: #1e3a8a; font-size: 18px; margin-bottom: 15px;">Booking Details</h2>

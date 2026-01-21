@@ -63,7 +63,7 @@ export const translations = {
     
     // Confirmation
     bookingConfirmed: "Booking Confirmed!",
-    thankYou: "Thank you for booking your hyperbaric chamber session.",
+    thankYou: "Thank you for booking.",
     emailConfirmation: "A confirmation email has been sent to:",
     bookingDetails: "Booking Details",
     name: "Name",
@@ -144,7 +144,7 @@ export const translations = {
     
     // Confirmation
     bookingConfirmed: "Réservation confirmée !",
-    thankYou: "Merci d'avoir réservé votre séance de chambre hyperbare.",
+    thankYou: "Merci pour votre réservation.",
     emailConfirmation: "Un email de confirmation a été envoyé à :",
     bookingDetails: "Détails de la réservation",
     name: "Nom",
@@ -225,7 +225,7 @@ export const translations = {
     
     // Confirmation
     bookingConfirmed: "¡Reserva confirmada!",
-    thankYou: "Gracias por reservar su sesión de cámara hiperbárica.",
+    thankYou: "Gracias por su reserva.",
     emailConfirmation: "Se ha enviado un correo electrónico de confirmación a:",
     bookingDetails: "Detalles de la reserva",
     name: "Nombre",
@@ -306,7 +306,7 @@ export const translations = {
     
     // Confirmation
     bookingConfirmed: "预约已确认！",
-    thankYou: "感谢您预约高压氧舱疗程。",
+    thankYou: "感谢您的预约。",
     emailConfirmation: "已向以下邮箱发送确认邮件：",
     bookingDetails: "预约详情",
     name: "姓名",
@@ -387,7 +387,7 @@ export const translations = {
     
     // Confirmation
     bookingConfirmed: "予約が確認されました！",
-    thankYou: "高気圧酸素室セッションのご予約ありがとうございます。",
+    thankYou: "ご予約ありがとうございます。",
     emailConfirmation: "確認メールが送信されました：",
     bookingDetails: "予約詳細",
     name: "名前",
@@ -468,7 +468,7 @@ export const translations = {
     
     // Confirmation
     bookingConfirmed: "Prenotazione confermata!",
-    thankYou: "Grazie per aver prenotato la tua sessione in camera iperbarica.",
+    thankYou: "Grazie per la tua prenotazione.",
     emailConfirmation: "Un'email di conferma è stata inviata a:",
     bookingDetails: "Dettagli prenotazione",
     name: "Nome",
