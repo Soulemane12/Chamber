@@ -179,18 +179,6 @@ export default function BookingPage() {
               </p>
             </div>
 
-            <div className="flex justify-center mb-6 animate-fade-in animate-delay-200">
-              <div className="relative w-full max-w-md h-48 md:h-64 overflow-hidden rounded-lg">
-                <Image
-                  src={bookingDetails?.location === "midtown" ? "/HBOT.png" : "/People_HBOT.png"}
-                  alt="Hyperbaric Chamber"
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </div>
-            </div>
-
             {bookingDetails && (
               <div className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-6 animate-fade-in animate-delay-300">
                 <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">{t('bookingDetails')}</h3>
