@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabaseClient";
 import { serviceOptions } from "@/lib/services";
 
 interface SiteSettings {
@@ -61,13 +60,12 @@ export default function SuperAdmin() {
   const loadUsers = async () => {
     setLoadingUsers(true);
     try {
-      const { data: usersData, error } = await supabase.auth.admin.listUsers();
-      if (error) {
-        console.error('Error loading users:', error);
-        setMessage({ text: 'Failed to load users', type: 'error' });
-        return;
+      const response = await fetch('/api/admin/auth-users');
+      if (!response.ok) {
+        throw new Error('Failed to fetch users');
       }
-      setUsers(usersData.users as User[]);
+      const usersData = await response.json();
+      setUsers(usersData as User[]);
     } catch (error) {
       console.error('Error loading users:', error);
       setMessage({ text: 'Failed to load users', type: 'error' });
@@ -126,17 +124,20 @@ export default function SuperAdmin() {
         notes: creditNotes || 'Granted by admin'
       };
 
-      // Get existing credits
-      const existingCredits = (user.user_metadata?.credits as any[]) || [];
-      const updatedCredits = [...existingCredits, newCreditPackage];
-
-      // Update user metadata
-      await supabase.auth.admin.updateUserById(user.id, {
-        user_metadata: {
-          ...user.user_metadata,
-          credits: updatedCredits,
-        }
+      // Grant credits via API
+      const grantResponse = await fetch('/api/admin/grant-credits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id,
+          creditPackage: newCreditPackage
+        })
       });
+
+      if (!grantResponse.ok) {
+        const errorData = await grantResponse.json();
+        throw new Error(errorData.error || 'Failed to grant credits');
+      }
 
       // Send confirmation email to customer
       try {
