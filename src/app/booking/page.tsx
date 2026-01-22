@@ -181,7 +181,7 @@ export default function BookingPage() {
             </div>
 
             <div className="flex justify-center mb-6 animate-fade-in animate-delay-200">
-              <div className="relative w-full max-w-[120px] md:max-w-[140px] h-14 md:h-16 overflow-hidden rounded-lg bg-white p-1.5">
+              <div className="relative w-full max-w-[80px] md:max-w-[100px] h-10 md:h-12 overflow-hidden rounded-lg bg-white p-1">
                 <Image
                   src="/atmos_screenshot.png"
                   alt="ATMOS Hyperbaric"
