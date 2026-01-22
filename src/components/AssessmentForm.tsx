@@ -38,23 +38,21 @@ export function AssessmentForm({ onAssessmentComplete, bookingId, autoFillDate, 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  // Parse auto-filled time if provided
-  const parseAutoFillTime = () => {
-    if (!autoFillTime) return { hour: "12", minutes: "00", ampm: "PM" };
-    
-    // Parse time like "9:00 AM" or "2:30 PM"
-    const timeMatch = autoFillTime.match(/(\d+):(\d+)\s*(AM|PM)/i);
-    if (timeMatch) {
-      return {
-        hour: timeMatch[1].padStart(2, '0'),
-        minutes: timeMatch[2].padStart(2, '0'),
-        ampm: timeMatch[3].toUpperCase()
-      };
-    }
-    return { hour: "12", minutes: "00", ampm: "PM" };
+  // Get current time for defaults
+  const getCurrentTime = () => {
+    const now = new Date();
+    let hour = now.getHours();
+    const minutes = now.getMinutes();
+    const ampm = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12 || 12;
+    return {
+      hour: hour.toString().padStart(2, '0'),
+      minutes: minutes.toString().padStart(2, '0'),
+      ampm
+    };
   };
 
-  const autoFillTimeData = parseAutoFillTime();
+  const currentTimeData = getCurrentTime();
 
   const {
     register,
@@ -65,10 +63,10 @@ export function AssessmentForm({ onAssessmentComplete, bookingId, autoFillDate, 
   } = useForm<AssessmentFormData>({
     resolver: zodResolver(assessmentSchema),
     defaultValues: {
-      date: autoFillDate ? autoFillDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-      hour: autoFillTimeData.hour,
-      minutes: autoFillTimeData.minutes,
-      ampm: autoFillTimeData.ampm,
+      date: new Date().toISOString().split('T')[0],
+      hour: currentTimeData.hour,
+      minutes: currentTimeData.minutes,
+      ampm: currentTimeData.ampm,
       firstName: autoFillFirstName || '',
       lastName: autoFillLastName || '',
       painLevel: 5,
@@ -158,7 +156,7 @@ export function AssessmentForm({ onAssessmentComplete, bookingId, autoFillDate, 
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Date and Time Section - Auto-filled from booking */}
+        {/* Date and Time Section - Current date/time */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -171,7 +169,7 @@ export function AssessmentForm({ onAssessmentComplete, bookingId, autoFillDate, 
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 cursor-not-allowed"
             />
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Auto-filled from your booking date
+              Current date
             </p>
           </div>
 
@@ -213,7 +211,7 @@ export function AssessmentForm({ onAssessmentComplete, bookingId, autoFillDate, 
               </select>
             </div>
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Auto-filled from your booking time
+              Current time
             </p>
           </div>
         </div>
