@@ -1018,18 +1018,18 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
                   </div>
 
                   {/* Add an image of the location */}
-                  <div className="mt-4 rounded-lg overflow-hidden">
-                    <Image 
+                  <div className="mt-4 rounded-lg overflow-hidden max-w-[150px] mx-auto">
+                    <Image
                       src="/atmos_screenshot.png"
                       alt="ATMOS Hyperbaric facility"
-                      width={600}
-                      height={300}
+                      width={150}
+                      height={75}
                       style={{
                         objectFit: "contain",
                         width: "100%",
                         height: "100%",
                         backgroundColor: "white",
-                        padding: "8px",
+                        padding: "4px",
                         borderRadius: "0.5rem"
                       }}
                       priority
