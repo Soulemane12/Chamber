@@ -2,12 +2,11 @@
 
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Head from "next/head";
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -70,9 +69,10 @@ function LoginForm() {
         setLoading(false);
         return;
       }
-      
+
       // Redirect to the specified redirect path or home
-      router.push(redirectPath);
+      // Use window.location for full page reload to ensure auth state is picked up
+      window.location.href = redirectPath;
     } catch (err) {
       console.error("Login error:", err);
       setError("An error occurred during login");
