@@ -90,7 +90,7 @@ export default function Home() {
         <div className="mb-12 sm:mb-16 animate-fade-in">
           <div className="text-center mb-8 sm:mb-10">
             <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-gray-900 dark:text-white px-4">
-              🌿 5 Wellness-Level Benefits of HBOT
+              Benefits of HBOT
             </h2>
             <div className="w-16 sm:w-20 h-1 bg-blue-600 mx-auto"></div>
           </div>
@@ -140,7 +140,7 @@ export default function Home() {
         <div className="mb-12 sm:mb-16 animate-fade-in">
           <div className="text-center mb-8 sm:mb-10">
             <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-gray-900 dark:text-white px-4">
-              🩺 5 Conditions Commonly Treated with HBOT
+              Conditions Commonly Treated with HBOT
             </h2>
             <div className="w-16 sm:w-20 h-1 bg-blue-600 mx-auto"></div>
           </div>
