@@ -180,6 +180,27 @@ export default function ChamberManagement({
     }
   };
 
+  // Handle delete chamber
+  const handleDeleteChamber = async (chamberId: string) => {
+    if (!confirm('Are you sure you want to delete this chamber?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/admin/chambers', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: chamberId })
+      });
+
+      if (response.ok) {
+        setChambers(prev => prev.filter(chamber => chamber.id !== chamberId));
+      }
+    } catch (error) {
+      console.error('Error deleting chamber:', error);
+    }
+  };
+
   // Handle add cleaning schedule
   const handleAddCleaning = async () => {
     try {
@@ -254,9 +275,20 @@ export default function ChamberManagement({
                   <h3 className="font-medium text-gray-900 dark:text-white">{chamber.name}</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">{chamber.description}</p>
                 </div>
-                <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(chamber.status)}`}>
-                  {chamber.status}
-                </span>
+                <div className="flex items-center space-x-2">
+                  <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(chamber.status)}`}>
+                    {chamber.status}
+                  </span>
+                  <button
+                    onClick={() => handleDeleteChamber(chamber.id)}
+                    className="p-1 text-red-500 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/30 rounded"
+                    title="Delete Chamber"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
               </div>
 
               <div className="text-sm text-gray-600 dark:text-gray-400 mb-3">
