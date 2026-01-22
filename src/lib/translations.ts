@@ -9,7 +9,7 @@ export const translations = {
     contact: "Contact",
     
     // Homepage
-    heroTitle: "Experience the Benefits of Hyperbaric Oxygen Therapy (HBOT) ",
+    heroTitle: "ATMOS",
     heroSubtitle: "Enhance your recovery, boost performance, and improve overall wellness with ATMOS's state-of-the-art hyperbaric chambers.",
     bookYourSession: "Book Your Session",
     
@@ -85,7 +85,7 @@ export const translations = {
     contact: "Contact",
     
     // Homepage
-    heroTitle: "Découvrez les bienfaits de l'oxygénothérapie hyperbare (HBOT)",
+    heroTitle: "ATMOS",
     heroSubtitle: "Améliorez votre récupération, augmentez vos performances et votre bien-être avec les chambres hyperbares de pointe de ATMOS.",
     bookYourSession: "Réserver votre séance",
     
@@ -167,7 +167,7 @@ export const translations = {
     contact: "Contacto",
     
     // Homepage
-    heroTitle: "Experimente los beneficios de la terapia de oxígeno hiperbárico (HBOT)",
+    heroTitle: "ATMOS",
     heroSubtitle: "Mejore su recuperación, aumente su rendimiento y bienestar general con las cámaras hiperbáricas de última generación de ATMOS.",
     bookYourSession: "Reserve su sesión",
     
@@ -249,7 +249,7 @@ export const translations = {
     contact: "联系我们",
     
     // Homepage
-    heroTitle: "体验高压氧疗法 (HBOT) 的益处",
+    heroTitle: "ATMOS",
     heroSubtitle: "通过ATMOS的先进高压氧舱，提升恢复能力，增强表现，改善整体健康。",
     bookYourSession: "预约您的疗程",
     
@@ -331,7 +331,7 @@ export const translations = {
     contact: "お問い合わせ",
     
     // Homepage
-    heroTitle: "高気圧酸素療法 (HBOT) の効果を体験しましょう",
+    heroTitle: "ATMOS",
     heroSubtitle: "ATMOSの最先端の高気圧酸素室で、回復力を高め、パフォーマンスを向上させ、全体的な健康状態を改善しましょう。",
     bookYourSession: "セッションを予約する",
     
@@ -413,7 +413,7 @@ export const translations = {
     contact: "Contatti",
     
     // Homepage
-    heroTitle: "Sperimenta i benefici della terapia iperbarica (HBOT)",
+    heroTitle: "ATMOS",
     heroSubtitle: "Migliora il tuo recupero, aumenta le prestazioni e il benessere generale con le camere iperbariche all'avanguardia di ATMOS.",
     bookYourSession: "Prenota la tua sessione",
     
