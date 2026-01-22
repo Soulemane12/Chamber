@@ -1,7 +1,24 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { serviceOptions } from "@/lib/services";
+import { serviceOptions, ServiceId } from "@/lib/services";
+
+// Default credit amounts for specific services/packages
+const defaultCreditsForService: Partial<Record<ServiceId, number>> = {
+  'morris-12-week': 12,
+  // 3-month commitments = 12 credits
+  'gray-matter-recovery-3mo': 12,
+  'optimal-wellness-3mo': 12,
+  'revitalize-wellness-3mo': 12,
+  // 6-month commitments = 18 credits
+  'gray-matter-recovery-6mo': 18,
+  'optimal-wellness-6mo': 18,
+  'revitalize-wellness-6mo': 18,
+  // 12-month commitments = 36 credits
+  'gray-matter-recovery-12mo': 36,
+  'optimal-wellness-12mo': 36,
+  'revitalize-wellness-12mo': 36,
+};
 
 interface SiteSettings {
   landingPageTitle?: string;
@@ -354,15 +371,28 @@ export default function SuperAdmin() {
                 </label>
                 <select
                   value={selectedService}
-                  onChange={(e) => setSelectedService(e.target.value)}
+                  onChange={(e) => {
+                    const serviceId = e.target.value as ServiceId;
+                    setSelectedService(serviceId);
+                    // Auto-set credit amount if service has a default
+                    const defaultCredits = defaultCreditsForService[serviceId];
+                    if (defaultCredits) {
+                      setCreditAmount(defaultCredits);
+                    }
+                  }}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
                 >
                   {serviceOptions.map(service => (
                     <option key={service.id} value={service.id}>
-                      {service.name} (${service.price})
+                      {service.name} (${service.price}) {defaultCreditsForService[service.id] ? `- ${defaultCreditsForService[service.id]} credits` : ''}
                     </option>
                   ))}
                 </select>
+                {defaultCreditsForService[selectedService as ServiceId] && (
+                  <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">
+                    This package includes {defaultCreditsForService[selectedService as ServiceId]} credits (auto-filled)
+                  </p>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
