@@ -1,18 +1,43 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
+import { createServerClient } from '@supabase/ssr';
 
 export async function middleware(request: NextRequest) {
-  // Create response object
-  const response = NextResponse.next();
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
 
-  // Create Supabase middleware client with the request context
-  const supabase = createMiddlewareClient({ req: request, res: response });
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            request.cookies.set(name, value);
+          });
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          });
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set(name, value, options);
+          });
+        },
+      },
+    }
+  );
 
   // Check the current session
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
   // Routes that require authentication
   const protectedPaths = ['/booking', '/account'];
@@ -20,7 +45,7 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith(path)
   );
 
-  if (!session && isProtectedPath) {
+  if (!user && isProtectedPath) {
     // Redirect to login if unauthenticated
     const redirectUrl = new URL('/login', request.url);
     redirectUrl.searchParams.set('redirect', request.nextUrl.pathname);
@@ -32,4 +57,4 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: ['/booking', '/booking/:path*', '/account', '/account/:path*'],
-}; 
+};
