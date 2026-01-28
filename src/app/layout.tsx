@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "WellNex02 | Book Your Hyperbaric Session",
+  title: "WellNex02 | Book Your Session",
   description: "Book and pay for your hyperbaric chamber session with our easy-to-use booking system.",
 };
 

@@ -24,7 +24,7 @@ export const translations = {
     bookYourSessionNow: "Book Your Session Now",
     
     // Booking Form
-    bookingTitle: "Book Your Hyperbaric Chamber Session",
+    bookingTitle: "Book Your Session",
     bookingSubtitle: "Fill out the form below to schedule your hyperbaric oxygen therapy session at ATMOS's premium wellness center.",
     personalDetails: "Personal Details",
     details: "Details",
@@ -100,7 +100,7 @@ export const translations = {
     bookYourSessionNow: "Réservez votre séance maintenant",
     
     // Booking Form
-    bookingTitle: "Réservez votre séance de chambre hyperbare",
+    bookingTitle: "Réservez votre séance",
     bookingSubtitle: "Remplissez le formulaire ci-dessous pour planifier votre séance d'oxygénothérapie hyperbare dans le centre de bien-être premium de ATMOS.",
     personalDetails: "Informations personnelles",
     details: "Détails",
@@ -182,7 +182,7 @@ export const translations = {
     bookYourSessionNow: "Reserve su sesión ahora",
     
     // Booking Form
-    bookingTitle: "Reserve su sesión de cámara hiperbárica",
+    bookingTitle: "Reserve su sesión",
     bookingSubtitle: "Complete el formulario a continuación para programar su sesión de terapia de oxígeno hiperbárico en el centro de bienestar premium de ATMOS.",
     personalDetails: "Datos personales",
     details: "Detalles",
@@ -264,7 +264,7 @@ export const translations = {
     bookYourSessionNow: "立即预约您的疗程",
     
     // Booking Form
-    bookingTitle: "预约您的高压氧舱疗程",
+    bookingTitle: "预约您的疗程",
     bookingSubtitle: "填写下面的表格，在ATMOS的高级健康中心安排您的高压氧疗疗程。",
     personalDetails: "个人信息",
     details: "详情",
@@ -346,7 +346,7 @@ export const translations = {
     bookYourSessionNow: "今すぐセッションを予約",
     
     // Booking Form
-    bookingTitle: "高気圧酸素室セッションを予約",
+    bookingTitle: "セッションを予約",
     bookingSubtitle: "以下のフォームに記入して、ATMOSのプレミアムウェルネスセンターで高気圧酸素療法セッションを予約してください。",
     personalDetails: "個人情報",
     details: "詳細",
@@ -428,7 +428,7 @@ export const translations = {
     bookYourSessionNow: "Prenota la tua sessione ora",
     
     // Booking Form
-    bookingTitle: "Prenota la tua sessione in camera iperbarica",
+    bookingTitle: "Prenota la tua sessione",
     bookingSubtitle: "Compila il modulo sottostante per programmare la tua sessione di ossigenoterapia iperbarica nel centro benessere premium di ATMOS.",
     personalDetails: "Dati personali",
     details: "Dettagli",

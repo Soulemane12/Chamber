@@ -691,7 +691,7 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
       <form onSubmit={handleSubmit(onSubmit)} className="p-6 sm:p-8">
         <div className="mb-10">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            Book Your Hyperbaric Chamber Session
+            Book Your Session
           </h1>
           <p className="text-gray-600 dark:text-gray-300">
             Fill out the form below to schedule your hyperbaric oxygen therapy session at ATMOS Hyperbaric.
