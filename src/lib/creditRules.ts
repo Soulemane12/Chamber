@@ -11,13 +11,13 @@ export const CREDIT_ALLOCATION_RULES: Record<string, CreditAllocationRule> = {
   'gray-matter-recovery-6mo': {
     serviceId: 'gray-matter-recovery-6mo',
     creditType: 'gray_matter',
-    sessions: 16,
+    sessions: 18,
     expirationDays: 180,
   },
   'gray-matter-recovery-12mo': {
     serviceId: 'gray-matter-recovery-12mo',
     creditType: 'gray_matter',
-    sessions: 48,
+    sessions: 36,
     expirationDays: 365,
   },
 
@@ -31,13 +31,13 @@ export const CREDIT_ALLOCATION_RULES: Record<string, CreditAllocationRule> = {
   'optimal-wellness-6mo': {
     serviceId: 'optimal-wellness-6mo',
     creditType: 'optimal_wellness',
-    sessions: 24,
+    sessions: 18,
     expirationDays: 180,
   },
   'optimal-wellness-12mo': {
     serviceId: 'optimal-wellness-12mo',
     creditType: 'optimal_wellness',
-    sessions: 48,
+    sessions: 36,
     expirationDays: 365,
   },
 
@@ -51,13 +51,13 @@ export const CREDIT_ALLOCATION_RULES: Record<string, CreditAllocationRule> = {
   'revitalize-wellness-6mo': {
     serviceId: 'revitalize-wellness-6mo',
     creditType: 'optimal_wellness',
-    sessions: 24,
+    sessions: 18,
     expirationDays: 180,
   },
   'revitalize-wellness-12mo': {
     serviceId: 'revitalize-wellness-12mo',
     creditType: 'optimal_wellness',
-    sessions: 48,
+    sessions: 36,
     expirationDays: 365,
   },
 
