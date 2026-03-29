@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "WellNex02 | Hyperbaric Chambers for Sale",
-  description: "Shop premium hyperbaric chambers. Detailed specs, images, and easy contact to purchase.",
+  title: "Site Unavailable | WellNex02",
+  description: "This site is currently offline.",
   icons: {
     icon: '/logo.png',
     shortcut: '/logo.png',
