@@ -2,7 +2,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
       <div className="text-center max-w-lg">
-        <h1 className="text-4xl font-bold text-white mb-4">Site Unavailable</h1>
+        <h1 className="text-4xl font-bold text-white mb-4">Website Offline</h1>
         <p className="text-gray-400 text-lg">
           This site is temporarily offline. Please check back later.
         </p>
