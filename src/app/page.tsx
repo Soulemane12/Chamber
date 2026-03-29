@@ -6,6 +6,9 @@ export default function Home() {
         <p className="text-gray-400 text-lg">
           Wellnex02.com is currently offline. Please check back later.
         </p>
+        <p className="text-gray-500 text-sm mt-4">
+          Last updated: {new Date().toLocaleString()}
+        </p>
       </div>
     </div>
   );
