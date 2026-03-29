@@ -7,7 +7,7 @@ export default function Home() {
           Wellnex02.com is currently offline. Please check back later.
         </p>
         <p className="text-gray-500 text-sm mt-4">
-          Last updated: {new Date().toLocaleString()}
+          Last updated: {new Date().toLocaleString()} - Build {Date.now()}
         </p>
       </div>
     </div>
