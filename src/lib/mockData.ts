@@ -1,4 +1,5 @@
 // Mock booking data for admin dashboard
+import { parseDateOnly } from "./utils";
 
 export interface Booking {
   id: string;
@@ -114,7 +115,7 @@ export function getBookingsByTimePeriod(period: 'day' | 'month' | 'quarter' | 'y
   
   // Now count actual bookings
   bookings.forEach(booking => {
-    const bookingDate = new Date(booking.date);
+    const bookingDate = parseDateOnly(booking.date);
     let key = '';
     
     if (period === 'day') {
@@ -245,7 +246,7 @@ export function getBookingRevenueByLocation(
   
   // Now calculate revenue from actual bookings
   filteredBookings.forEach(booking => {
-    const bookingDate = new Date(booking.date);
+    const bookingDate = parseDateOnly(booking.date);
     let key = '';
     
     if (period === 'day') {

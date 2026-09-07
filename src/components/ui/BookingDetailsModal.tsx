@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { parseDateOnly } from "@/lib/utils";
 
 export interface GuestBookingInfo {
   id: string;
@@ -161,7 +162,7 @@ export default function BookingDetailsModal({ booking, isOpen, onClose, onUpdate
   // Format date for display
   const formatDate = (dateStr: string) => {
     try {
-      const date = new Date(dateStr);
+      const date = parseDateOnly(dateStr);
       return new Intl.DateTimeFormat('en-US', {
         year: 'numeric',
         month: 'long',

@@ -471,9 +471,11 @@ export function BookingForm({ onBookingComplete, isAuthenticated }: BookingFormP
         const emailResult = await emailResponse.json();
         if (!emailResult.success) {
           console.error('Failed to send confirmation email:', emailResult.message);
+          alert("Your booking was confirmed, but we couldn't send a confirmation email. Please save your booking details.");
         }
       } catch (emailError) {
         console.error('Error sending email:', emailError);
+        alert("Your booking was confirmed, but we couldn't send a confirmation email. Please save your booking details.");
       }
 
       // Complete booking after attempting to send email

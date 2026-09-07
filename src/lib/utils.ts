@@ -26,6 +26,15 @@ export function delay(ms: number): Promise<void> {
 }
 
 /**
+ * Parses a "YYYY-MM-DD" date-only string as local midnight, avoiding the
+ * UTC-midnight shift that `new Date(dateStr)` produces.
+ */
+export function parseDateOnly(dateStr: string): Date {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+/**
  * Location data for the hyperbaric chamber centers
  */
 export const locationData = {

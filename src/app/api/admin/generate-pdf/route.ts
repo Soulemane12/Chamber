@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import Groq from 'groq-sdk';
+import { parseDateOnly } from '@/lib/utils';
 
 // Create a Supabase client with the service role key for admin operations
 const supabase = createClient(
@@ -151,7 +152,7 @@ function generateBookingReport(data: any) {
       <tbody>
         ${bookings?.slice(0, 20).map((booking: any) => `
           <tr>
-            <td>${new Date(booking.date).toLocaleDateString()}</td>
+            <td>${parseDateOnly(booking.date).toLocaleDateString()}</td>
             <td>${booking.first_name} ${booking.last_name}</td>
             <td>${booking.location}</td>
             <td>${booking.duration} min</td>
@@ -241,7 +242,7 @@ function generateRevenueReport(data: any) {
   
   // Calculate revenue by month
   const revenueByMonth = bookings?.reduce((acc: any, booking: any) => {
-    const month = new Date(booking.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+    const month = parseDateOnly(booking.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
     acc[month] = (acc[month] || 0) + (Number(booking.amount) || 0);
     return acc;
   }, {}) || {};
